@@ -1,11 +1,8 @@
 Hello this is my 27th attempt at getting started with lwjgl.
-Maybe this is the one.
 
-Let's hope I can keep it up and not give up like the previous 26 attempts.
+Imma try to not give up on this one.
 
-inside project folder do:
+Inside project folder open cmd and do:
 
 `./gradlew run` to run on linux  
 `gradlew.bat run` to run on windows
-
-wow such gradle many amaze
