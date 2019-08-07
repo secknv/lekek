@@ -7,3 +7,5 @@ inside project folder do:
 
 `./gradlew run` to run on linux  
 `gradlew.bat run` to run on windows
+
+wow such gradle many amaze
