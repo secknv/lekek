@@ -25,10 +25,10 @@ public class ShaderProgram {
         uniforms = new HashMap<>();
     }
 
-    public void createUniform(String uniformName) throws Exception{
+    public void createUniform(String uniformName) throws Exception {
         int uniformLocation = glGetUniformLocation(programId, uniformName);
         if (uniformLocation < 0) {
-            throw new Exception("Could not find uniform!");
+            throw new Exception("Could not find uniform: " + uniformName);
         }
         uniforms.put(uniformName, uniformLocation);
     }
@@ -79,7 +79,7 @@ public class ShaderProgram {
         }
 
         if (fragmentShaderId != 0) {
-            glDetachShader(programId, vertexShaderId);
+            glDetachShader(programId, fragmentShaderId);
         }
 
         glValidateProgram(programId);
