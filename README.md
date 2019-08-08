@@ -8,3 +8,7 @@ Inside project folder open cmd and do:
 `gradlew.bat run` to run on windows
 
 wow such gradle many amaze
+
+arrow keys to move cube  
+`z`/`x` to scale cube  
+`q`/`a` to move z axis  

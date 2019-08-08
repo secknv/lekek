@@ -23,7 +23,7 @@ public class GameItem {
         this.pos.z = z;
     }
 
-    public void setRotation(float x, float y, float z) {
+    public void setRot(float x, float y, float z) {
         this.rot.x = x;
         this.rot.y = y;
         this.rot.z = z;
