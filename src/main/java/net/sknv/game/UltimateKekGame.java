@@ -11,7 +11,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class UltimateKekGame implements IGameLogic {
 
-    private int displxInc, displyInc, displzInc, scaleInc;
+    private int displxInc, displyInc, rotxInc, rotyInc, scaleInc;
 
     private final Renderer renderer;
 
@@ -114,6 +114,7 @@ public class UltimateKekGame implements IGameLogic {
         Mesh mesh = new Mesh(positions, textCoords, indices, texture);
         GameItem gameItem = new GameItem(mesh);
         gameItem.setPos(0, 0, -2);
+        gameItem.setScale(0.5f);
         gameItems = new GameItem[] {gameItem};
 
     }
@@ -122,7 +123,8 @@ public class UltimateKekGame implements IGameLogic {
     public void input(Window window) {
         displxInc = 0;
         displyInc = 0;
-        displzInc = 0;
+        rotxInc = 0;
+        rotyInc = 0;
         scaleInc = 0;
 
         if (window.isKeyPressed(GLFW_KEY_UP)) {
@@ -133,15 +135,20 @@ public class UltimateKekGame implements IGameLogic {
             displxInc = -1;
         } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
             displxInc = 1;
+        } else if (window.isKeyPressed(GLFW_KEY_W)) {
+            rotxInc = -1;
+        } else if (window.isKeyPressed(GLFW_KEY_S)) {
+            rotxInc = 1;
         } else if (window.isKeyPressed(GLFW_KEY_A)) {
-            displzInc = -1;
+            rotyInc = -1;
+        } else if (window.isKeyPressed(GLFW_KEY_D)) {
+            rotyInc = 1;
         } else if (window.isKeyPressed(GLFW_KEY_Q)) {
-            displzInc = 1;
-        } else if (window.isKeyPressed(GLFW_KEY_Z)) {
-            scaleInc = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_X)) {
             scaleInc = 1;
+        } else if (window.isKeyPressed(GLFW_KEY_E)) {
+            scaleInc = -1;
         }
+
     }
 
     @Override
@@ -149,7 +156,7 @@ public class UltimateKekGame implements IGameLogic {
         for (GameItem item : gameItems) {
             //update pos
             Vector3f itemPos = item.getPos();
-            item.setPos(itemPos.x + displxInc*0.01f, itemPos.y + displyInc*0.01f, itemPos.z + displzInc*0.01f);
+            item.setPos(itemPos.x + displxInc*0.01f, itemPos.y + displyInc*0.01f, itemPos.z + rotxInc *0.01f);
 
             //update scale
             float scale = item.getScale();
@@ -157,10 +164,17 @@ public class UltimateKekGame implements IGameLogic {
             if (scale < 0) scale = 0;
             item.setScale(scale);
 
+
             //update rotation
-            float rot = item.getRot().x + 1.5f;
-            if (rot > 360) rot = 0;
-            item.setRot(rot, rot, rot);
+            float rotx = item.getRot().x;
+            rotx += rotxInc * 2f;
+            if (rotx > 360) rotx = 0;
+
+            float roty = item.getRot().y;
+            roty += rotyInc * 2f;
+            if (roty > 360) roty = 0;
+
+            item.setRot(rotx, roty, 0);
         }
     }
 

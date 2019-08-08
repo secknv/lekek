@@ -50,7 +50,7 @@ public class Mesh {
             textCoordsBuff.put(textCoords).flip();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, textCoordsBuff, GL_STATIC_DRAW);
-            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 
             // Index VBO #2
             vboId = glGenBuffers();
