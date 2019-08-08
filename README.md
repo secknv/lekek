@@ -9,6 +9,8 @@ Inside project folder open cmd and do:
 
 wow such gradle many amaze
 
-arrow keys to move cube  
-`z`/`x` to scale cube  
-`q`/`a` to move z axis  
+arrow keys to move cube 
+awsd to rotate
+q/e to scale
+
+press power button to paint screen black
