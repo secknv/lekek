@@ -8,6 +8,7 @@ version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 project.ext.lwjglVersion = "3.2.2"
+project.ext.jomlVersion = "1.9.16"
 project.ext.lwjglNatives = "natives-linux"
 
 application {
@@ -43,4 +44,5 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-par:$lwjglVersion:$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
+    implementation "org.joml:joml:${jomlVersion}"
 }
