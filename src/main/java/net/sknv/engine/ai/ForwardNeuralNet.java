@@ -20,7 +20,7 @@ public class ForwardNeuralNet {
         init();
     }
 
-    private void init() {
+    private void init() { //sigmoid init values must be changed !!
         //init first hidden (input fed) layer
         hiddenLayers.set(0, new Sigmoid[nNodesHiddenLayer]);
         Arrays.fill(hiddenLayers.get(0), new Sigmoid(nInputNodes, null, 0));
