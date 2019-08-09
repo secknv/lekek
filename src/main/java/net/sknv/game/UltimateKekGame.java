@@ -11,6 +11,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.glClearColor;
 
 public class UltimateKekGame implements IGameLogic {
 
@@ -157,11 +158,19 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void update(float interval, MouseInput mouseInput) {
+        //click testing
+        glClearColor(0.0f, 0.0f,0.0f, 0.0f);
+
         camera.movePos(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
 
         if (mouseInput.isRightClicked()) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRot(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+        }
+
+        //click testing
+        if (mouseInput.isLeftClicked()) {
+            glClearColor(1.0f, 0.0f,0.0f, 1.0f);
         }
     }
 
