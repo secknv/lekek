@@ -29,7 +29,7 @@ public class Camera {
     public void movePos(float offsetX, float offsetY, float offsetZ) {
         if (offsetZ != 0) {
             pos.x += (float) Math.sin(Math.toRadians(rot.y)) * -1.0f * offsetZ;
-            pos.z += (float) Math.cos(Math.toRadians(rot.y)) * offsetX;
+            pos.z += (float) Math.cos(Math.toRadians(rot.y)) * offsetZ;
         }
         if (offsetX != 0) {
             pos.x += (float)Math.sin(Math.toRadians(rot.y - 90)) * -1.0f * offsetX;
@@ -49,8 +49,8 @@ public class Camera {
     }
 
     public void moveRot(float offsetX, float offsetY, float offsetZ) {
-        rot.x = offsetX;
-        rot.y = offsetY;
-        rot.z = offsetZ;
+        rot.x += offsetX;
+        rot.y += offsetY;
+        rot.z += offsetZ;
     }
 }

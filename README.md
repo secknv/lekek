@@ -1,6 +1,6 @@
 Hello this is my 27th attempt at getting started with lwjgl.
 
-Imma try to not give up on this one.
+Wow actually getting somewhere
 
 Inside project folder open cmd and do:
 
@@ -9,8 +9,8 @@ Inside project folder open cmd and do:
 
 wow such gradle many amaze
 
-arrow keys to move cube 
-awsd to rotate
-q/e to scale
+`a w s d` to move camera in plane  
+`space shift` to control height  
+`rightclick drag` to rotate
 
 press power button to paint screen black

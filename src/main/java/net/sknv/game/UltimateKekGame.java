@@ -14,7 +14,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class UltimateKekGame implements IGameLogic {
 
-    private static final float MOUSE_SENSITIVITY = 0.2f;
+    private static final float MOUSE_SENSITIVITY = 0.8f;
     private static final float CAMERA_POS_STEP = 0.05f;
 
     private final Vector3f cameraInc;
@@ -121,6 +121,7 @@ public class UltimateKekGame implements IGameLogic {
 
         Texture texture = new Texture("src/main/resources/textures/lebloq.png");
         Mesh mesh = new Mesh(positions, textCoords, indices, texture);
+
         GameItem gameItem1 = new GameItem(mesh);
         gameItem1.setPos(0, 0, -2);
         gameItem1.setScale(0.5f);
@@ -145,21 +146,12 @@ public class UltimateKekGame implements IGameLogic {
     public void input(Window window, MouseInput mouseInput) {
         cameraInc.set(0, 0, 0);
 
-        if (window.isKeyPressed(GLFW_KEY_W)) {
-            cameraInc.z = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_S)) {
-            cameraInc.z = 1;
-        }
-        if (window.isKeyPressed(GLFW_KEY_A)) {
-            cameraInc.x = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            cameraInc.x = 1;
-        }
-        if (window.isKeyPressed(GLFW_KEY_Z)) {
-            cameraInc.y = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_X)) {
-            cameraInc.y = 1;
-        }
+        if (window.isKeyPressed(GLFW_KEY_W)) cameraInc.z = -1;
+        if (window.isKeyPressed(GLFW_KEY_S)) cameraInc.z = 1;
+        if (window.isKeyPressed(GLFW_KEY_A)) cameraInc.x = -1;
+        if (window.isKeyPressed(GLFW_KEY_D)) cameraInc.x = 1;
+        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraInc.y = -1;
+        if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraInc.y = 1;
 
     }
 

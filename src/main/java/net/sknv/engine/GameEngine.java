@@ -79,7 +79,7 @@ public class GameEngine implements Runnable {
     }
 
     protected void input() {
-        mouseInput.init(window);
+        mouseInput.input(window);
         gameLogic.input(window, mouseInput);
     }
 

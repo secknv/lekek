@@ -47,21 +47,21 @@ public class MouseInput {
         displVec.y = 0;
 
         if (previousPos.x > 0 && previousPos.y > 0 && inWindow) {
-            double deltax = currentPos.x - previousPos.x;
-            double deltay = currentPos.y - previousPos.y;
-            boolean rotatex = deltax != 0;
-            boolean rotatey = deltay != 0;
+            double deltaX = currentPos.x - previousPos.x;
+            double deltaY = currentPos.y - previousPos.y;
+            boolean rotateX = deltaX != 0;
+            boolean rotateY = deltaY != 0;
 
-            if (rotatex) {
-                displVec.y = (float) deltax;
+            if (rotateX) {
+                displVec.y = (float) deltaX;
             }
-            if (rotatey) {
-                displVec.x = (float) deltay;
+            if (rotateY) {
+                displVec.x = (float) deltaY;
             }
-
-            previousPos.x = currentPos.x;
-            previousPos.y = currentPos.y;
         }
+
+        previousPos.x = currentPos.x;
+        previousPos.y = currentPos.y;
     }
 
     public boolean isLeftClicked() {
