@@ -12,6 +12,10 @@ version '1.0-SNAPSHOT'
 
 application {
     mainClassName = 'net.sknv.game.Main'
+
+    if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+    }
 }
 
 switch (OperatingSystem.current()) {
