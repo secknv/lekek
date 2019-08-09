@@ -21,10 +21,13 @@ public class ForwardNeuralNet {
     }
 
     private void init() {
-        //init hidden layers
-        for(int i=0; i!=nHiddenLayers; i++){
+        //init first hidden (input fed) layer
+        hiddenLayers.set(0, new Sigmoid[nNodesHiddenLayer]);
+        Arrays.fill(hiddenLayers.get(0), new Sigmoid(nInputNodes, null, 0));
+        //init subsequent layers
+        for(int i=1; i!=nHiddenLayers; i++){
             hiddenLayers.set(i, new Sigmoid[nNodesHiddenLayer]);
-            Arrays.fill(hiddenLayers.get(i), new Sigmoid(nInputNodes, null, 0));
+            Arrays.fill(hiddenLayers.get(i), new Sigmoid(hiddenLayers.get(i-1).length, null, 0));
         }
 
         //init output layer
