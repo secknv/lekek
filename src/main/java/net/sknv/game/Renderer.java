@@ -4,6 +4,7 @@ import net.sknv.engine.GameItem;
 import net.sknv.engine.Utils;
 import net.sknv.engine.Window;
 import net.sknv.engine.graph.Camera;
+import net.sknv.engine.graph.Mesh;
 import net.sknv.engine.graph.ShaderProgram;
 import net.sknv.engine.graph.Transformation;
 import org.joml.Matrix4f;
@@ -35,6 +36,8 @@ public class Renderer {
         shaderProgram.createUniform("projectionMatrix");
         shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("texture_sampler");
+        shaderProgram.createUniform("color");
+        shaderProgram.createUniform("useColor");
     }
 
     public void clear() {
@@ -61,9 +64,15 @@ public class Renderer {
 
         //render each game item
         for (GameItem gameItem : gameItems) {
+            Mesh mesh = gameItem.getMesh();
+            //set model view
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-            gameItem.getMesh().render();
+
+            //if color
+            shaderProgram.setUniform("color", mesh.getColor());
+            shaderProgram.setUniform("useColor", mesh.isTextured() ? 0 : 1);
+            mesh.render();
         }
 
         shaderProgram.unbind();
