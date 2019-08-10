@@ -71,4 +71,8 @@ public class MouseInput {
     public boolean isRightClicked() {
         return rightClicked;
     }
+
+    public Vector2d getPos() {
+        return currentPos;
+    }
 }

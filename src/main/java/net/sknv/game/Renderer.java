@@ -1,12 +1,17 @@
 package net.sknv.game;
 
 import net.sknv.engine.GameItem;
+import net.sknv.engine.MouseInput;
 import net.sknv.engine.Utils;
 import net.sknv.engine.Window;
 import net.sknv.engine.graph.Camera;
+import net.sknv.engine.graph.GraphUtils;
 import net.sknv.engine.graph.ShaderProgram;
 import net.sknv.engine.graph.Transformation;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -41,7 +46,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Camera camera, GameItem[] gameItems) {
+    public void render(Window window, MouseInput mouseInput, Camera camera, GameItem[] gameItems) {
         clear();
 
         if (window.isResized()) {
@@ -58,6 +63,38 @@ public class Renderer {
         Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
         shaderProgram.setUniform("texture_sampler", 0);
+
+        //render mouse inputs
+        //glClearColor(0.0f, 0.0f,0.0f, 0.0f); //click testing
+        if(mouseInput.isLeftClicked()){
+            glClearColor(1.0f, 0.0f,0.0f, 1.0f);
+
+            //convert from viewport to normalised device space
+            Vector4f ray_clip = new Vector4f((float)(2.0f * mouseInput.getPos().x) / Window.getWidth() - 1.0f,
+                    (float)((2.0f * mouseInput.getPos().y) / Window.getHeight() - 1.0f ), -1.0f, 1.0f);
+
+            //convert from normalised device space to eye space
+            Matrix4f invertedProjection = new Matrix4f();
+            projectionMatrix.invert(invertedProjection);
+            invertedProjection.transform(ray_clip);
+            Vector4f ray_eye = new Vector4f(ray_clip.x,ray_clip.y, -1f, 0f);
+
+            //convert from eye space to world space
+            Matrix4f invertedViewMatrix = new Matrix4f();
+            viewMatrix.invert(invertedViewMatrix);
+            invertedViewMatrix.transform(ray_eye);
+            Vector3f ray_world = new Vector3f(ray_eye.x,ray_eye.y, ray_eye.z);
+            ray_world.normalize();
+
+            //normalised world ray
+            System.out.println(ray_world.x+"x " + ray_world.y+"y " + ray_world.z+"z" );
+
+            Vector3f cameraPos = camera.getPos();
+
+
+           GraphUtils.drawLine(new Vector3f(3f,3f,3f), new Vector3f(-3f,-3f,-3f));
+
+        }
 
         //render each game item
         for (GameItem gameItem : gameItems) {

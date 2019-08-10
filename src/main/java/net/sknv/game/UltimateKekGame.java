@@ -158,8 +158,6 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void update(float interval, MouseInput mouseInput) {
-        //click testing
-        glClearColor(0.0f, 0.0f,0.0f, 0.0f);
 
         camera.movePos(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
 
@@ -167,16 +165,11 @@ public class UltimateKekGame implements IGameLogic {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRot(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
-
-        //click testing
-        if (mouseInput.isLeftClicked()) {
-            glClearColor(1.0f, 0.0f,0.0f, 1.0f);
-        }
     }
 
     @Override
-    public void render(Window window) {
-        renderer.render(window, camera, gameItems);
+    public void render(Window window, MouseInput mouseInput) {
+        renderer.render(window, mouseInput, camera, gameItems);
     }
 
     @Override
