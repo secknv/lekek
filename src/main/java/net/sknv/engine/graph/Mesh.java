@@ -1,5 +1,6 @@
 package net.sknv.engine.graph;
 
+import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
@@ -19,15 +20,15 @@ public class Mesh {
 
     public final int vertexCount;
 
-    private final Texture texture;
+    private Vector3f color;
 
-    public Mesh(float[] pos, float[] textCoords, int[] idx, Texture texture) {
+    public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx) {
         FloatBuffer posbuff = null;
         FloatBuffer textCoordsBuff = null;
+        FloatBuffer vecNormalsBuffer = null;
         IntBuffer idxbuff = null;
 
         try {
-            this.texture = texture;
             vertexCount = idx.length;
             vboIdList = new ArrayList<>();
 
@@ -52,6 +53,15 @@ public class Mesh {
             glBufferData(GL_ARRAY_BUFFER, textCoordsBuff, GL_STATIC_DRAW);
             glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 
+            // Vertex normals VBO #2
+            vboId = glGenBuffers();
+            vboIdList.add(vboId);
+            vecNormalsBuffer = MemoryUtil.memAllocFloat(normals.length);
+            vecNormalsBuffer.put(normals).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            glBufferData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+
             // Index VBO #2
             vboId = glGenBuffers();
             vboIdList.add(vboId);
@@ -62,6 +72,8 @@ public class Mesh {
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
+
+
         }
         finally {
             if (posbuff != null) {
@@ -93,12 +105,14 @@ public class Mesh {
         glBindVertexArray(getVaoId());
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
 
         glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
 
         //restore state
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
         glBindVertexArray(0);
     }
 
