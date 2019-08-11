@@ -1,5 +1,6 @@
 package net.sknv.engine.graph;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
@@ -35,14 +36,13 @@ public class GraphUtils {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
         glDrawElements(GL_LINES, 3, GL_UNSIGNED_INT, 0);
+        glDisableVertexAttribArray(0);
         glBindVertexArray(0);
 
         glBindBuffer(GL_ARRAY_BUFFER,0);
         glDeleteBuffers(vboId);
         glDeleteBuffers(vboId2);
         glDeleteVertexArrays(vaoId);
-
     }
 }

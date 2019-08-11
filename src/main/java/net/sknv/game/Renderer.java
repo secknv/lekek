@@ -4,10 +4,7 @@ import net.sknv.engine.GameItem;
 import net.sknv.engine.MouseInput;
 import net.sknv.engine.Utils;
 import net.sknv.engine.Window;
-import net.sknv.engine.graph.Camera;
-import net.sknv.engine.graph.GraphUtils;
-import net.sknv.engine.graph.ShaderProgram;
-import net.sknv.engine.graph.Transformation;
+import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -64,10 +61,7 @@ public class Renderer {
 
         shaderProgram.setUniform("texture_sampler", 0);
 
-        //render mouse inputs
-        //glClearColor(0.0f, 0.0f,0.0f, 0.0f); //click testing
-        if(mouseInput.isLeftClicked()){
-            //glClearColor(1.0f, 0.0f,0.0f, 1.0f);
+        if(mouseInput.isLeftClicked()){// ray casting test code (will be moved later)
 
             //convert from viewport to normalised device space
             Vector4f ray_clip = new Vector4f((float)(2.0f * mouseInput.getPos().x) / Window.getWidth() - 1.0f,
@@ -87,13 +81,14 @@ public class Renderer {
             ray_world.normalize();
 
             //normalised world ray
-            System.out.println(ray_world.x+"x " + ray_world.y+"y " + ray_world.z+"z" );
+            //System.out.println(ray_world.x+"x " + ray_world.y+"y " + ray_world.z+"z" );
 
             Vector3f cameraPos = camera.getPos();
-
-
-           GraphUtils.drawLine(new Vector3f(3f,3f,3f), new Vector3f(-3f,-3f,-3f));
-
+            System.out.println(cameraPos.x + "x " +  cameraPos.y + "y " + cameraPos.z + "z");
+            GraphUtils.drawLine(new Vector3f(0,3,0), new Vector3f(-3,0,0));
+            GraphUtils.drawLine(new Vector3f(3,0,0), new Vector3f(-3,0,0));
+            GraphUtils.drawLine(new Vector3f(3,0,0), new Vector3f(0,3,0));
+            //GraphUtils.drawLine(new Vector3f(0,3,0), cameraPos);
         }
 
         //render each game item
