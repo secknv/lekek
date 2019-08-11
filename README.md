@@ -11,6 +11,8 @@ wow such gradle many amaze
 
 `a w s d` to move camera in plane  
 `space shift` to control height  
-`rightclick drag` to rotate
+`rightclick drag` to rotate  
+`left click spam` for epilepsy  
+`n m` to control point light  
 
 press power button to paint screen black

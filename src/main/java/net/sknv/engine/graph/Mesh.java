@@ -117,7 +117,7 @@ public class Mesh {
         }
         else {
             //for test models
-            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+            //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         }
 
         //draw mesh

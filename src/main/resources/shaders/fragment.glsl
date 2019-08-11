@@ -15,7 +15,7 @@ struct Attenuation {
 struct PointLight {
     vec3 color;
     //pos in view space coords
-    vec3 postition;
+    vec3 position;
     float intensity;
     Attenuation att;
 };
@@ -56,7 +56,7 @@ vec4 calcPointLight(PointLight light, vec3 postition, vec3 normal) {
     vec4 specColor = vec4(0, 0, 0, 0);
 
     //Diffuse Light
-    vec3 light_direction = light.postition - postition;
+    vec3 light_direction = light.position - postition;
     vec3 to_light_source = normalize(light_direction);
     float diffuseFactor = max(dot(normal, to_light_source), 0.0);
     diffuseColor = diffuseC * vec4(light.color, 1.0) * light.intensity * diffuseFactor;
@@ -70,7 +70,7 @@ vec4 calcPointLight(PointLight light, vec3 postition, vec3 normal) {
     specColor = specularC * specularFactor * material.reflectance * vec4(light.color, 1.0);
 
     //Attenuation
-    float distance = lenght(light_direction);
+    float distance = length(light_direction);
     float attenuationInv = light.att.constant + light.att.linear * distance + light.att.exponent * distance * distance;
 
     return (diffuseColor + specColor) / attenuationInv;

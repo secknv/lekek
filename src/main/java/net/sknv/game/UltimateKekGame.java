@@ -4,12 +4,10 @@ import net.sknv.engine.GameItem;
 import net.sknv.engine.IGameLogic;
 import net.sknv.engine.MouseInput;
 import net.sknv.engine.Window;
-import net.sknv.engine.graph.Camera;
-import net.sknv.engine.graph.Mesh;
-import net.sknv.engine.graph.OBJLoader;
-import net.sknv.engine.graph.Texture;
+import net.sknv.engine.graph.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.glClearColor;
@@ -26,6 +24,9 @@ public class UltimateKekGame implements IGameLogic {
 
     private GameItem[] gameItems;
 
+    private Vector3f ambientLight;
+    private PointLight pointLight;
+
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera();
@@ -36,13 +37,15 @@ public class UltimateKekGame implements IGameLogic {
     public void init(Window window) throws Exception {
         renderer.init(window);
 
-        Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
+        float reflectance = 1f;
+
+        Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
         Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
-        Mesh bunny = OBJLoader.loadMesh("/models/bunny.obj");
 
         Texture texture = new Texture("src/main/resources/textures/lebloq.png");
-        mesh.setTexture(texture);
-        kek.setColor(new Vector3f(1f, 0f, 0f));
+        Material material = new Material(texture, reflectance);
+        cube.setMaterial(material);
+        kek.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
 
         float scale = 0.2f;
 
@@ -50,28 +53,31 @@ public class UltimateKekGame implements IGameLogic {
         gameItem0.setPos(0, 0, -5);
         gameItem0.setScale(1f);
 
-        GameItem gameItem20 = new GameItem(bunny);
-        gameItem20.setPos(-5, 0, -5);
-        gameItem20.setScale(1f);
-
-        GameItem gameItem1 = new GameItem(mesh);
+        GameItem gameItem1 = new GameItem(cube);
         gameItem1.setPos(0, 0, -2);
         gameItem1.setScale(scale);
 
-        GameItem gameItem2 = new GameItem(mesh);
+        GameItem gameItem2 = new GameItem(cube);
         gameItem2.setPos(0.5f, 0.5f, -2);
         gameItem2.setScale(scale);
 
-        GameItem gameItem3 = new GameItem(mesh);
+        GameItem gameItem3 = new GameItem(cube);
         gameItem3.setPos(0, 0, -2.5f);
         gameItem3.setScale(scale);
 
-        GameItem gameItem4 = new GameItem(mesh);
+        GameItem gameItem4 = new GameItem(cube);
         gameItem4.setPos(0.5f, 0, -2.5f);
         gameItem4.setScale(scale);
 
-        gameItems = new GameItem[] {gameItem0, gameItem20,gameItem1, gameItem2, gameItem3, gameItem4};
+        gameItems = new GameItem[] {gameItem0, gameItem1, gameItem2, gameItem3, gameItem4};
 
+        ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
+        Vector3f lightColor = new Vector3f(1, 1, 1);
+        Vector3f lightPos = new Vector3f(0, 0, 1);
+        float lightIntensity = 1.0f;
+        pointLight = new PointLight(lightColor, lightPos, lightIntensity);
+        PointLight.Attenuation att = new PointLight.Attenuation(0, 0, 0.1f);
+        pointLight.setAttenuation(att);
     }
 
     @Override
@@ -85,6 +91,13 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraInc.y = -1;
         if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraInc.y = 1;
 
+        float lightPos = pointLight.getPos().x;
+        if (window.isKeyPressed(GLFW_KEY_N)) {
+            this.pointLight.getPos().x = lightPos + 0.1f;
+        }
+        else if (window.isKeyPressed(GLFW_KEY_M)) {
+            this.pointLight.getPos().x = lightPos - 0.1f;
+        }
     }
 
     @Override
@@ -107,7 +120,7 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, camera, gameItems);
+        renderer.render(window, camera, gameItems, ambientLight, pointLight);
     }
 
     @Override
