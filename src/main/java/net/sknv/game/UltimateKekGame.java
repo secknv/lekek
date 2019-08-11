@@ -93,10 +93,10 @@ public class UltimateKekGame implements IGameLogic {
 
         float lightPos = pointLight.getPos().x;
         if (window.isKeyPressed(GLFW_KEY_N)) {
-            this.pointLight.getPos().x = lightPos + 0.1f;
+            this.pointLight.getPos().x = lightPos - 0.1f;
         }
         else if (window.isKeyPressed(GLFW_KEY_M)) {
-            this.pointLight.getPos().x = lightPos - 0.1f;
+            this.pointLight.getPos().x = lightPos + 0.1f;
         }
     }
 
