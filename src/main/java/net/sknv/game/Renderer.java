@@ -67,7 +67,7 @@ public class Renderer {
         //render mouse inputs
         //glClearColor(0.0f, 0.0f,0.0f, 0.0f); //click testing
         if(mouseInput.isLeftClicked()){
-            glClearColor(1.0f, 0.0f,0.0f, 1.0f);
+            //glClearColor(1.0f, 0.0f,0.0f, 1.0f);
 
             //convert from viewport to normalised device space
             Vector4f ray_clip = new Vector4f((float)(2.0f * mouseInput.getPos().x) / Window.getWidth() - 1.0f,
