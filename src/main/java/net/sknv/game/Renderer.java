@@ -63,7 +63,6 @@ public class Renderer {
         shaderProgram.setUniform("texture_sampler", 0);
 
         if(mouseInput.isLeftClicked()){// ray casting test code (will be moved later)
-
             //convert from viewport to normalised device space
             Vector4f ray_clip = new Vector4f((float)(2.0f * mouseInput.getPos().x) / Window.getWidth() - 1.0f,
                     (float)((2.0f * mouseInput.getPos().y) / Window.getHeight() - 1.0f ), -1.0f, 1.0f);
@@ -86,10 +85,8 @@ public class Renderer {
 
             Vector3f cameraPos = camera.getPos();
             System.out.println(cameraPos.x + "x " +  cameraPos.y + "y " + cameraPos.z + "z");
-            GraphUtils.drawLine(new Vector3f(0,3,0), new Vector3f(-3,0,0));
-            GraphUtils.drawLine(new Vector3f(3,0,0), new Vector3f(-3,0,0));
-            GraphUtils.drawLine(new Vector3f(3,0,0), new Vector3f(0,3,0));
-            //GraphUtils.drawLine(new Vector3f(0,3,0), cameraPos);
+
+            GraphUtils.drawLine(shaderProgram, new Vector3f(0,3,0), ray_world);
         }
 
         //render each game item
