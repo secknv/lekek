@@ -1,6 +1,5 @@
 package net.sknv.engine;
 
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -13,7 +12,7 @@ public class Window {
 
     private final String title;
 
-    private int width, height;
+    private static int width, height;
 
     private long windowHandle;
 
@@ -94,11 +93,11 @@ public class Window {
         return title;
     }
 
-    public int getWidth() {
+    public static int getWidth() {
         return width;
     }
 
-    public int getHeight() {
+    public static int getHeight() {
         return height;
     }
 
