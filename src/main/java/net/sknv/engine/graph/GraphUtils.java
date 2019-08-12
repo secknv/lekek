@@ -17,7 +17,7 @@ public class GraphUtils {
 
     public static void drawLine(ShaderProgram shaderProgram, Vector3f i, Vector3f f){
 
-        shaderProgram.setUniform("material", new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
+        shaderProgram.setUniform("material", new Material(new Vector4f(1f, 1f, 0,1f), 0.5f));
 
         FloatBuffer posBuff = null;
         posBuff = MemoryUtil.memAllocFloat(6);
