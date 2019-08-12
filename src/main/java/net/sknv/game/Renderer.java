@@ -110,11 +110,14 @@ public class Renderer {
             //System.out.println(ray_world.x+"x " + ray_world.y+"y " + ray_world.z+"z" );
 
             Vector3f cameraPos = camera.getPos();
-            System.out.println(cameraPos.x + "x " +  cameraPos.y + "y " + cameraPos.z + "z");
+            //System.out.println(cameraPos.x + "x " +  cameraPos.y + "y " + cameraPos.z + "z");
 
+            //camera tracker
             GraphUtils.drawLine(shaderProgram,(new Vector3f(cameraPos.x - 5f, cameraPos.y, cameraPos.z)) , (new Vector3f(cameraPos.x + 5f, cameraPos.y, cameraPos.z)) );
             GraphUtils.drawLine(shaderProgram,(new Vector3f(cameraPos.x, cameraPos.y - 5f, cameraPos.z)) , (new Vector3f(cameraPos.x,cameraPos.y + 5f, cameraPos.z)) );
             GraphUtils.drawLine(shaderProgram,(new Vector3f(cameraPos.x, cameraPos.y,cameraPos.z - 5f)) , (new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z + 5f)) );
+
+            GraphUtils.drawGrid(shaderProgram, new Vector3f(0,0,0),21);
 
         }
         //end dbz mark
