@@ -6,8 +6,6 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -17,13 +15,17 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class GraphUtils {
 
-    public static void drawLine(ShaderProgram shaderProgram, Vector3f i, Vector3f f){
+    public static void drawLine(ShaderProgram shaderProgram, Vector4f color, Vector3f i, Vector3f f){
 
-        shaderProgram.setUniform("material", new Material(new Vector4f(1f, 1f, 0,1f), 0.5f));
+        shaderProgram.setUniform("material", new Material(color, 0.5f));
 
-        FloatBuffer posBuff = null;
-        posBuff = MemoryUtil.memAllocFloat(6);
+        //setup vertex positions and buffer
+        FloatBuffer posBuff = MemoryUtil.memAllocFloat(6);
         posBuff.put(new float[]{i.x,i.y,i.z,f.x,f.y,f.z}).flip();
+
+        //setup indexes and buffer
+        IntBuffer idxBuff = MemoryUtil.memAllocInt(2);
+        idxBuff.put(new int[]{0,1}).flip();
 
         int vaoId = glGenVertexArrays();
         glBindVertexArray(vaoId);
@@ -35,8 +37,6 @@ public class GraphUtils {
 
 
         int vboId2 = glGenBuffers();
-        IntBuffer idxBuff = MemoryUtil.memAllocInt(2);
-        idxBuff.put(new int[]{0,1}).flip();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
         glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
@@ -52,14 +52,19 @@ public class GraphUtils {
         glDeleteBuffers(vboId);
     }
 
+    public static void drawLine(ShaderProgram shaderProgram, Vector3f i, Vector3f f) {
+        drawLine(shaderProgram, new Vector4f(1f,1f,1f,1f), i, f);
+    }
+
     public static void drawGrid(ShaderProgram shaderProgram, Vector3f origin, int size){
 
         shaderProgram.setUniform("material", new Material(new Vector4f(1f, 1f, 1f,0f), 0f));
 
+        //setup vertex positions
+        float[] pos = new float[3*4*size];
+
         Vector3f start = new Vector3f();
         origin.add(-size/2, 0f, -size/2, start);
-
-        float[] pos = new float[3*4*size];
 
         for(int i=0; i!=4*size; i++){
             if(i<size){
@@ -117,5 +122,52 @@ public class GraphUtils {
 
         glBindBuffer(GL_ARRAY_BUFFER,0);
         glDeleteBuffers(vboId);
+    }
+
+    public static void drawQuad(ShaderProgram shaderProgram,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){
+
+        shaderProgram.setUniform("material", new Material(new Vector4f(0f, 1f, 0,0.5f), .5f));
+
+        //setup vertex positions and buffer
+
+        FloatBuffer posBuff = MemoryUtil.memAllocFloat(12);
+        posBuff.put(new float[]{
+                p1.x, p1.y, p1.z,
+                p2.x, p2.y, p2.z,
+                p3.x, p3.y, p3.z,
+                p4.x, p4.y, p4.z,
+        }).flip();
+
+        //setup indexes array and buffer
+        IntBuffer idxBuff = MemoryUtil.memAllocInt(6);
+        idxBuff.put(new int[]{
+                0,1,2,
+                0,2,3,
+        }).flip();
+
+        int vaoId = glGenVertexArrays();
+        glBindVertexArray(vaoId);
+
+        int vboId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ARRAY_BUFFER, posBuff, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+
+
+        int vboId2 = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glBindVertexArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER,0);
+        glDeleteBuffers(vboId);
+
     }
 }

@@ -2,15 +2,13 @@ package net.sknv.game;
 
 import net.sknv.engine.GameItem;
 import net.sknv.engine.MouseInput;
-import net.sknv.engine.MouseInput;
 import net.sknv.engine.Utils;
 import net.sknv.engine.Window;
 import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
+import net.sknv.engine.graph.RayCast;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -91,7 +89,7 @@ public class Renderer {
         if(mouseInput.isLeftClicked()){// ray casting test code (will be moved later)
             //convert from viewport to normalised device space
             Vector4f ray_clip = new Vector4f((float)(2.0f * mouseInput.getPos().x) / Window.getWidth() - 1.0f,
-                    (float)((2.0f * mouseInput.getPos().y) / Window.getHeight() - 1.0f ), -1.0f, 1.0f);
+                    (float)(1f - (2.0f * mouseInput.getPos().y) / Window.getHeight()), -1.0f, 1.0f);
 
             //convert from normalised device space to eye space
             Matrix4f invertedProjection = new Matrix4f();
@@ -103,22 +101,23 @@ public class Renderer {
             Matrix4f invertedViewMatrix = new Matrix4f();
             viewMatrix.invert(invertedViewMatrix);
             invertedViewMatrix.transform(ray_eye);
-            Vector3f ray_world = new Vector3f(ray_eye.x,ray_eye.y, ray_eye.z);
+            Vector3f ray_world = new Vector3f(ray_eye.x,ray_eye.y, ray_eye.z); //y inverted idk why
             ray_world.normalize();
-
-            //normalised world ray
-            //System.out.println(ray_world.x+"x " + ray_world.y+"y " + ray_world.z+"z" );
 
             Vector3f cameraPos = camera.getPos();
             //System.out.println(cameraPos.x + "x " +  cameraPos.y + "y " + cameraPos.z + "z");
 
-            //camera tracker
-            GraphUtils.drawLine(shaderProgram,(new Vector3f(cameraPos.x - 5f, cameraPos.y, cameraPos.z)) , (new Vector3f(cameraPos.x + 5f, cameraPos.y, cameraPos.z)) );
-            GraphUtils.drawLine(shaderProgram,(new Vector3f(cameraPos.x, cameraPos.y - 5f, cameraPos.z)) , (new Vector3f(cameraPos.x,cameraPos.y + 5f, cameraPos.z)) );
-            GraphUtils.drawLine(shaderProgram,(new Vector3f(cameraPos.x, cameraPos.y,cameraPos.z - 5f)) , (new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z + 5f)) );
+            //camera tracker & quad test
+            GraphUtils.drawLine(shaderProgram, (new Vector3f(cameraPos.x - 5f, cameraPos.y, cameraPos.z)) , (new Vector3f(cameraPos.x + 5f, cameraPos.y, cameraPos.z)) );
+            GraphUtils.drawLine(shaderProgram, (new Vector3f(cameraPos.x, cameraPos.y - 5f, cameraPos.z)) , (new Vector3f(cameraPos.x,cameraPos.y + 5f, cameraPos.z)) );
+            GraphUtils.drawLine(shaderProgram, (new Vector3f(cameraPos.x, cameraPos.y,cameraPos.z - 5f)) , (new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z + 5f)) );
 
             GraphUtils.drawGrid(shaderProgram, new Vector3f(0,0,0),21);
+            //ray casting
+            GraphUtils.drawQuad(shaderProgram, new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
 
+            RayCast a = new RayCast(shaderProgram, new Vector3f(-7.5f, 2.5f, 5f), new Vector3f(ray_world.x, ray_world.y, ray_world.z));
+            a.drawScaledRay(6, new Vector4f(1f,0f,0f,0f));
         }
         //end dbz mark
 
