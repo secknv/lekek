@@ -1,7 +1,6 @@
 package net.sknv.engine;
 
-import org.joml.Vector2d;
-import org.joml.Vector2f;
+import org.joml.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -74,5 +73,25 @@ public class MouseInput {
 
     public Vector2d getPos() {
         return currentPos;
+    }
+
+    public Vector3f getWorldRay(Matrix4f projectionMatrix, Matrix4f viewMatrix) {
+        //convert from viewport to normalised device space
+        Vector4f ray_clip = new Vector4f((float)(2.0f * getPos().x) / Window.getWidth() - 1.0f,
+                (float)(1f - (2.0f * getPos().y) / Window.getHeight()), -1.0f, 1.0f);
+
+        //convert from normalised device space to eye space
+        Matrix4f invertedProjection = new Matrix4f();
+        projectionMatrix.invert(invertedProjection);
+        invertedProjection.transform(ray_clip);
+        Vector4f ray_eye = new Vector4f(ray_clip.x,ray_clip.y, -1f, 0f);
+
+        //convert from eye space to world space
+        Matrix4f invertedViewMatrix = new Matrix4f();
+        viewMatrix.invert(invertedViewMatrix);
+        invertedViewMatrix.transform(ray_eye);
+        Vector3f ray_world = new Vector3f(ray_eye.x,ray_eye.y, ray_eye.z); //y inverted idk why
+        ray_world.normalize();
+        return ray_world;
     }
 }

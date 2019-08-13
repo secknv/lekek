@@ -86,23 +86,8 @@ public class Renderer {
         shaderProgram.setUniform("texture_sampler", 0);
 
         //dbz mark
-        if(mouseInput.isLeftClicked()){// ray casting test code (will be moved later)
-            //convert from viewport to normalised device space
-            Vector4f ray_clip = new Vector4f((float)(2.0f * mouseInput.getPos().x) / Window.getWidth() - 1.0f,
-                    (float)(1f - (2.0f * mouseInput.getPos().y) / Window.getHeight()), -1.0f, 1.0f);
-
-            //convert from normalised device space to eye space
-            Matrix4f invertedProjection = new Matrix4f();
-            projectionMatrix.invert(invertedProjection);
-            invertedProjection.transform(ray_clip);
-            Vector4f ray_eye = new Vector4f(ray_clip.x,ray_clip.y, -1f, 0f);
-
-            //convert from eye space to world space
-            Matrix4f invertedViewMatrix = new Matrix4f();
-            viewMatrix.invert(invertedViewMatrix);
-            invertedViewMatrix.transform(ray_eye);
-            Vector3f ray_world = new Vector3f(ray_eye.x,ray_eye.y, ray_eye.z); //y inverted idk why
-            ray_world.normalize();
+        if(mouseInput.isLeftClicked()){
+            Vector3f worldRay = mouseInput.getWorldRay(projectionMatrix, viewMatrix);
 
             Vector3f cameraPos = camera.getPos();
             //System.out.println(cameraPos.x + "x " +  cameraPos.y + "y " + cameraPos.z + "z");
@@ -116,7 +101,7 @@ public class Renderer {
             //ray casting
             GraphUtils.drawQuad(shaderProgram, new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
 
-            RayCast a = new RayCast(shaderProgram, new Vector3f(-7.5f, 2.5f, 5f), new Vector3f(ray_world.x, ray_world.y, ray_world.z));
+            RayCast a = new RayCast(shaderProgram, new Vector3f(-7.5f, 2.5f, 5f), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
             a.drawScaledRay(6, new Vector4f(1f,0f,0f,0f));
         }
         //end dbz mark
