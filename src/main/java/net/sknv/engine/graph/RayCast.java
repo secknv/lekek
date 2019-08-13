@@ -53,11 +53,6 @@ public class RayCast {
         Vector3f perp = new Vector3f();
         Vector3f perpLength = new Vector3f();
 
-        //triangle visual aid
-        GraphUtils.drawLine(shader, new Vector4f(1,0,0,0), p1,p2);
-        GraphUtils.drawLine(shader, new Vector4f(1,0,0,0), p2,p3);
-        GraphUtils.drawLine(shader, new Vector4f(1,0,0,0), p3,p1);
-
         p1.sub(p2, edge1);
         p3.sub(p2, edge2);
         float dotP = edge1.dot(edge2) / edge2.dot(edge2);
@@ -67,16 +62,12 @@ public class RayCast {
 
         edge2.mul(dotP, perp);
         perp.add(p2);
-
-        perp.sub(p1, perpLength); //all fine
+        perp.sub(p1, perpLength);
 
         Vector3f intersectionLength = new Vector3f();
         intersectionPoint.sub(p1, intersectionLength);
 
         float barycentric = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
-
-        GraphUtils.drawLine(shader, new Vector4f(1,1,0,0), p1, intersectionPoint);
-        GraphUtils.drawLine(shader, new Vector4f(1,1,0,0), p1, perp);
 
         //-------------------------second barycentric
         p3.sub(p1, edge1);
@@ -90,10 +81,6 @@ public class RayCast {
 
         float barycentric2 = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
 
-        GraphUtils.drawLine(shader, new Vector4f(1,1,0,0), p3, intersectionPoint);
-        GraphUtils.drawLine(shader, new Vector4f(1,1,0,0), p3, perp);
-
-
         //----------------------third barycentric
         p2.sub(p3, edge1);
         p1.sub(p3, edge2);
@@ -105,11 +92,6 @@ public class RayCast {
         intersectionPoint.sub(p2, intersectionLength);
 
         float barycentric3 = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
-
-        GraphUtils.drawLine(shader, new Vector4f(1,1,0,0), p2, intersectionPoint);
-        GraphUtils.drawLine(shader, new Vector4f(1,1,0,0), p2, perp);
-
-        System.out.println(barycentric + " " + barycentric2 + " " + barycentric3);
 
         return barycentric<=1 && barycentric>=0 && barycentric2<=1 && barycentric2>=0 && barycentric3<=1 && barycentric3>=0;
     }

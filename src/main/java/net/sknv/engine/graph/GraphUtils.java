@@ -124,9 +124,9 @@ public class GraphUtils {
         glDeleteBuffers(vboId);
     }
 
-    public static void drawQuad(ShaderProgram shaderProgram,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){
+    public static void drawQuad(ShaderProgram shaderProgram, Vector4f color,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){
 
-        shaderProgram.setUniform("material", new Material(new Vector4f(0f, 255f, 0f,0.5f), .5f));
+        shaderProgram.setUniform("material", new Material(color, .5f));
 
         //setup vertex positions and buffer
 
@@ -169,5 +169,9 @@ public class GraphUtils {
         glBindBuffer(GL_ARRAY_BUFFER,0);
         glDeleteBuffers(vboId);
 
+    }
+
+    public static void drawQuad(ShaderProgram shader, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4) {
+        drawQuad(shader, new Vector4f(1f,1f,1f,1f), p1, p2, p3, p4);
     }
 }

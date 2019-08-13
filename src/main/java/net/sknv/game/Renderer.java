@@ -92,25 +92,26 @@ public class Renderer {
             Vector3f cameraPos = camera.getPos();
             //System.out.println(cameraPos.x + "x " +  cameraPos.y + "y " + cameraPos.z + "z");
 
-            //camera tracker & quad test
-            GraphUtils.drawLine(shaderProgram, (new Vector3f(cameraPos.x - 5f, cameraPos.y, cameraPos.z)) , (new Vector3f(cameraPos.x + 5f, cameraPos.y, cameraPos.z)) );
-            GraphUtils.drawLine(shaderProgram, (new Vector3f(cameraPos.x, cameraPos.y - 5f, cameraPos.z)) , (new Vector3f(cameraPos.x,cameraPos.y + 5f, cameraPos.z)) );
-            GraphUtils.drawLine(shaderProgram, (new Vector3f(cameraPos.x, cameraPos.y,cameraPos.z - 5f)) , (new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z + 5f)) );
-
-            GraphUtils.drawQuad(shaderProgram, new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
+            //grid
             GraphUtils.drawGrid(shaderProgram, new Vector3f(0,0,0),21);
+
+            //camera tracker
+            GraphUtils.drawLine(shaderProgram, new Vector4f(255f,255f,0,0), (new Vector3f(cameraPos.x - 5f, cameraPos.y, cameraPos.z)) , (new Vector3f(cameraPos.x + 5f, cameraPos.y, cameraPos.z)) );
+            GraphUtils.drawLine(shaderProgram, new Vector4f(255f,255f,0,0), (new Vector3f(cameraPos.x, cameraPos.y - 5f, cameraPos.z)) , (new Vector3f(cameraPos.x,cameraPos.y + 5f, cameraPos.z)) );
+            GraphUtils.drawLine(shaderProgram, new Vector4f(255f,255f,0,0), (new Vector3f(cameraPos.x, cameraPos.y,cameraPos.z - 5f)) , (new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z + 5f)) );
 
             //ray casting
             RayCast ray = new RayCast(shaderProgram, new Vector3f(-7.5f, 2.5f, 5f), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-            //ray.drawScaledRay(7, new Vector4f(255f,0f,0f,0f));
-
             Vector3f intersectionPoint =  ray.intersectPlane(new Vector3f(-5,0,0), new Vector3f(0,0,-1));
-            if(intersectionPoint != null){
-                GraphUtils.drawLine(shaderProgram, ray.origin, intersectionPoint);
-                //System.out.println("Distance to plane " + intersectionPoint.distance(ray.origin));
+            GraphUtils.drawLine(shaderProgram, ray.origin, intersectionPoint);
+
+            //ray casting triangle intersection test
+            if(intersectionPoint != null && ( ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) )){
+                GraphUtils.drawQuad(shaderProgram,new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
+            } else{
+                GraphUtils.drawQuad(shaderProgram,new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
             }
 
-            System.out.println(ray.intersectsTriangle(new Vector3f(-10,6,0), new Vector3f(-5,6,0), new Vector3f(-8,11,0)));
         }
         //end dbz mark
 
