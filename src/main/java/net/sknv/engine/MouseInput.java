@@ -92,6 +92,7 @@ public class MouseInput {
         invertedViewMatrix.transform(ray_eye);
         Vector3f ray_world = new Vector3f(ray_eye.x,ray_eye.y, ray_eye.z); //y inverted idk why
         ray_world.normalize();
+
         return ray_world;
     }
 }

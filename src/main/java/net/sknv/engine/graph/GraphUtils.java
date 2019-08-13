@@ -58,7 +58,7 @@ public class GraphUtils {
 
     public static void drawGrid(ShaderProgram shaderProgram, Vector3f origin, int size){
 
-        shaderProgram.setUniform("material", new Material(new Vector4f(1f, 1f, 1f,0f), 0f));
+        shaderProgram.setUniform("material", new Material(new Vector4f(10f, 10f, 10f,0f), 0f));
 
         //setup vertex positions
         float[] pos = new float[3*4*size];
@@ -126,7 +126,7 @@ public class GraphUtils {
 
     public static void drawQuad(ShaderProgram shaderProgram,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){
 
-        shaderProgram.setUniform("material", new Material(new Vector4f(0f, 1f, 0,0.5f), .5f));
+        shaderProgram.setUniform("material", new Material(new Vector4f(0f, 255f, 0f,0.5f), .5f));
 
         //setup vertex positions and buffer
 
