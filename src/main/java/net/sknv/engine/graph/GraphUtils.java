@@ -23,7 +23,6 @@ public class GraphUtils {
         shaderProgram.setUniform("material", new Material(color, 0.5f));
 
         GameItem gi = new GameItem();
-        gi.setPos(i.x,i.y,i.z);
 
         shaderProgram.setUniform("modelViewMatrix", transformation.getModelViewMatrix( gi, viewMatrix));
 

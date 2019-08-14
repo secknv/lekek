@@ -109,7 +109,7 @@ public class UltimateKekGame implements IGameLogic {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRot(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
-        gameItems[0].setPos(camera.getPos().x, camera.getPos().y, camera.getPos().z);
+        //gameItems[0].setPos(camera.getPos().x, camera.getPos().y, camera.getPos().z);
     }
 
     @Override

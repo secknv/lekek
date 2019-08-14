@@ -86,7 +86,7 @@ public class Renderer {
         shaderProgram.setUniform("texture_sampler", 0);
 
         //dbz mark
-        if(mouseInput.isLeftClicked()){
+        if(true){
             Vector3f worldRay = mouseInput.getWorldRay(projectionMatrix, viewMatrix);
 
             Vector3f cameraPos = camera.getPos();
@@ -101,7 +101,7 @@ public class Renderer {
             GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0),(new Vector3f(cameraPos.x, cameraPos.y,cameraPos.z - 5f)) , (new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z + 5f)) );
 
             //ray casting
-            RayCast ray = new RayCast(shaderProgram, new Vector3f(-7.5f, 2.5f, 5f), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+            RayCast ray = new RayCast(shaderProgram, cameraPos, new Vector3f(worldRay.x, worldRay.y, worldRay.z));
             Vector3f intersectionPoint =  ray.intersectPlane(new Vector3f(-5,0,0), new Vector3f(0,0,-1));
             GraphUtils.drawLine(shaderProgram, ray.origin, intersectionPoint);
 
