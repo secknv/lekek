@@ -17,6 +17,13 @@ public class GameItem {
         scale = 1;
     }
 
+    public GameItem() { //skill que eu vou mandar
+        mesh = null;
+        pos = new Vector3f(0, 0, 0);
+        rot = new Vector3f(0, 0, 0);
+        scale = 1;
+    }
+
     public void setPos(float x, float y, float z) {
         this.pos.x = x;
         this.pos.y = y;

@@ -96,9 +96,9 @@ public class Renderer {
             GraphUtils.drawGrid(shaderProgram, new Vector3f(0,0,0),21);
 
             //camera tracker
-            GraphUtils.drawLine(shaderProgram, new Vector4f(255f,255f,0,0), (new Vector3f(cameraPos.x - 5f, cameraPos.y, cameraPos.z)) , (new Vector3f(cameraPos.x + 5f, cameraPos.y, cameraPos.z)) );
-            GraphUtils.drawLine(shaderProgram, new Vector4f(255f,255f,0,0), (new Vector3f(cameraPos.x, cameraPos.y - 5f, cameraPos.z)) , (new Vector3f(cameraPos.x,cameraPos.y + 5f, cameraPos.z)) );
-            GraphUtils.drawLine(shaderProgram, new Vector4f(255f,255f,0,0), (new Vector3f(cameraPos.x, cameraPos.y,cameraPos.z - 5f)) , (new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z + 5f)) );
+            GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0),(new Vector3f(cameraPos.x - 5f, cameraPos.y, cameraPos.z)) , (new Vector3f(cameraPos.x + 5f, cameraPos.y, cameraPos.z)) );
+            GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0),(new Vector3f(cameraPos.x, cameraPos.y - 5f, cameraPos.z)) , (new Vector3f(cameraPos.x,cameraPos.y + 5f, cameraPos.z)) );
+            GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0),(new Vector3f(cameraPos.x, cameraPos.y,cameraPos.z - 5f)) , (new Vector3f(cameraPos.x, cameraPos.y, cameraPos.z + 5f)) );
 
             //ray casting
             RayCast ray = new RayCast(shaderProgram, new Vector3f(-7.5f, 2.5f, 5f), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
