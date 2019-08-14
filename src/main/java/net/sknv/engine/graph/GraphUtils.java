@@ -1,5 +1,8 @@
 package net.sknv.engine.graph;
 
+import net.sknv.engine.GameEngine;
+import net.sknv.engine.GameItem;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.system.MemoryUtil;
@@ -15,9 +18,15 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class GraphUtils {
 
-    public static void drawLine(ShaderProgram shaderProgram, Vector4f color, Vector3f i, Vector3f f){
+    public static void drawLine(ShaderProgram shaderProgram,Transformation transformation,Matrix4f viewMatrix, Vector4f color, Vector3f i, Vector3f f){
 
         shaderProgram.setUniform("material", new Material(color, 0.5f));
+
+        GameItem gi = new GameItem();
+        gi.setPos(i.x,i.y,i.z);
+
+        shaderProgram.setUniform("modelViewMatrix", transformation.getModelViewMatrix( gi, viewMatrix));
+
 
         //setup vertex positions and buffer
         FloatBuffer posBuff = MemoryUtil.memAllocFloat(6);
@@ -53,7 +62,7 @@ public class GraphUtils {
     }
 
     public static void drawLine(ShaderProgram shaderProgram, Vector3f i, Vector3f f) {
-        drawLine(shaderProgram, new Vector4f(1f,1f,1f,1f), i, f);
+        //drawLine(shaderProgram, new Vector4f(1f,1f,1f,1f), i, f);
     }
 
     public static void drawGrid(ShaderProgram shaderProgram, Vector3f origin, int size){

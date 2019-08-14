@@ -23,7 +23,7 @@ public class RayCast {
     public void drawScaledRay(int k, Vector4f color) {
         Vector3f scaled = new Vector3f();
         origin.add(direction.mul(k, scaled), scaled);
-        GraphUtils.drawLine(shader, color, origin, scaled);
+        //GraphUtils.drawLine(shader, color, origin, scaled);
     }
 
     public Vector3f intersectPlane(Vector3f origin, Vector3f normal){
