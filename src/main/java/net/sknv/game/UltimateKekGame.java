@@ -51,7 +51,7 @@ public class UltimateKekGame implements IGameLogic {
 
         GameItem gameItem0 = new GameItem(kek);
         gameItem0.setPos(0, 0, -5);
-        gameItem0.setScale(1f);
+        gameItem0.setScale(0.005f);
 
         GameItem gameItem1 = new GameItem(cube);
         gameItem1.setPos(0, 0, -2);
@@ -109,6 +109,7 @@ public class UltimateKekGame implements IGameLogic {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRot(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
+        gameItems[0].setPos(camera.getPos().x, camera.getPos().y, camera.getPos().z);
     }
 
     @Override
