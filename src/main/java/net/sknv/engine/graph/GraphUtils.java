@@ -1,6 +1,5 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.GameEngine;
 import net.sknv.engine.GameItem;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -18,14 +17,12 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class GraphUtils {
 
-    public static void drawLine(ShaderProgram shaderProgram,Transformation transformation,Matrix4f viewMatrix, Vector4f color, Vector3f i, Vector3f f){
+    public static void drawLine(ShaderProgram shaderProgram,Transformation transformation, Matrix4f viewMatrix, Vector4f color, Vector3f i, Vector3f f){
 
         shaderProgram.setUniform("material", new Material(color, 0.5f));
 
         GameItem gi = new GameItem();
-
         shaderProgram.setUniform("modelViewMatrix", transformation.getModelViewMatrix( gi, viewMatrix));
-
 
         //setup vertex positions and buffer
         FloatBuffer posBuff = MemoryUtil.memAllocFloat(6);
@@ -64,9 +61,12 @@ public class GraphUtils {
         //drawLine(shaderProgram, new Vector4f(1f,1f,1f,1f), i, f);
     }
 
-    public static void drawGrid(ShaderProgram shaderProgram, Vector3f origin, int size){
+    public static void drawGrid(ShaderProgram shaderProgram,Transformation transformation, Matrix4f viewMatrix, Vector3f origin, int size){
 
         shaderProgram.setUniform("material", new Material(new Vector4f(10f, 10f, 10f,0f), 0f));
+
+        GameItem gi = new GameItem();
+        shaderProgram.setUniform("modelViewMatrix", transformation.getModelViewMatrix( gi, viewMatrix));
 
         //setup vertex positions
         float[] pos = new float[3*4*size];
@@ -132,9 +132,12 @@ public class GraphUtils {
         glDeleteBuffers(vboId);
     }
 
-    public static void drawQuad(ShaderProgram shaderProgram, Vector4f color,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){
+    public static void drawQuad(ShaderProgram shaderProgram, Transformation transformation, Matrix4f viewMatrix, Vector4f color,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){
 
         shaderProgram.setUniform("material", new Material(color, .5f));
+
+        GameItem gi = new GameItem();
+        shaderProgram.setUniform("modelViewMatrix", transformation.getModelViewMatrix( gi, viewMatrix));
 
         //setup vertex positions and buffer
 
@@ -180,6 +183,6 @@ public class GraphUtils {
     }
 
     public static void drawQuad(ShaderProgram shader, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4) {
-        drawQuad(shader, new Vector4f(1f,1f,1f,1f), p1, p2, p3, p4);
+        //drawQuad(shader, new Vector4f(1f,1f,1f,1f), p1, p2, p3, p4);
     }
 }

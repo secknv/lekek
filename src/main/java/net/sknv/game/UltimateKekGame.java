@@ -8,9 +8,7 @@ import net.sknv.engine.graph.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.glClearColor;
 
 public class UltimateKekGame implements IGameLogic {
 

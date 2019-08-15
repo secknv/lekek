@@ -55,11 +55,12 @@ public class RayCast {
 
         p1.sub(p2, edge1);
         p3.sub(p2, edge2);
-        float dotP = edge1.dot(edge2) / edge2.dot(edge2);
 
         edge1.cross(edge2, triangleNormal);
         Vector3f intersectionPoint = intersectPlane(p1, triangleNormal);
+        if(intersectionPoint==null) return false;
 
+        float dotP = edge1.dot(edge2) / edge2.dot(edge2);
         edge2.mul(dotP, perp);
         perp.add(p2);
         perp.sub(p1, perpLength);
@@ -68,6 +69,7 @@ public class RayCast {
         intersectionPoint.sub(p1, intersectionLength);
 
         float barycentric = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
+        if(barycentric>1 || barycentric<0) return false;
 
         //-------------------------second barycentric
         p3.sub(p1, edge1);
@@ -79,7 +81,8 @@ public class RayCast {
         perp.sub(p3, perpLength);
         intersectionPoint.sub(p3, intersectionLength);
 
-        float barycentric2 = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
+        barycentric = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
+        if(barycentric>1 || barycentric<0) return false;
 
         //----------------------third barycentric
         p2.sub(p3, edge1);
@@ -91,8 +94,8 @@ public class RayCast {
         perp.sub(p2, perpLength);
         intersectionPoint.sub(p2, intersectionLength);
 
-        float barycentric3 = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
-
-        return barycentric<=1 && barycentric>=0 && barycentric2<=1 && barycentric2>=0 && barycentric3<=1 && barycentric3>=0;
+        barycentric = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
+        if(barycentric>1 || barycentric<0) return false;
+        return true;
     }
 }
