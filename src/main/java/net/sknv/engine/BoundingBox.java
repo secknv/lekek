@@ -6,7 +6,9 @@ public class BoundingBox {
     Vector3f min, max, rot;
 
     public BoundingBox(Vector3f min, Vector3f max) {//AABB
-        new BoundingBox(min, max, null);
+        this.min = min;
+        this.max = max;
+        this.rot = null;
     }
     public BoundingBox(Vector3f min, Vector3f max , Vector3f rot) {//OBB
         this.min = min;
