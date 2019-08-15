@@ -26,11 +26,14 @@ public class UltimateKekGame implements IGameLogic {
 
     private Vector3f ambientLight;
     private PointLight pointLight;
+    private DirectionalLight directionalLight;
+    private float lightAngle;
 
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
+        lightAngle = -90;
     }
 
     @Override
@@ -78,6 +81,10 @@ public class UltimateKekGame implements IGameLogic {
         pointLight = new PointLight(lightColor, lightPos, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0, 0, 0.1f);
         pointLight.setAttenuation(att);
+
+        lightPos = new Vector3f(-1, 0, 0);
+        lightColor = new Vector3f(1, 1, 1);
+        directionalLight = new DirectionalLight(lightColor, lightPos, lightIntensity);
     }
 
     @Override
@@ -109,12 +116,36 @@ public class UltimateKekGame implements IGameLogic {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRot(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
-        //gameItems[0].setPos(camera.getPos().x, camera.getPos().y, camera.getPos().z);
+
+        //number of seconds for the sun do to one full rotation
+        float fullCycleSeconds = 600f;
+
+        lightAngle += 1f/30f * (360/fullCycleSeconds);
+        System.out.println("sun angle: " + lightAngle + "°");
+        if (lightAngle > 90) {
+            directionalLight.setIntensity(1);
+            if (lightAngle >= 270) {
+                lightAngle = -90;
+            }
+        }
+        else if (lightAngle <= -80 || lightAngle >= 80) {
+            float factor = 1 - (float)(Math.abs(lightAngle) - 80)/10.0f;
+            directionalLight.setIntensity(factor);
+            directionalLight.getColor().y = Math.max(factor, 0.9f);
+            directionalLight.getColor().z = Math.max(factor, 0.5f);
+        }
+        else {
+            directionalLight.setIntensity(1);
+            directionalLight.setColor(new Vector3f(1, 1, 1));
+        }
+        double angRad = Math.toRadians(lightAngle);
+        directionalLight.getDirection().x = (float)Math.sin(angRad);
+        directionalLight.getDirection().y = (float)Math.cos(angRad);
     }
 
     @Override
     public void render(Window window, MouseInput mouseInput) {
-        renderer.render(window, mouseInput, camera, gameItems, ambientLight, pointLight);
+        renderer.render(window, mouseInput, camera, gameItems, ambientLight, pointLight, directionalLight);
     }
 
     @Override

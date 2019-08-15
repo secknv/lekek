@@ -46,13 +46,14 @@ public class Renderer {
         shaderProgram.createUniform("specularPower");
         shaderProgram.createUniform("ambientLight");
         shaderProgram.createPointLightUniform("pointLight");
+        shaderProgram.createDirectionalLightUniform("directionalLight");
     }
 
     public void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, MouseInput mouseInput, Camera camera, GameItem[] gameItems, Vector3f ambientLight, PointLight pointLight) {
+    public void render(Window window, MouseInput mouseInput, Camera camera, GameItem[] gameItems, Vector3f ambientLight, PointLight pointLight, DirectionalLight directionalLight) {
         clear();
 
         if (window.isResized()) {
@@ -83,9 +84,16 @@ public class Renderer {
         lightPos.z = aux.z;
         shaderProgram.setUniform("pointLight", currPointLight);
 
+        //directional light and transform to view coords
+        DirectionalLight currDirLight = new DirectionalLight(directionalLight);
+        Vector4f dir = new Vector4f(currDirLight.getDirection(), 0);
+        dir.mul(viewMatrix);
+        currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
+        shaderProgram.setUniform("directionalLight", currDirLight);
+
         shaderProgram.setUniform("texture_sampler", 0);
 
-        //dbz mark
+        //dbz mark ---------------------------------------------------------------------------
         if(true){
             Vector3f worldRay = mouseInput.getWorldRay(projectionMatrix, viewMatrix);
 
@@ -113,7 +121,7 @@ public class Renderer {
             }
 
         }
-        //end dbz mark
+        //end dbz mark ---------------------------------------------------------------------------
 
         //render each game item
         for (GameItem gameItem : gameItems) {
