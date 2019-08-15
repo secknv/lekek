@@ -1,5 +1,6 @@
 package net.sknv.engine.graph;
 
+import net.sknv.engine.BoundingBox;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
@@ -19,10 +20,12 @@ public class Mesh {
     public final List<Integer> vboIdList;
 
     public final int vertexCount;
+    public final float[] pos;
 
     private Material material;
 
     public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx) {
+        this.pos = pos;
         FloatBuffer posbuff = null;
         FloatBuffer textCoordsBuff = null;
         FloatBuffer vecNormalsBuffer = null;
@@ -152,5 +155,16 @@ public class Mesh {
         //delete VAO
         glBindVertexArray(0);
         glDeleteVertexArrays(vaoId);
+    }
+
+    public BoundingBox getAABBB() {//did this thinking this were words coords.. they aren't. Must apply scale & translation or somehow get that info from the getModelViewMatrix method so we don't do it twice?
+        //calculate AABB
+        Vector3f min = new Vector3f(pos[0], pos[1], pos[2]);
+        Vector3f max = new Vector3f(pos[0], pos[1], pos[2]);
+        for(int i=0; i!=this.pos.length; i+=3){
+            if(pos[i]<=min.x && pos[i+1]<=min.y && pos[i+2]<=min.z) min = new Vector3f(pos[i], pos[i+1], pos[i+2]);
+            if(pos[i]>=max.x && pos[i+1]>=max.y && pos[i+2]>=max.z) max = new Vector3f(pos[i], pos[i+1], pos[i+2]);
+        }
+        return new BoundingBox(min, max);
     }
 }

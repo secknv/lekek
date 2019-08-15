@@ -6,12 +6,14 @@ import org.joml.Vector3f;
 public class GameItem {
 
     private final Mesh mesh;
+    private final BoundingBox boundingBox;
 
     private final Vector3f pos, rot;
     private float scale;
 
     public GameItem(Mesh mesh) {
         this.mesh = mesh;
+        boundingBox = mesh.getAABBB();
         pos = new Vector3f(0, 0, 0);
         rot = new Vector3f(0, 0, 0);
         scale = 1;
@@ -19,6 +21,7 @@ public class GameItem {
 
     public GameItem() { //skill que eu vou mandar
         mesh = null;
+        boundingBox = null;
         pos = new Vector3f(0, 0, 0);
         rot = new Vector3f(0, 0, 0);
         scale = 1;
