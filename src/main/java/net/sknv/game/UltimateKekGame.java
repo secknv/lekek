@@ -119,7 +119,6 @@ public class UltimateKekGame implements IGameLogic {
         float fullCycleSeconds = 600f;
 
         lightAngle += 1f/30f * (360/fullCycleSeconds);
-        System.out.println("sun angle: " + lightAngle + "°");
         if (lightAngle > 90) {
             directionalLight.setIntensity(1);
             if (lightAngle >= 270) {

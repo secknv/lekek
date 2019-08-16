@@ -2,6 +2,8 @@ Hello this is my 27th attempt at getting started with lwjgl.
 
 Wow actually getting somewhere
 
+## Requires java 11+
+
 Inside project folder open cmd and do:
 
 `./gradlew run` to run on linux  
@@ -11,8 +13,8 @@ wow such gradle many amaze
 
 `a w s d` to move camera in plane  
 `space shift` to control height  
-`rightclick drag` to rotate  
-`left click spam` for epilepsy  
+`rightclick drag` to rotate
+
 `n m` to control point light  
 
 press power button to paint screen black
