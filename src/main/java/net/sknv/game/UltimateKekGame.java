@@ -22,16 +22,20 @@ public class UltimateKekGame implements IGameLogic {
 
     private GameItem[] gameItems;
 
+    //light stuff
     private Vector3f ambientLight;
-    private PointLight pointLight;
+    private PointLight[] pointLightList;
+    private SpotLight[] spotLightList;
     private DirectionalLight directionalLight;
-    private float lightAngle;
+    private float lightAngle, spotAngle, spotInc;
 
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
         lightAngle = -90;
+        spotAngle = 0;
+        spotInc = 1;
     }
 
     @Override
@@ -52,7 +56,7 @@ public class UltimateKekGame implements IGameLogic {
 
         GameItem gameItem0 = new GameItem(kek);
         gameItem0.setPos(0, 0, -5);
-        gameItem0.setScale(0.005f);
+        gameItem0.setScale(0.5f);
 
         GameItem gameItem1 = new GameItem(cube);
         gameItem1.setPos(0, 0, -2);
@@ -73,12 +77,27 @@ public class UltimateKekGame implements IGameLogic {
         gameItems = new GameItem[] {gameItem0, gameItem1, gameItem2, gameItem3, gameItem4};
 
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
-        Vector3f lightColor = new Vector3f(1, 1, 1);
-        Vector3f lightPos = new Vector3f(0, 0, 1);
+
+        // Point Light
+        Vector3f lightColor = new Vector3f(1, 0.5f, 0);
+        Vector3f lightPos = new Vector3f(0, 1, -2);
         float lightIntensity = 1.0f;
-        pointLight = new PointLight(lightColor, lightPos, lightIntensity);
+        PointLight pointLight = new PointLight(lightColor, lightPos, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0, 0, 0.1f);
         pointLight.setAttenuation(att);
+        pointLightList = new PointLight[] {pointLight};
+
+        // Spot Light
+        lightColor = new Vector3f(1, 0, 1);
+        lightPos = new Vector3f(0, 0, 10);
+        lightIntensity = 1.0f;
+        pointLight = new PointLight(lightColor, lightPos, lightIntensity);
+        att = new PointLight.Attenuation(0, 0, 0.2f);
+        pointLight.setAttenuation(att);
+        Vector3f coneDir = new Vector3f(0, 0, -1);
+        float cutoff = (float) Math.cos(Math.toRadians(140));
+        SpotLight spotLight = new SpotLight(pointLight, coneDir, cutoff);
+        spotLightList = new SpotLight[] {spotLight};
 
         lightPos = new Vector3f(-1, 0, 0);
         lightColor = new Vector3f(1, 1, 1);
@@ -96,12 +115,19 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraInc.y = -1;
         if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraInc.y = 1;
 
-        float lightPos = pointLight.getPos().x;
-        if (window.isKeyPressed(GLFW_KEY_N)) {
-            this.pointLight.getPos().x = lightPos - 0.1f;
+        float lightPosX = pointLightList[0].getPos().x;
+        float lightPosZ = pointLightList[0].getPos().z;
+        if (window.isKeyPressed(GLFW_KEY_UP)) {
+            this.pointLightList[0].getPos().z = lightPosZ - 0.1f;
         }
-        else if (window.isKeyPressed(GLFW_KEY_M)) {
-            this.pointLight.getPos().x = lightPos + 0.1f;
+        else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
+            this.pointLightList[0].getPos().z = lightPosZ + 0.1f;
+        }
+        else if (window.isKeyPressed(GLFW_KEY_LEFT)) {
+            this.pointLightList[0].getPos().x = lightPosX - 0.1f;
+        }
+        else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
+            this.pointLightList[0].getPos().x = lightPosX + 0.1f;
         }
     }
 
@@ -114,6 +140,16 @@ public class UltimateKekGame implements IGameLogic {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRot(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
+
+        /*
+        spotAngle += spotInc * 0.05f;
+        if (spotAngle > 2) spotInc = -1;
+        else if (spotAngle < -2) spotInc = 1;
+        double spotAngleRad = Math.toRadians(spotAngle);
+        Vector3f coneDir = spotLightList[0].getConeDirection();
+        coneDir.y = (float) Math.sin(spotAngleRad);*/
+
+        //update directional light -------------------------------------------------------------------------------------
 
         //number of seconds for the sun do to one full rotation
         float fullCycleSeconds = 600f;
@@ -138,11 +174,12 @@ public class UltimateKekGame implements IGameLogic {
         double angRad = Math.toRadians(lightAngle);
         directionalLight.getDirection().x = (float)Math.sin(angRad);
         directionalLight.getDirection().y = (float)Math.cos(angRad);
+        // end directional light ---------------------------------------------------------------------------------------
     }
 
     @Override
     public void render(Window window, MouseInput mouseInput) {
-        renderer.render(window, mouseInput, camera, gameItems, ambientLight, pointLight, directionalLight);
+        renderer.render(window, mouseInput, camera, gameItems, ambientLight, pointLightList, spotLightList, directionalLight);
     }
 
     @Override
