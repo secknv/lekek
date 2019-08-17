@@ -81,10 +81,10 @@ public class Renderer {
         //update view matrix
         Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
-        shaderProgram.setUniform("texture_sampler", 0);
-
         //update light uniforms
         renderLights(viewMatrix, ambientLight, pointLightList, spotLightList, directionalLight);
+
+        shaderProgram.setUniform("texture_sampler", 0);
 
         //dbz mark
         Vector3f worldRay = mouseInput.getWorldRay(projectionMatrix, viewMatrix);

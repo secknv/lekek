@@ -141,13 +141,13 @@ public class UltimateKekGame implements IGameLogic {
             camera.moveRot(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
 
-        /*
+
         spotAngle += spotInc * 0.05f;
         if (spotAngle > 2) spotInc = -1;
         else if (spotAngle < -2) spotInc = 1;
         double spotAngleRad = Math.toRadians(spotAngle);
         Vector3f coneDir = spotLightList[0].getConeDirection();
-        coneDir.y = (float) Math.sin(spotAngleRad);*/
+        coneDir.y = (float) Math.sin(spotAngleRad);
 
         //update directional light -------------------------------------------------------------------------------------
 
