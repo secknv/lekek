@@ -89,14 +89,13 @@ public class UltimateKekGame implements IGameLogic {
 
         // Spot Light
         lightColor = new Vector3f(1, 0, 1);
-        lightPos = new Vector3f(0, 0, 10);
+        lightPos = new Vector3f(0, 0, -2);
         lightIntensity = 1.0f;
         pointLight = new PointLight(lightColor, lightPos, lightIntensity);
-        att = new PointLight.Attenuation(0, 0, 0.2f);
+        att = new PointLight.Attenuation(0, 0, 0.1f);
         pointLight.setAttenuation(att);
         Vector3f coneDir = new Vector3f(0, 0, -1);
-        float cutoff = (float) Math.cos(Math.toRadians(140));
-        SpotLight spotLight = new SpotLight(pointLight, coneDir, cutoff);
+        SpotLight spotLight = new SpotLight(pointLight, coneDir, 140);
         spotLightList = new SpotLight[] {spotLight};
 
         lightPos = new Vector3f(-1, 0, 0);
@@ -115,19 +114,18 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraInc.y = -1;
         if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraInc.y = 1;
 
-        float lightPosX = pointLightList[0].getPos().x;
-        float lightPosZ = pointLightList[0].getPos().z;
+
         if (window.isKeyPressed(GLFW_KEY_UP)) {
-            this.pointLightList[0].getPos().z = lightPosZ - 0.1f;
+            this.pointLightList[0].getPos().z -= 0.1f;
         }
         else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
-            this.pointLightList[0].getPos().z = lightPosZ + 0.1f;
+            this.pointLightList[0].getPos().z += 0.1f;
         }
         else if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-            this.pointLightList[0].getPos().x = lightPosX - 0.1f;
+            this.pointLightList[0].getPos().x -= 0.1f;
         }
         else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
-            this.pointLightList[0].getPos().x = lightPosX + 0.1f;
+            this.pointLightList[0].getPos().x += 0.1f;
         }
     }
 
@@ -142,12 +140,12 @@ public class UltimateKekGame implements IGameLogic {
         }
 
 
-        spotAngle += spotInc * 0.05f;
+        /*spotAngle += spotInc * 0.05f;
         if (spotAngle > 2) spotInc = -1;
         else if (spotAngle < -2) spotInc = 1;
         double spotAngleRad = Math.toRadians(spotAngle);
         Vector3f coneDir = spotLightList[0].getConeDirection();
-        coneDir.y = (float) Math.sin(spotAngleRad);
+        coneDir.y = (float) Math.sin(spotAngleRad);*/
 
         //update directional light -------------------------------------------------------------------------------------
 
