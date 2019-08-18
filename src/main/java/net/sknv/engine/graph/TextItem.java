@@ -16,10 +16,6 @@ public class TextItem extends GameItem {
         this.numCols = numCols;
         this.numRows = numRows;
         Texture texture = new Texture(fontFileName);
-        this.setMesh(buildMesh(texture, numCols, numRows));
-    }
-
-    private Mesh buildMesh(Texture texture, int numCols, int numRows) {
-        //todo
+        //this.setMesh(buildMesh(texture, numCols, numRows));
     }
 }
