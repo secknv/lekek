@@ -173,13 +173,18 @@ public class Mesh {
         glDeleteVertexArrays(vaoId);
     }
 
-    public BoundingBox getAABB() {//did this thinking this were words coords.. they aren't. Must apply scale & translation or somehow get that info from the getModelViewMatrix method so we don't do it twice?
+    public BoundingBox getAABB() {//did this thinking this were world coords.. they aren't. Must apply scale & translation or somehow get that info from the getModelViewMatrix method so we don't do it twice?
         //calculate AABB
         Vector3f min = new Vector3f(pos[0], pos[1], pos[2]);
         Vector3f max = new Vector3f(pos[0], pos[1], pos[2]);
         for(int i=0; i!=this.pos.length; i+=3){
-            if(pos[i]<=min.x && pos[i+1]<=min.y && pos[i+2]<=min.z) min = new Vector3f(pos[i], pos[i+1], pos[i+2]);
-            if(pos[i]>=max.x && pos[i+1]>=max.y && pos[i+2]>=max.z) max = new Vector3f(pos[i], pos[i+1], pos[i+2]);
+            if(pos[i]<min.x) min.x = pos[i];
+            if(pos[i+1]<min.y) min.y = pos[i+1];
+            if(pos[i+2]<min.z) min.z = pos[i+2];
+
+            if(pos[i]>max.x) max.x = pos[i];
+            if(pos[i+1]>max.y) max.y = pos[i+1];
+            if(pos[i+2]>max.z) max.z = pos[i+2];
         }
         return new BoundingBox(min, max);
     }

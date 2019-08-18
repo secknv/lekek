@@ -103,6 +103,7 @@ public class Renderer {
 
         //render each game item
         for (GameItem gameItem : gameItems) {
+
             Mesh mesh = gameItem.getMesh();
             //set model view
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
@@ -111,6 +112,13 @@ public class Renderer {
             //if color
             shaderProgram.setUniform("material", mesh.getMaterial());
             mesh.render();
+
+            //dbz proof of concept AABB
+            System.out.println(gameItem.getBoundingBox().getMin() +" "+ gameItem.getBoundingBox().getMax());
+            //gameItem.getBoundingBox().transform(modelViewMatrix);
+            System.out.println(gameItem.getBoundingBox().getMin() +" "+ gameItem.getBoundingBox().getMax());
+
+            GraphUtils.drawLine(shaderProgram, transformation, modelViewMatrix, new Vector4f(1,1,0,0), gameItem.getBoundingBox().getMin(), gameItem.getBoundingBox().getMax());
         }
 
         if(devMode) renderGraphUtils(viewMatrix);
