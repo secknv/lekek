@@ -22,7 +22,7 @@ public class GraphUtils {
         shaderProgram.setUniform("material", new Material(color, 0.5f));
 
         GameItem gi = new GameItem();
-        shaderProgram.setUniform("modelViewMatrix", transformation.getModelViewMatrix( gi, viewMatrix));
+        shaderProgram.setUniform("modelViewMatrix", viewMatrix);
 
         //setup vertex positions and buffer
         FloatBuffer posBuff = MemoryUtil.memAllocFloat(6);

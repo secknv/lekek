@@ -29,6 +29,7 @@ public class Renderer {
 
     private float specularPower;
     private boolean devMode;
+    private boolean spaghet = true;
 
     public Renderer() {
         transformation = new Transformation();
@@ -114,12 +115,17 @@ public class Renderer {
             mesh.render();
 
             //dbz proof of concept AABB
+            System.out.println("---");
             System.out.println(gameItem.getBoundingBox().getMin() +" "+ gameItem.getBoundingBox().getMax());
-            //gameItem.getBoundingBox().transform(modelViewMatrix);
+            if(spaghet){
+                gameItem.getBoundingBox().transform(modelViewMatrix);
+            }
             System.out.println(gameItem.getBoundingBox().getMin() +" "+ gameItem.getBoundingBox().getMax());
 
-            GraphUtils.drawLine(shaderProgram, transformation, modelViewMatrix, new Vector4f(1,1,0,0), gameItem.getBoundingBox().getMin(), gameItem.getBoundingBox().getMax());
+            GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0), gameItem.getBoundingBox().getMin(), gameItem.getBoundingBox().getMax());
+            //GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0), new Vector3f(-3,0,-2), new Vector3f(-2,0,-1));
         }
+        spaghet = false;
 
         if(devMode) renderGraphUtils(viewMatrix);
 
