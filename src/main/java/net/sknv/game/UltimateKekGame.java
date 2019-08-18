@@ -116,16 +116,16 @@ public class UltimateKekGame implements IGameLogic {
 
 
         if (window.isKeyPressed(GLFW_KEY_UP)) {
-            this.pointLightList[0].getPos().z -= 0.1f;
+            gameItems[0].getPos().z -= 0.1f;
         }
         else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
-            this.pointLightList[0].getPos().z += 0.1f;
+            gameItems[0].getPos().z += 0.1f;
         }
         else if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-            this.pointLightList[0].getPos().x -= 0.1f;
+            gameItems[0].getPos().x -= 0.1f;
         }
         else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
-            this.pointLightList[0].getPos().x += 0.1f;
+            gameItems[0].getPos().x += 0.1f;
         }
     }
 
@@ -183,6 +183,6 @@ public class UltimateKekGame implements IGameLogic {
     @Override
     public void cleanup() {
         renderer.cleanup();
-        for(GameItem item : gameItems) item.getMesh().cleanup();
+        for(GameItem item : gameItems) item.getMesh().cleanUp();
     }
 }
