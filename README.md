@@ -15,6 +15,6 @@ wow such gradle many amaze
 `space shift` to control height  
 `rightclick drag` to rotate
 
-`arrow keys` to control point light  
+`arrow keys` to control gameItem0
 
 press power button to paint screen black
