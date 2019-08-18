@@ -30,14 +30,13 @@ public class BoundingBox {
         return rot;
     }
 
-    public void transform(Matrix4f modelViewMatrix) { //vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+    public Vector3f[] transform(Matrix4f modelViewMatrix) { //vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
         Vector4f min = new Vector4f(this.min.x, this.min.y, this.min.z, 1f);
         Vector4f max = new Vector4f(this.max.x, this.max.y, this.max.z, 1f);
 
         modelViewMatrix.transform(min);
         modelViewMatrix.transform(max);
 
-        this.min = new Vector3f(min.x, min.y, min.z);
-        this.max = new Vector3f(max.x, max.y, max.z);
+        return new Vector3f[]{new Vector3f(min.x, min.y, min.z), new Vector3f(max.x, max.y, max.z)};
     }
 }

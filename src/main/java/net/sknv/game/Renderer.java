@@ -115,17 +115,10 @@ public class Renderer {
             mesh.render();
 
             //dbz proof of concept AABB
-            System.out.println("---");
-            System.out.println(gameItem.getBoundingBox().getMin() +" "+ gameItem.getBoundingBox().getMax());
-            if(spaghet){
-                gameItem.getBoundingBox().transform(modelViewMatrix);
-            }
-            System.out.println(gameItem.getBoundingBox().getMin() +" "+ gameItem.getBoundingBox().getMax());
-
-            GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0), gameItem.getBoundingBox().getMin(), gameItem.getBoundingBox().getMax());
-            //GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0), new Vector3f(-3,0,-2), new Vector3f(-2,0,-1));
+            Vector3f[] bb = gameItem.getBoundingBox().transform(modelViewMatrix);
+            GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0), bb[0], bb[1]);
+            //GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0), new Vector3f(-2,0,-2), new Vector3f(-1,0,-1));
         }
-        spaghet = false;
 
         if(devMode) renderGraphUtils(viewMatrix);
 
@@ -182,9 +175,6 @@ public class Renderer {
     private void renderGraphUtils(Matrix4f viewMatrix) {
         //grid
         GraphUtils.drawGrid(shaderProgram, transformation, viewMatrix, new Vector3f(0,0,0),20);
-
-        //ray cast
-
     }
 
     public void cleanup() {
