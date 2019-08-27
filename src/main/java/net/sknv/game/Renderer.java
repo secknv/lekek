@@ -10,8 +10,6 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import net.sknv.engine.graph.RayCast;
 
-import java.lang.invoke.SwitchPoint;
-
 import static org.lwjgl.opengl.GL11.*;
 
 public class Renderer {
@@ -115,9 +113,8 @@ public class Renderer {
             mesh.render();
 
             //dbz proof of concept AABB
-            Vector3f[] bb = gameItem.getBoundingBox().transform(modelViewMatrix);
-            GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0), bb[0], bb[1]);
-            //GraphUtils.drawLine(shaderProgram, transformation, viewMatrix, new Vector4f(1,1,0,0), new Vector3f(-2,0,-2), new Vector3f(-1,0,-1));
+            Vector3f[] bb = gameItem.getBoundingBox().transform(transformation.getModelMatrix(gameItem));
+            GraphUtils.drawLine(shaderProgram, viewMatrix, new Vector4f(1,0,0,0), bb[0], bb[1]);
         }
 
         if(devMode) renderGraphUtils(viewMatrix);

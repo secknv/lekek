@@ -34,18 +34,22 @@ public class Transformation {
         return viewMatrix;
     }
 
-    public Matrix4f getModelViewMatrix(GameItem item, Matrix4f viewMatrix) {
+    public Matrix4f getModelViewMatrix(GameItem item, Matrix4f viewMatrix) {// modelViewMatrix = modelMatrix * viewMatrix
+        //must create copy
+        Matrix4f viewCurr = new Matrix4f(viewMatrix);
+        //because this changes the values of viewCurr and since there is only one viewMatrix for all the items,
+        //the values would accumulate every time this method ran
+        return viewCurr.mul(getModelMatrix(item));
+    }
+
+    public Matrix4f getModelMatrix(GameItem item){
         Vector3f rotation = item.getRot();
         modelViewMatrix.identity().translate(item.getPos()).
                 rotateX((float)Math.toRadians(-rotation.x)).
                 rotateY((float)Math.toRadians(-rotation.y)).
                 rotateZ((float)Math.toRadians(-rotation.z)).
                 scale(item.getScale());
-        //must create copy
-        Matrix4f viewCurr = new Matrix4f(viewMatrix);
-        //because this changes the values of viewCurr and since there is only one viewMatrix for all the items,
-        //the values would accumulate every time this method ran
-        return viewCurr.mul(modelViewMatrix);
+        return modelViewMatrix;
     }
 
 }

@@ -17,11 +17,9 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class GraphUtils {
 
-    public static void drawLine(ShaderProgram shaderProgram,Transformation transformation, Matrix4f viewMatrix, Vector4f color, Vector3f i, Vector3f f){
+    public static void drawLine(ShaderProgram shaderProgram, Matrix4f viewMatrix, Vector4f color, Vector3f i, Vector3f f){
 
         shaderProgram.setUniform("material", new Material(color, 0.5f));
-
-        GameItem gi = new GameItem();
         shaderProgram.setUniform("modelViewMatrix", viewMatrix);
 
         //setup vertex positions and buffer
