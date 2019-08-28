@@ -173,7 +173,7 @@ public class Mesh {
         glDeleteVertexArrays(vaoId);
     }
 
-    public BoundingBox getAABB() {//did this thinking this were world coords.. they aren't. Must apply scale & translation or somehow get that info from the getModelViewMatrix method so we don't do it twice?
+    public BoundingBox getAABB() {
         //calculate AABB
         Vector3f min = new Vector3f(pos[0], pos[1], pos[2]);
         Vector3f max = new Vector3f(pos[0], pos[1], pos[2]);

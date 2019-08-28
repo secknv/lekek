@@ -1,5 +1,6 @@
 package net.sknv.engine.graph;
 
+import net.sknv.engine.BoundingBox;
 import net.sknv.engine.GameItem;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -182,5 +183,72 @@ public class GraphUtils {
 
     public static void drawQuad(ShaderProgram shader, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4) {
         //drawQuad(shader, new Vector4f(1f,1f,1f,1f), p1, p2, p3, p4);
+    }
+
+    public static void drawAABB(ShaderProgram shaderProgram, Matrix4f viewMatrix, Vector4f color, BoundingBox bb) {
+        shaderProgram.setUniform("material", new Material(color, 0.5f));
+        shaderProgram.setUniform("modelViewMatrix", viewMatrix);
+
+        Vector3f min = bb.tmin;
+        Vector3f max = bb.tmax;
+
+        //setup vertex positions and buffer
+        FloatBuffer posBuff = MemoryUtil.memAllocFloat(8*3);
+        posBuff.put(new float[]{
+                min.x, min.y, min.z,
+                max.x, min.y, min.z,
+                min.x, max.y, min.z,
+                min.x, min.y, max.z,
+
+                min.x, max.y, max.z,
+                max.x, min.y, max.z,
+                max.x, max.y, min.z,
+                max.x, max.y, max.z,
+        }).flip();
+
+        //setup indexes and buffer
+        IntBuffer idxBuff = MemoryUtil.memAllocInt(24);
+        idxBuff.put(new int[]{
+                0,1,
+                0,2,
+                0,3,
+
+                1,5,
+                1,6,
+
+                2,4,
+                2,6,
+
+                3,4,
+                3,5,
+
+                4,7,
+                5,7,
+                6,7,
+        }).flip();
+
+        int vaoId = glGenVertexArrays();
+        glBindVertexArray(vaoId);
+
+        int vboId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ARRAY_BUFFER, posBuff, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+
+
+        int vboId2 = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glBindVertexArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER,0);
+        glDeleteBuffers(vboId);
     }
 }

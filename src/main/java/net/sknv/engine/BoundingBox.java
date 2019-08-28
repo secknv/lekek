@@ -6,6 +6,8 @@ import org.joml.Vector4f;
 
 public class BoundingBox {
     Vector3f min, max, rot;
+    public Vector3f tmin, tmax, trot;
+    float[] triangles;
 
     public BoundingBox(Vector3f min, Vector3f max) {//AABB
         this.min = min;
@@ -30,13 +32,14 @@ public class BoundingBox {
         return rot;
     }
 
-    public Vector3f[] transform(Matrix4f modelMatrix) {
+    public void transform(Matrix4f modelMatrix) {
         Vector4f min = new Vector4f(this.min.x, this.min.y, this.min.z, 1f);
         Vector4f max = new Vector4f(this.max.x, this.max.y, this.max.z, 1f);
 
         modelMatrix.transform(min);
         modelMatrix.transform(max);
 
-        return new Vector3f[]{new Vector3f(min.x, min.y, min.z), new Vector3f(max.x, max.y, max.z)};
+        tmin = new Vector3f(min.x, min.y, min.z);
+        tmax = new Vector3f(max.x, max.y, max.z);
     }
 }

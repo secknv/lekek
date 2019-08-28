@@ -113,8 +113,11 @@ public class Renderer {
             mesh.render();
 
             //dbz proof of concept AABB
-            Vector3f[] bb = gameItem.getBoundingBox().transform(transformation.getModelMatrix(gameItem));
-            GraphUtils.drawLine(shaderProgram, viewMatrix, new Vector4f(1,0,0,0), bb[0], bb[1]);
+            gameItem.getBoundingBox().transform(transformation.getModelMatrix(gameItem));// bb coords are being transformed from local to world every frame...
+
+            if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)){
+                GraphUtils.drawAABB(shaderProgram, viewMatrix, new Vector4f(255,255,0,0), gameItem.getBoundingBox());
+            }
         }
 
         if(devMode) renderGraphUtils(viewMatrix);

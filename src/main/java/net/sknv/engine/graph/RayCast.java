@@ -1,5 +1,6 @@
 package net.sknv.engine.graph;
 
+import net.sknv.engine.GameItem;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -97,5 +98,33 @@ public class RayCast {
         barycentric = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
         if(barycentric>1 || barycentric<0) return false;
         return true;
+    }
+
+    public boolean intersectsItem(GameItem gameItem) {
+        Vector3f min = gameItem.getBoundingBox().tmin;
+        Vector3f max = gameItem.getBoundingBox().tmax;
+
+        Vector3f[] vertex = new Vector3f[]{
+                min, new Vector3f(max.x, min.y, min.z), new Vector3f(min.x, min.y, max.z),
+                min, new Vector3f(min.x, max.y, min.z), new Vector3f(min.x, min.z, max.z),
+                min, new Vector3f(min.x, max.y, min.z), new Vector3f(max.x, min.y, min.z),
+
+                max, new Vector3f(max.x, max.y, min.z), new Vector3f(min.x, max.y, max.z),
+                max, new Vector3f(max.x, min.y, max.z), new Vector3f(min.x, max.y, max.z),
+                max, new Vector3f(max.x, min.y, max.z), new Vector3f(max.x, max.y, min.z),
+
+                new Vector3f(min.x, max.y, min.z), new Vector3f(max.x, max.y, min.z), new Vector3f(min.x, max.y, max.z),
+                new Vector3f(min.x, max.y, min.z), new Vector3f(max.x, max.y, min.z), new Vector3f(max.x, min.y, min.z),
+                new Vector3f(min.x, max.y, min.z), new Vector3f(min.x, max.y, max.z), new Vector3f(min.x, min.y, max.z),
+
+                new Vector3f(max.x, min.y, max.z), new Vector3f(max.x, min.y, min.z), new Vector3f(min.x, min.y, max.z),
+                new Vector3f(max.x, min.y, max.z), new Vector3f(max.x, min.y, min.z), new Vector3f(max.x, max.y, min.z),
+                new Vector3f(max.x, min.y, max.z), new Vector3f(min.x, min.y, max.z), new Vector3f(min.x, max.y, max.z),
+        };
+
+        for(int i=0; i!=vertex.length; i+=3){
+            if(intersectsTriangle(vertex[i], vertex[i+1], vertex[i+2])) return true;
+        }
+        return false;
     }
 }
