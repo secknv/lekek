@@ -1,18 +1,22 @@
 package net.sknv.engine;
 
 import net.sknv.engine.graph.Mesh;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class GameItem {
 
+    public Vector3f accel;
+    public boolean isColliding = false;
     private Mesh mesh;
     private BoundingBox boundingBox;
-
-    private final Vector3f pos, rot;
+    private Vector3f pos, nextPos, rot;
     private float scale;
 
     public GameItem() { //skill que dbz mandou has been officialized
+        accel = new Vector3f(0, 0, 0);
         pos = new Vector3f(0, 0, 0);
+        nextPos = new Vector3f(0, 0, 0);
         rot = new Vector3f(0, 0, 0);
         scale = 1;
     }
@@ -20,7 +24,7 @@ public class GameItem {
     public GameItem(Mesh mesh) {
         this();
         this.mesh = mesh;
-        this.boundingBox = mesh.getAABB();
+        this.boundingBox = mesh.getAABB(this);
     }
 
     public Vector3f getPos() {
@@ -31,6 +35,7 @@ public class GameItem {
         this.pos.x = x;
         this.pos.y = y;
         this.pos.z = z;
+        boundingBox.transform(this);
     }
 
     public Vector3f getRot() {
@@ -41,6 +46,7 @@ public class GameItem {
         this.rot.x = x;
         this.rot.y = y;
         this.rot.z = z;
+        boundingBox.transform(this);
     }
 
     public float getScale() {
@@ -66,5 +72,17 @@ public class GameItem {
 
     public void setBoundingBox(BoundingBox boundingBox) {
         this.boundingBox = boundingBox;
+    }
+
+    public Vector3f tryMove(){
+        nextPos = pos;
+        pos = pos.add(accel.mul(0.1f));
+        boundingBox.transform(this);
+        return new Vector3f(accel.x, accel.y, accel.z);
+    }
+
+    public void move() {
+        //pos = nextPos;
+        accel.zero();
     }
 }

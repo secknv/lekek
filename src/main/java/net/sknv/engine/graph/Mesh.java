@@ -1,6 +1,7 @@
 package net.sknv.engine.graph;
 
 import net.sknv.engine.BoundingBox;
+import net.sknv.engine.GameItem;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
@@ -173,7 +174,7 @@ public class Mesh {
         glDeleteVertexArrays(vaoId);
     }
 
-    public BoundingBox getAABB() {
+    public BoundingBox getAABB(GameItem gameItem) {
         //calculate AABB
         Vector3f min = new Vector3f(pos[0], pos[1], pos[2]);
         Vector3f max = new Vector3f(pos[0], pos[1], pos[2]);
@@ -186,6 +187,6 @@ public class Mesh {
             if(pos[i+1]>max.y) max.y = pos[i+1];
             if(pos[i+2]>max.z) max.z = pos[i+2];
         }
-        return new BoundingBox(min, max);
+        return new BoundingBox(gameItem, min, max);
     }
 }

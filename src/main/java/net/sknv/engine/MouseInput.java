@@ -1,6 +1,7 @@
 package net.sknv.engine;
 
 import org.joml.*;
+import org.lwjgl.glfw.GLFWVidMode;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -35,6 +36,8 @@ public class MouseInput {
             leftClicked = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS;
             rightClicked = button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS;
         });
+
+        glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
     public Vector2f getDisplVec() {
@@ -61,6 +64,7 @@ public class MouseInput {
 
         previousPos.x = currentPos.x;
         previousPos.y = currentPos.y;
+        glfwSetCursorPos(window.getWindowHandle(), previousPos.x, previousPos.y);
     }
 
     public boolean isLeftClicked() {
@@ -73,6 +77,10 @@ public class MouseInput {
 
     public Vector2d getPos() {
         return currentPos;
+    }
+
+    public Vector2d getPrevPos() {
+        return previousPos;
     }
 
     public Vector3f getWorldRay(Matrix4f projectionMatrix, Matrix4f viewMatrix) {

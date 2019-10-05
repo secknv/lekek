@@ -1,5 +1,6 @@
 package net.sknv.engine;
 
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -124,5 +125,9 @@ public class Window {
 
     public long getWindowHandle() {
         return windowHandle;
+    }
+
+    public Vector2f getCenter() {
+        return new Vector2f(width/2, height/2);
     }
 }

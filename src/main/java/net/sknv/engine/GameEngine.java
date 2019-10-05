@@ -3,7 +3,7 @@ package net.sknv.engine;
 public class GameEngine implements Runnable {
 
     public static final int TARGET_FPS = 75;
-    public static final int TARGET_UPS = 30;
+    public static final int TARGET_UPS = 60;
 
     private final Window window;
     private final Timer timer;
@@ -84,7 +84,7 @@ public class GameEngine implements Runnable {
     }
 
     protected void update(float interval) {
-        gameLogic.update(interval, mouseInput);
+        gameLogic.update(window, interval, mouseInput);
     }
 
     protected void render() {

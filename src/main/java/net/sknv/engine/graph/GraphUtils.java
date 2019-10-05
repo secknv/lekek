@@ -251,4 +251,15 @@ public class GraphUtils {
         glBindBuffer(GL_ARRAY_BUFFER,0);
         glDeleteBuffers(vboId);
     }
+
+    public static void drawAxis(ShaderProgram shaderProgram, Transformation transformation, Matrix4f viewMatrix) {
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        glLineWidth(10f);
+        drawLine(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), new Vector3f(-20,0,0), new Vector3f(20,0,0));
+        drawLine(shaderProgram, viewMatrix, new Vector4f(0,255,0,0), new Vector3f(0,-20,0), new Vector3f(0,20,0));
+        drawLine(shaderProgram, viewMatrix, new Vector4f(0,0,255,0), new Vector3f(0,0,-20), new Vector3f(0,0,20));
+        glDisable(GL_LINE_SMOOTH);
+
+    }
 }

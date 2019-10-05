@@ -10,6 +10,8 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import net.sknv.engine.graph.RayCast;
 
+import java.util.ArrayList;
+
 import static org.lwjgl.opengl.GL11.*;
 
 public class Renderer {
@@ -27,7 +29,6 @@ public class Renderer {
 
     private float specularPower;
     private boolean devMode;
-    private boolean spaghet = true;
 
     public Renderer() {
         transformation = new Transformation();
@@ -62,7 +63,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, MouseInput mouseInput, Camera camera, GameItem[] gameItems, Vector3f ambientLight,
+    public void render(Window window, MouseInput mouseInput, Camera camera, ArrayList<GameItem> gameItems, Vector3f ambientLight,
                        PointLight[] pointLightList, SpotLight[] spotLightList, DirectionalLight directionalLight) {
         clear();
 
@@ -113,14 +114,17 @@ public class Renderer {
             mesh.render();
 
             //dbz proof of concept AABB
-            gameItem.getBoundingBox().transform(transformation.getModelMatrix(gameItem));// bb coords are being transformed from local to world every frame...
-
+            //gameItem.getBoundingBox().transform(gameItem);// bb coords are being transformed from local to world every frame...
+            //not anymore, bb coords are updated upon movement (done in update like its supposed to)
             if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)){
                 GraphUtils.drawAABB(shaderProgram, viewMatrix, new Vector4f(255,255,0,0), gameItem.getBoundingBox());
             }
+            if(gameItem.isColliding){
+                GraphUtils.drawAABB(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
+            }
         }
 
-        if(devMode) renderGraphUtils(viewMatrix);
+        if(true) renderGraphUtils(viewMatrix);
 
         shaderProgram.unbind();
     }
@@ -173,8 +177,8 @@ public class Renderer {
     }
 
     private void renderGraphUtils(Matrix4f viewMatrix) {
-        //grid
-        GraphUtils.drawGrid(shaderProgram, transformation, viewMatrix, new Vector3f(0,0,0),20);
+        //GraphUtils.drawGrid(shaderProgram, transformation, viewMatrix, new Vector3f(0,0,0),20);
+        GraphUtils.drawAxis(shaderProgram, transformation, viewMatrix);
     }
 
     public void cleanup() {
