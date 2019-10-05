@@ -5,7 +5,6 @@ import com.google.common.collect.Table;
 import net.sknv.engine.BoundingBox;
 import net.sknv.engine.GameItem;
 import org.joml.Vector3f;
-
 import java.util.*;
 
 public class SPCollisions implements ISweepPrune{

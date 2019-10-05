@@ -1,7 +1,6 @@
 package net.sknv.engine;
 
 import net.sknv.engine.graph.Mesh;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class GameItem {

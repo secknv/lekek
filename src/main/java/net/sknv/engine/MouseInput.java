@@ -1,7 +1,6 @@
 package net.sknv.engine;
 
 import org.joml.*;
-import org.lwjgl.glfw.GLFWVidMode;
 
 import static org.lwjgl.glfw.GLFW.*;
 
