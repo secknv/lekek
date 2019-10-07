@@ -26,7 +26,10 @@ public class SPCollisions implements ISweepPrune{
                 if (yCollisions.contains(bb2) && zCollisions.contains(bb2)){
                     yCollisions.remove(bb2);
                     zCollisions.remove(bb2);
-                    throw new Exception("Object Colliding");
+                    //throw new Exception("Object Colliding"); if spawning colliding item isn't allowed
+                    collisionPairs.put(bb,bb2, 3);
+                    bb.gameItem.isColliding=true;
+                    bb2.gameItem.isColliding=true;
                 }
                 else {
                     collisionPairs.put(bb, bb2, 1);
@@ -58,7 +61,7 @@ public class SPCollisions implements ISweepPrune{
     }
 
     @Override
-    public void updateItem(GameItem gameItem) {
+    public boolean updateItem(GameItem gameItem) {
         BoundingBox bb = gameItem.getBoundingBox();
         final int[] nColl = {0};
 
@@ -77,26 +80,31 @@ public class SPCollisions implements ISweepPrune{
         Map<BoundingBox, Integer> pairs = collisionPairs.column(bb);
         pairs.forEach((boundingBox, integer) -> {
             if (integer == 3){
-                boundingBox.gameItem.isColliding = true;
-                gameItem.isColliding = true;
-                nColl[0]++;
-            } else {
-                boundingBox.gameItem.isColliding = false;
-            }
+                if(testCollision(bb, boundingBox)){
+                    boundingBox.gameItem.isColliding = true;
+                    gameItem.isColliding = true;
+                    nColl[0]++;
+                } else boundingBox.gameItem.isColliding = false;
+            } else boundingBox.gameItem.isColliding = false;
         });
 
         Map<BoundingBox, Integer> pairs2 = collisionPairs.row(bb);
         pairs2.forEach((boundingBox, integer) -> {
             if (integer == 3){
-                boundingBox.gameItem.isColliding = true;
-                gameItem.isColliding = true;
-                nColl[0]++;
-            } else {
-                boundingBox.gameItem.isColliding = false;
-            }
+                if(testCollision(bb, boundingBox)) {
+                    boundingBox.gameItem.isColliding = true;
+                    gameItem.isColliding = true;
+                    nColl[0]++;
+                } else boundingBox.gameItem.isColliding = false;
+            } else boundingBox.gameItem.isColliding = false;
         });
 
-        if (nColl[0] == 0) gameItem.isColliding = false;
+        if (nColl[0] == 0){
+            gameItem.isColliding = false;
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -203,7 +211,7 @@ public class SPCollisions implements ISweepPrune{
             while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).position <= value) {
                 if (bb.xMax.position > xAxis.get(i).position) {
                     nextBb = xAxis.get(i).getBox();
-                    if (xAxis.get(i).isMin) {//collision
+                    if (xAxis.get(i).isMin && testCollisionX(bb, nextBb)) {//collision
                         incCollisions(bb, nextBb);
                     }
                 }
@@ -214,7 +222,7 @@ public class SPCollisions implements ISweepPrune{
             while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).position <= value) {
                 if (bb.xMin.position > xAxis.get(i).position) {
                     nextBb = xAxis.get(i).getBox();
-                    if (!xAxis.get(i).isMin) {//out collision
+                    if (!xAxis.get(i).isMin && !testCollisionX(bb, nextBb)) {//out collision
                         decCollisions(bb, nextBb);
                     }
                 }
@@ -227,7 +235,7 @@ public class SPCollisions implements ISweepPrune{
             while (i > -1 && i < xAxis.size()-1 && xAxis.get(i).position >= value) {
                 if (bb.xMin.position < xAxis.get(i).position) {
                     prevBb = xAxis.get(i).getBox();
-                    if (!xAxis.get(i).isMin) {//collision
+                    if (!xAxis.get(i).isMin && testCollisionX(bb, prevBb)) {//collision
                         incCollisions(bb, prevBb);
                     }
                 }
@@ -238,7 +246,7 @@ public class SPCollisions implements ISweepPrune{
             while (i > -1 && i < xAxis.size()-1 && xAxis.get(i).position >= value) {
                 if (bb.xMax.position < xAxis.get(i).position) {
                     prevBb = xAxis.get(i).getBox();
-                    if (xAxis.get(i).isMin) {//out collision
+                    if (xAxis.get(i).isMin && !testCollisionX(bb, prevBb)) {//out collision
                         decCollisions(bb, prevBb);
                     }
                 }
@@ -256,7 +264,7 @@ public class SPCollisions implements ISweepPrune{
             while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).position <= value) {
                 if (bb.yMax.position > yAxis.get(i).position) {
                     nextBb = yAxis.get(i).getBox();
-                    if (yAxis.get(i).isMin) {//collision
+                    if (yAxis.get(i).isMin && testCollisionY(bb, nextBb)) {//collision
                         incCollisions(bb, nextBb);
                     }
                 }
@@ -268,7 +276,7 @@ public class SPCollisions implements ISweepPrune{
             while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).position <= value) {
                 if (bb.yMin.position > yAxis.get(i).position) {
                     nextBb = yAxis.get(i).getBox();
-                    if (!yAxis.get(i).isMin) {//out collision
+                    if (!yAxis.get(i).isMin && !testCollisionY(bb, nextBb)){//out collision
                         decCollisions(bb, nextBb);
                     }
                 }
@@ -282,7 +290,7 @@ public class SPCollisions implements ISweepPrune{
             while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).position >= value) {
                 if (bb.yMin.position < yAxis.get(i).position) {
                     prevBb = yAxis.get(i).getBox();
-                    if (!yAxis.get(i).isMin) {//collision
+                    if (!yAxis.get(i).isMin && testCollisionY(bb, prevBb)) {//collision
                         incCollisions(bb, prevBb);
                     }
                 }
@@ -293,7 +301,7 @@ public class SPCollisions implements ISweepPrune{
             while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).position >= value) {
                 if (bb.yMax.position < yAxis.get(i).position) {
                     prevBb = yAxis.get(i).getBox();
-                    if (yAxis.get(i).isMin) {//out collision
+                    if (yAxis.get(i).isMin && !testCollisionY(bb, prevBb)) {//out collision
                         decCollisions(bb, prevBb);
                     }
                 }
@@ -310,7 +318,7 @@ public class SPCollisions implements ISweepPrune{
             while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).position <= value) {
                 if (bb.zMax.position > zAxis.get(i).position) {
                     nextBb = zAxis.get(i).getBox();
-                    if (zAxis.get(i).isMin) {//collision
+                    if (zAxis.get(i).isMin && testCollisionZ(bb, nextBb)) {//collision
                         incCollisions(bb, nextBb);
                     }
                 }
@@ -321,7 +329,7 @@ public class SPCollisions implements ISweepPrune{
             while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).position <= value) {
                 if (bb.zMin.position > zAxis.get(i).position) {
                     nextBb = zAxis.get(i).getBox();
-                    if (!zAxis.get(i).isMin) {//out collision
+                    if (!zAxis.get(i).isMin && !testCollisionZ(bb, nextBb) ) {//out collision
                         decCollisions(bb, nextBb);
                     }
                 }
@@ -334,7 +342,7 @@ public class SPCollisions implements ISweepPrune{
             while (i > -1 && i < zAxis.size()-1 && zAxis.get(i).position >= value) {
                 if (bb.zMin.position < zAxis.get(i).position) {
                     prevBb = zAxis.get(i).getBox();
-                    if (!zAxis.get(i).isMin) {//collision
+                    if (!zAxis.get(i).isMin && testCollisionZ(bb, prevBb)) {//collision
                         incCollisions(bb, prevBb);
                     }
                 }
@@ -345,7 +353,7 @@ public class SPCollisions implements ISweepPrune{
             while (i > -1 && i < zAxis.size()-1 && zAxis.get(i).position >= value) {
                 if (bb.zMax.position < zAxis.get(i).position) {
                     prevBb = zAxis.get(i).getBox();
-                    if (zAxis.get(i).isMin) {//out collision
+                    if (zAxis.get(i).isMin && !testCollisionZ(bb, prevBb)) {//out collision
                         decCollisions(bb, prevBb);
                     }
                 }
@@ -375,15 +383,30 @@ public class SPCollisions implements ISweepPrune{
     }
 
     private void increment(BoundingBox bb, BoundingBox bb2) {
-        collisionPairs.put(bb, bb2, collisionPairs.get(bb, bb2) + 1);
+        if(collisionPairs.get(bb, bb2) < 3) collisionPairs.put(bb, bb2, collisionPairs.get(bb, bb2) + 1);
     }
 
     private void decrement(BoundingBox bb, BoundingBox bb2) {
-        collisionPairs.put(bb, bb2, collisionPairs.get(bb, bb2) - 1);
+        if(collisionPairs.get(bb, bb2) > 0) collisionPairs.put(bb, bb2, collisionPairs.get(bb, bb2) - 1);
+    }
+
+    private boolean testCollision(BoundingBox bb, BoundingBox bb2) {
+        return testCollisionX(bb, bb2) && testCollisionY(bb, bb2) && testCollisionZ(bb, bb2);
+    }
+
+    private boolean testCollisionX(BoundingBox bb, BoundingBox bb2){
+        return !(bb.xMax.position<=bb2.xMin.position || bb.xMin.position>=bb2.xMax.position);
+    }
+
+    private boolean testCollisionY(BoundingBox bb, BoundingBox bb2){
+        return !(bb.yMax.position<=bb2.yMin.position || bb.yMin.position>=bb2.yMax.position);
+    }
+
+    private boolean testCollisionZ(BoundingBox bb, BoundingBox bb2){
+        return !(bb.zMax.position<=bb2.zMin.position || bb.zMin.position>=bb2.zMax.position);
     }
 
     public void printAxis() {
-        System.out.println("-----------------------------------------------------------");
         System.out.println(xAxis);
         System.out.println(yAxis);
         System.out.println(zAxis);

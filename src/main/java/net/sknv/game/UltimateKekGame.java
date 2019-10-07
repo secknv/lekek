@@ -63,12 +63,14 @@ public class UltimateKekGame implements IGameLogic {
 
         float scale = .25f;
 
+        /*
         GameItem gameItem0 = new GameItem(kek);
-        gameItem0.setPos(0, 0, -1);
+        gameItem0.setPos(0, 0, -6);
         gameItem0.setScale(.5f);
+        */
 
         GameItem gameItem1 = new GameItem(cube);
-        gameItem1.setPos(0, 0, 0);
+        gameItem1.setPos(0, 0, .6f);
         gameItem1.setScale(scale);
 
         GameItem gameItem2 = new GameItem(cube);
@@ -83,7 +85,11 @@ public class UltimateKekGame implements IGameLogic {
         gameItem4.setPos(1f, 0, 1f);
         gameItem4.setScale(scale);
 
-        gameItems = new ArrayList<>(Arrays.asList(new GameItem[]{gameItem0, gameItem1, gameItem2, gameItem3, gameItem4}));
+        GameItem gameItem5 = new GameItem(cube);
+        gameItem5.setPos(.6f, 0, .6f);
+        gameItem5.setScale(scale);
+
+        gameItems = new ArrayList<>(Arrays.asList(new GameItem[]{ gameItem1, gameItem2, gameItem3, gameItem4, gameItem5}));
 
         //collisions
         for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
@@ -93,14 +99,9 @@ public class UltimateKekGame implements IGameLogic {
                 sweepPrune.addItem(gameItem);
             } catch (Exception e){
                 System.out.println("object colliding");;
-                iterator.remove();
+                //iterator.remove();
             }
         }
-
-        for(GameItem gameItem : gameItems){
-
-        }
-
         System.out.println(gameItems);
         sweepPrune.printAxis();
 
@@ -144,13 +145,13 @@ public class UltimateKekGame implements IGameLogic {
 
         if(cameraInc.length()!=0) cameraInc.normalize();
 
-        gameItems.get(3).accel.zero();
-        if (window.isKeyPressed(GLFW_KEY_UP)) gameItems.get(3).accel.z += -1f;
-        if (window.isKeyPressed(GLFW_KEY_DOWN)) gameItems.get(3).accel.z += 1f;
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) gameItems.get(3).accel.x += -1f;
-        if (window.isKeyPressed(GLFW_KEY_RIGHT)) gameItems.get(3).accel.x += 1f;
-
-        if (gameItems.get(3).accel.length()!=0) gameItems.get(3).accel.normalize();
+        int moveableItem = 3;
+        gameItems.get(moveableItem).accel.zero();
+        if (window.isKeyPressed(GLFW_KEY_UP)) gameItems.get(moveableItem).accel.z += -1f;
+        if (window.isKeyPressed(GLFW_KEY_DOWN)) gameItems.get(moveableItem).accel.z += 1f;
+        if (window.isKeyPressed(GLFW_KEY_LEFT)) gameItems.get(moveableItem).accel.x += -1f;
+        if (window.isKeyPressed(GLFW_KEY_RIGHT)) gameItems.get(moveableItem).accel.x += 1f;
+        if (gameItems.get(moveableItem).accel.length()!=0) gameItems.get(moveableItem).accel.normalize();
 
         if (window.isKeyPressed(GLFW_KEY_P)) {
             if(menu){
@@ -226,9 +227,13 @@ public class UltimateKekGame implements IGameLogic {
         for(GameItem gi : gameItems){
             if(gi.accel.length() != 0){ //game item has acceleration
                 //check for collisions wip
-                sweepPrune.updateItem(gi);
-                //perform movement
-                gi.move();
+                if(sweepPrune.updateItem(gi)){
+                    //gi.immobilize(); for collision
+                    gi.move();
+                } else {
+                    //perform movement
+                    gi.move();
+                }
             }
         }
     }

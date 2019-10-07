@@ -18,17 +18,23 @@ public class BoundingBox {
         this.min = min;
         this.max = max;
         this.rot = null;
-        this.xMin = new EndPoint(this, 0, true);
-        this.xMax = new EndPoint(this, 0, false);
-        this.yMin = new EndPoint(this, 0, true);
-        this.yMax = new EndPoint(this, 0, false);
-        this.zMin = new EndPoint(this, 0, true);
-        this.zMax = new EndPoint(this, 0, false);
+        this.xMin = new EndPoint(this, min.x, true);
+        this.xMax = new EndPoint(this, max.x, false);
+        this.yMin = new EndPoint(this, min.y, true);
+        this.yMax = new EndPoint(this, max.y, false);
+        this.zMin = new EndPoint(this, min.z, true);
+        this.zMax = new EndPoint(this, max.z, false);
     }
-    public BoundingBox(Vector3f min, Vector3f max , Vector3f rot) {//OBB
+    public BoundingBox(Vector3f min, Vector3f max) {
         this.min = min;
         this.max = max;
-        this.rot = rot;
+        this.rot = null;
+        this.xMin = new EndPoint(this, min.x, true);
+        this.xMax = new EndPoint(this, max.x, false);
+        this.yMin = new EndPoint(this, min.y, true);
+        this.yMax = new EndPoint(this, max.y, false);
+        this.zMin = new EndPoint(this, min.z, true);
+        this.zMax = new EndPoint(this, max.z, false);
     }
 
     public Vector3f getMin() {

@@ -5,6 +5,6 @@ import net.sknv.engine.GameItem;
 public interface ISweepPrune {
 
     void addItem(GameItem gameItem) throws Exception;
-    void updateItem(GameItem gameItem);
+    boolean updateItem(GameItem gameItem);
     void removeItem(GameItem gameItem);
 }
