@@ -55,19 +55,19 @@ public class UltimateKekGame implements IGameLogic {
 
         Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
         Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
+        Mesh boid = OBJLoader.loadMesh("/models/boid.obj");
 
         Texture texture = new Texture("src/main/resources/textures/lebloq.png");
         Material material = new Material(texture, reflectance);
         cube.setMaterial(material);
         kek.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
+        boid.setMaterial(new Material(new Vector4f(0f, 1f, 1f, 1f), 0.5f));
 
         float scale = .25f;
 
-        /*
         GameItem gameItem0 = new GameItem(kek);
         gameItem0.setPos(0, 0, -6);
         gameItem0.setScale(.5f);
-        */
 
         GameItem gameItem1 = new GameItem(cube);
         gameItem1.setPos(0, 0, .6f);
@@ -89,7 +89,11 @@ public class UltimateKekGame implements IGameLogic {
         gameItem5.setPos(.6f, 0, .6f);
         gameItem5.setScale(scale);
 
-        gameItems = new ArrayList<>(Arrays.asList(new GameItem[]{ gameItem1, gameItem2, gameItem3, gameItem4, gameItem5}));
+        GameItem gameItem6 = new GameItem(boid);
+        gameItem6.setPos(-2, 0, 0);
+        gameItem6.setScale(.1f);
+
+        gameItems = new ArrayList<>(Arrays.asList(new GameItem[]{gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5, gameItem6}));
 
         //collisions
         for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
@@ -145,13 +149,13 @@ public class UltimateKekGame implements IGameLogic {
 
         if(cameraInc.length()!=0) cameraInc.normalize();
 
-        int moveableItem = 3;
-        gameItems.get(moveableItem).accel.zero();
-        if (window.isKeyPressed(GLFW_KEY_UP)) gameItems.get(moveableItem).accel.z += -1f;
-        if (window.isKeyPressed(GLFW_KEY_DOWN)) gameItems.get(moveableItem).accel.z += 1f;
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) gameItems.get(moveableItem).accel.x += -1f;
-        if (window.isKeyPressed(GLFW_KEY_RIGHT)) gameItems.get(moveableItem).accel.x += 1f;
-        if (gameItems.get(moveableItem).accel.length()!=0) gameItems.get(moveableItem).accel.normalize();
+        int movableItem = 6;
+        gameItems.get(movableItem).accel.zero();
+        if (window.isKeyPressed(GLFW_KEY_UP)) gameItems.get(movableItem).accel.z += -1f;
+        if (window.isKeyPressed(GLFW_KEY_DOWN)) gameItems.get(movableItem).accel.z += 1f;
+        if (window.isKeyPressed(GLFW_KEY_LEFT)) gameItems.get(movableItem).accel.x += -1f;
+        if (window.isKeyPressed(GLFW_KEY_RIGHT)) gameItems.get(movableItem).accel.x += 1f;
+        if (gameItems.get(movableItem).accel.length()!=0) gameItems.get(movableItem).accel.normalize();
 
         if (window.isKeyPressed(GLFW_KEY_P)) {
             if(menu){
