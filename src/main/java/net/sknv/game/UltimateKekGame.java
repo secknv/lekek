@@ -156,6 +156,7 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_LEFT)) gameItems.get(movableItem).accel.x += -1f;
         if (window.isKeyPressed(GLFW_KEY_RIGHT)) gameItems.get(movableItem).accel.x += 1f;
         if (gameItems.get(movableItem).accel.length()!=0) gameItems.get(movableItem).accel.normalize();
+        if (window.isKeyPressed(GLFW_KEY_R)) gameItems.get(movableItem).setRot(0, gameItems.get(movableItem).getRot().y + .2f, 0);
 
         if (window.isKeyPressed(GLFW_KEY_P)) {
             if(menu){
