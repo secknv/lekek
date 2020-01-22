@@ -5,12 +5,14 @@ import org.joml.Vector3f;
 
 public class GameItem {
 
-    public Vector3f accel;
-    public boolean isColliding = false;
     private Mesh mesh;
-    private BoundingBox boundingBox;
-    private Vector3f pos, prevPos, rot;
+    protected Vector3f pos;
+    protected Vector3f prevPos;
+    private Vector3f rot;
     private float scale;
+    protected BoundingBox boundingBox;
+    public Vector3f accel;
+    public int nCollisions;
 
     public GameItem() { //skill que dbz mandou has been officialized
         accel = new Vector3f(0, 0, 0);
@@ -29,6 +31,8 @@ public class GameItem {
     public Vector3f getPos() {
         return pos;
     }
+
+    public Vector3f getPrevPos() { return prevPos; }
 
     public Vector3f getRot() {
         return rot;
@@ -76,7 +80,7 @@ public class GameItem {
         prevPos = new Vector3f(pos.x, pos.y, pos.z);
         pos = pos.add(accel.mul(0.1f));
         boundingBox.transform(this);
-        return new Vector3f(accel.x, accel.y, accel.z);
+        return accel;
     }
 
     public void move() {
@@ -87,5 +91,9 @@ public class GameItem {
         pos = prevPos;
         boundingBox.transform(this);
         accel.zero();
+    }
+
+    public void rotate(float x, float y, float z) {
+        setRot(rot.x + x, rot.y + y, rot.z + z);
     }
 }

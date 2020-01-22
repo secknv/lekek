@@ -7,7 +7,7 @@ import net.sknv.engine.GameItem;
 import org.joml.Vector3f;
 import java.util.*;
 
-public class SPCollisions implements ISweepPrune{
+public class SPCollision implements ISweepPrune{
     private ArrayList<EndPoint> xAxis = new ArrayList<EndPoint>();
     private ArrayList<EndPoint> yAxis = new ArrayList<EndPoint>();
     private ArrayList<EndPoint> zAxis = new ArrayList<EndPoint>();
@@ -28,10 +28,9 @@ public class SPCollisions implements ISweepPrune{
                     zCollisions.remove(bb2);
                     //throw new Exception("Object Colliding"); if spawning colliding item isn't allowed
                     collisionPairs.put(bb,bb2, 3);
-                    bb.gameItem.isColliding=true;
-                    bb2.gameItem.isColliding=true;
-                }
-                else {
+                    bb.gameItem.nCollisions += 1;
+                    bb2.gameItem.nCollisions += 1;
+                } else {
                     collisionPairs.put(bb, bb2, 1);
                 }
             }
@@ -61,11 +60,12 @@ public class SPCollisions implements ISweepPrune{
     }
 
     @Override
-    public boolean updateItem(GameItem gameItem) {
+    public int updateItem(GameItem gameItem) {
         BoundingBox bb = gameItem.getBoundingBox();
         final int[] nColl = {0};
 
         Vector3f accel = gameItem.tryMove();
+
         if(accel.x!=0) tryMoveX(gameItem, bb);
         if(accel.y!=0) tryMoveY(gameItem, bb);
         if(accel.z!=0) tryMoveZ(gameItem, bb);
@@ -74,37 +74,29 @@ public class SPCollisions implements ISweepPrune{
         yAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
         zAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
 
-        System.out.println(collisionPairs.values());
-
         //maybe wont work for multiple updates (vese mais tarde)
         Map<BoundingBox, Integer> pairs = collisionPairs.column(bb);
         pairs.forEach((boundingBox, integer) -> {
             if (integer == 3){
                 if(testCollision(bb, boundingBox)){
-                    boundingBox.gameItem.isColliding = true;
-                    gameItem.isColliding = true;
                     nColl[0]++;
-                } else boundingBox.gameItem.isColliding = false;
-            } else boundingBox.gameItem.isColliding = false;
+                }
+            }
         });
 
         Map<BoundingBox, Integer> pairs2 = collisionPairs.row(bb);
         pairs2.forEach((boundingBox, integer) -> {
             if (integer == 3){
                 if(testCollision(bb, boundingBox)) {
-                    boundingBox.gameItem.isColliding = true;
-                    gameItem.isColliding = true;
                     nColl[0]++;
-                } else boundingBox.gameItem.isColliding = false;
-            } else boundingBox.gameItem.isColliding = false;
+                }
+            }
         });
 
-        if (nColl[0] == 0){
-            gameItem.isColliding = false;
-            return false;
-        } else {
-            return true;
-        }
+        if (nColl[0] != 0) System.out.println("collision");
+        gameItem.nCollisions = nColl[0];
+
+        return gameItem.nCollisions;
     }
 
     @Override

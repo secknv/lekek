@@ -56,10 +56,6 @@ public class GraphUtils {
         glDeleteBuffers(vboId);
     }
 
-    public static void drawLine(ShaderProgram shaderProgram, Vector3f i, Vector3f f) {
-        //drawLine(shaderProgram, new Vector4f(1f,1f,1f,1f), i, f);
-    }
-
     public static void drawGrid(ShaderProgram shaderProgram,Transformation transformation, Matrix4f viewMatrix, Vector3f origin, int size){
 
         shaderProgram.setUniform("material", new Material(new Vector4f(10f, 10f, 10f,0f), 0f));
@@ -179,10 +175,6 @@ public class GraphUtils {
         glBindBuffer(GL_ARRAY_BUFFER,0);
         glDeleteBuffers(vboId);
 
-    }
-
-    public static void drawQuad(ShaderProgram shader, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4) {
-        //drawQuad(shader, new Vector4f(1f,1f,1f,1f), p1, p2, p3, p4);
     }
 
     public static void drawAABB(ShaderProgram shaderProgram, Matrix4f viewMatrix, Vector4f color, BoundingBox bb) {

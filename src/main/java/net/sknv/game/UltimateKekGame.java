@@ -4,7 +4,7 @@ import net.sknv.engine.GameItem;
 import net.sknv.engine.IGameLogic;
 import net.sknv.engine.MouseInput;
 import net.sknv.engine.Window;
-import net.sknv.engine.collisions.SPCollisions;
+import net.sknv.engine.collisions.SPCollision;
 import net.sknv.engine.graph.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -36,7 +36,7 @@ public class UltimateKekGame implements IGameLogic {
     private float lightAngle, spotAngle, spotInc;
 
     //collisions stuff
-    private SPCollisions sweepPrune = new SPCollisions();
+    private SPCollision sweepPrune = new SPCollision();
 
     public UltimateKekGame() {
         renderer = new Renderer();
@@ -50,7 +50,64 @@ public class UltimateKekGame implements IGameLogic {
     @Override
     public void init(Window window) throws Exception {
         renderer.init(window);
+        initLighting();
+        initGameItems();
+        initCollisions();
+    }
 
+    @Override
+    public void input(Window window, MouseInput mouseInput) {
+        cameraInc.zero();
+
+        if (window.isKeyPressed(GLFW_KEY_W)) cameraInc.z += -1;
+        if (window.isKeyPressed(GLFW_KEY_S)) cameraInc.z += 1;
+        if (window.isKeyPressed(GLFW_KEY_A)) cameraInc.x += -1;
+        if (window.isKeyPressed(GLFW_KEY_D)) cameraInc.x += 1;
+        if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraInc.y += 1;
+        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraInc.y += -1;
+
+        if(cameraInc.length()!=0) cameraInc.normalize();
+
+        /*
+        Boid b = (Boid) gameItems.get(6);
+        //b.accel = new Vector3f(0,0, -.1f);
+        //b.rotate(0, -1f, 0);
+        if (window.isKeyPressed(GLFW_KEY_UP)) b.inUp();
+        if (window.isKeyPressed(GLFW_KEY_DOWN)) b.inDown();
+        if (window.isKeyPressed(GLFW_KEY_LEFT)) b.inLeft();
+        if (window.isKeyPressed(GLFW_KEY_RIGHT)) b.inRight();
+        //if (gameItems.get(movableItem).accel.length()!=0) gameItems.get(movableItem).accel.normalize();
+        if (window.isKeyPressed(GLFW_KEY_R)) b.rotate(0, 10f, 0);
+        */
+
+        GameItem movableItem = gameItems.get(4);
+        if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.accel.z -= .1;
+        if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.accel.z += .1;
+        if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.accel.x -= .1;
+        if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.accel.x += .1;
+
+        if (window.isKeyPressed(GLFW_KEY_P)) {
+            if(menu){
+                menu = false;
+                glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
+                glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            } else {
+                menu = true;
+                glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
+                glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
+        }
+    }
+
+    @Override
+    public void update(Window window, float interval, MouseInput mouseInput) {
+        cancerCode();
+        collisionTesting();
+        movePlayer();
+        moveCamera(window, mouseInput);
+    }
+
+    private void initGameItems() throws Exception{
         float reflectance = 1f;
 
         Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
@@ -89,26 +146,14 @@ public class UltimateKekGame implements IGameLogic {
         gameItem5.setPos(.6f, 0, .6f);
         gameItem5.setScale(scale);
 
-        GameItem gameItem6 = new GameItem(boid);
-        gameItem6.setPos(-2, 0, 0);
-        gameItem6.setScale(.1f);
+        Boid b = new Boid(boid);
+        b.setPos(-2, 0, 0);
+        b.setScale(.1f);
 
-        gameItems = new ArrayList<>(Arrays.asList(new GameItem[]{gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5, gameItem6}));
+        gameItems = new ArrayList<>(Arrays.asList(new GameItem[]{gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5, b}));
+    }
 
-        //collisions
-        for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
-            GameItem gameItem = iterator.next();
-            gameItem.getBoundingBox().transform(gameItem);// converts bb coords from local to world
-            try {
-                sweepPrune.addItem(gameItem);
-            } catch (Exception e){
-                System.out.println("object colliding");;
-                //iterator.remove();
-            }
-        }
-        System.out.println(gameItems);
-        sweepPrune.printAxis();
-
+    private void initLighting() {
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
 
         // Point Light
@@ -136,47 +181,17 @@ public class UltimateKekGame implements IGameLogic {
         directionalLight = new DirectionalLight(lightColor, lightPos, lightIntensity);
     }
 
-    @Override
-    public void input(Window window, MouseInput mouseInput) {
-        cameraInc.zero();
-
-        if (window.isKeyPressed(GLFW_KEY_W)) cameraInc.z += -1;
-        if (window.isKeyPressed(GLFW_KEY_S)) cameraInc.z += 1;
-        if (window.isKeyPressed(GLFW_KEY_A)) cameraInc.x += -1;
-        if (window.isKeyPressed(GLFW_KEY_D)) cameraInc.x += 1;
-        if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraInc.y += 1;
-        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraInc.y += -1;
-
-        if(cameraInc.length()!=0) cameraInc.normalize();
-
-        int movableItem = 6;
-        gameItems.get(movableItem).accel.zero();
-        if (window.isKeyPressed(GLFW_KEY_UP)) gameItems.get(movableItem).accel.z += -1f;
-        if (window.isKeyPressed(GLFW_KEY_DOWN)) gameItems.get(movableItem).accel.z += 1f;
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) gameItems.get(movableItem).accel.x += -1f;
-        if (window.isKeyPressed(GLFW_KEY_RIGHT)) gameItems.get(movableItem).accel.x += 1f;
-        if (gameItems.get(movableItem).accel.length()!=0) gameItems.get(movableItem).accel.normalize();
-        if (window.isKeyPressed(GLFW_KEY_R)) gameItems.get(movableItem).setRot(0, gameItems.get(movableItem).getRot().y + .2f, 0);
-
-        if (window.isKeyPressed(GLFW_KEY_P)) {
-            if(menu){
-                menu = false;
-                glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-                glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            } else {
-                menu = true;
-                glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-                glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    private void initCollisions() {
+        for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
+            GameItem gameItem = iterator.next();
+            gameItem.getBoundingBox().transform(gameItem);// converts bb coords from local to world
+            try {
+                sweepPrune.addItem(gameItem);
+            } catch (Exception e){
+                System.out.println("object colliding");;
+                //iterator.remove();
             }
         }
-    }
-
-    @Override
-    public void update(Window window, float interval, MouseInput mouseInput) {
-        cancerCode();
-        collisionTesting();
-        movePlayer();
-        moveCamera(window, mouseInput);
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {
@@ -232,9 +247,9 @@ public class UltimateKekGame implements IGameLogic {
         for(GameItem gi : gameItems){
             if(gi.accel.length() != 0){ //game item has acceleration
                 //check for collisions wip
-                if(sweepPrune.updateItem(gi)){
-                    //gi.immobilize(); for collision
-                    gi.move();
+                if(sweepPrune.updateItem(gi) > 0){
+                    //gi.immobilize(); for collisions
+                    gi.move(); // for no collisions
                 } else {
                     //perform movement
                     gi.move();

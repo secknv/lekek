@@ -1,6 +1,7 @@
 package net.sknv.engine.graph;
 
 import net.sknv.engine.GameItem;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -15,16 +16,18 @@ public class RayCast {
         this.direction = direction.normalize();
     }
 
-    public void drawNormalisedRay(){
+    public void drawNormalisedRay(Matrix4f viewMatrix){
         Vector3f ray = new Vector3f();
         origin.add(direction, ray);
-        GraphUtils.drawLine(shader, origin, ray);
+        GraphUtils.drawLine(shader, viewMatrix, new Vector4f(255,255,0,0), origin, ray);
     }
 
-    public void drawScaledRay(int k, Vector4f color) {
-        Vector3f scaled = new Vector3f();
-        origin.add(direction.mul(k, scaled), scaled);
-        //GraphUtils.drawLine(shader, color, origin, scaled);
+    public void drawScaledRay(int k, Matrix4f viewMatrix) {
+        Vector3f end = new Vector3f();
+        direction.mul(k, end);
+        origin.add(end, end);
+        GraphUtils.drawLine(shader, viewMatrix, new Vector4f(255,255,0,0), origin, end);
+        System.out.println(origin + " " + end);
     }
 
     public Vector3f intersectPlane(Vector3f origin, Vector3f normal){

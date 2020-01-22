@@ -30,6 +30,9 @@ public class Renderer {
     private float specularPower;
     private boolean devMode;
 
+    //spaghet
+    private ArrayList<Vector3f> track = new ArrayList<>();
+
     public Renderer() {
         transformation = new Transformation();
         specularPower = 10f;
@@ -86,7 +89,7 @@ public class Renderer {
 
         shaderProgram.setUniform("texture_sampler", 0);
 
-        //dbz mark
+        //dbz mark -------------------------------------------------------------------------------
         Vector3f worldRay = mouseInput.getWorldRay(projectionMatrix, viewMatrix);
         Vector3f cameraPos = camera.getPos();
 
@@ -99,6 +102,34 @@ public class Renderer {
         } else{
             GraphUtils.drawQuad(shaderProgram, transformation, viewMatrix, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
         }
+
+        Boid boid = (Boid) gameItems.get(6);
+        //tracking line
+        /*
+        Vector3f t = new Vector3f(boid.getPos().x, boid.getPos().y, boid.getPos().z);
+        if(track.size()<2){
+            track.add(t);
+        }
+        else {
+            if(t.distance(track.get(track.size()-1))>0.05f) track.add(t);
+            if(track.size()>200){ track.remove(0);};
+            for(int i=0; i!=track.size()-1; i++){
+                GraphUtils.drawLine(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), track.get(i), track.get(i+1));
+            }
+        }
+         */
+
+        //boid rays
+        RayCast boidL = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+        RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.accel);
+        RayCast boidR = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+
+        //boidC.drawScaledRay(1, viewMatrix);
+
+        boid.drawSelfAxis(shaderProgram, viewMatrix);
+
+
+
         //end dbz mark ---------------------------------------------------------------------------
 
         //render each game item
@@ -119,7 +150,7 @@ public class Renderer {
             if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)){
                 GraphUtils.drawAABB(shaderProgram, viewMatrix, new Vector4f(255,255,0,0), gameItem.getBoundingBox());
             }
-            if(gameItem.isColliding){
+            if(gameItem.nCollisions > 0){
                 GraphUtils.drawAABB(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
             }
         }
