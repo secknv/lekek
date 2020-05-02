@@ -1,14 +1,10 @@
-package net.sknv.game;
+package net.sknv.engine;
 
-import net.sknv.engine.GameItem;
-import net.sknv.engine.MouseInput;
-import net.sknv.engine.Utils;
-import net.sknv.engine.Window;
+import net.sknv.engine.entities.GameItem;
 import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import net.sknv.engine.graph.RayCast;
 
 import java.util.ArrayList;
 
@@ -28,15 +24,10 @@ public class Renderer {
     private ShaderProgram shaderProgram;
 
     private float specularPower;
-    private boolean devMode;
-
-    //spaghet
-    private ArrayList<Vector3f> track = new ArrayList<>();
 
     public Renderer() {
         transformation = new Transformation();
         specularPower = 10f;
-        devMode = true;
     }
 
     public void init(Window window) throws Exception {
@@ -57,6 +48,7 @@ public class Renderer {
         //light uniforms
         shaderProgram.createUniform("specularPower");
         shaderProgram.createUniform("ambientLight");
+
         shaderProgram.createPointLightListUniform("pointLights", MAX_POINT_LIGHTS);
         shaderProgram.createSpotLightListUniform("spotLights", MAX_SPOT_LIGHTS);
         shaderProgram.createDirectionalLightUniform("directionalLight");
@@ -66,7 +58,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, MouseInput mouseInput, Camera camera, ArrayList<GameItem> gameItems, Vector3f ambientLight,
+    public void render(Window window, Camera camera, ArrayList<GameItem> gameItems, Vector3f ambientLight,
                        PointLight[] pointLightList, SpotLight[] spotLightList, DirectionalLight directionalLight) {
         clear();
 
@@ -89,53 +81,11 @@ public class Renderer {
 
         shaderProgram.setUniform("texture_sampler", 0);
 
-        //dbz mark -------------------------------------------------------------------------------
-        Vector3f worldRay = mouseInput.getWorldRay(projectionMatrix, viewMatrix);
-        Vector3f cameraPos = camera.getPos();
-
-        //ray casting
-        RayCast ray = new RayCast(shaderProgram, cameraPos, new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-
-        //ray casting triangle intersection test
-        if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
-            GraphUtils.drawQuad(shaderProgram, transformation, viewMatrix, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        } else{
-            GraphUtils.drawQuad(shaderProgram, transformation, viewMatrix, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        }
-
-        Boid boid = (Boid) gameItems.get(6);
-        //tracking line
-        /*
-        Vector3f t = new Vector3f(boid.getPos().x, boid.getPos().y, boid.getPos().z);
-        if(track.size()<2){
-            track.add(t);
-        }
-        else {
-            if(t.distance(track.get(track.size()-1))>0.05f) track.add(t);
-            if(track.size()>200){ track.remove(0);};
-            for(int i=0; i!=track.size()-1; i++){
-                GraphUtils.drawLine(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), track.get(i), track.get(i+1));
-            }
-        }
-         */
-
-        //boid rays
-        RayCast boidL = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-        RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.accel);
-        RayCast boidR = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-
-        //boidC.drawScaledRay(1, viewMatrix);
-
-        boid.drawSelfAxis(shaderProgram, viewMatrix);
-
-
-
-        //end dbz mark ---------------------------------------------------------------------------
-
         //render each game item
         for (GameItem gameItem : gameItems) {
 
             Mesh mesh = gameItem.getMesh();
+
             //set model view
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
@@ -143,19 +93,7 @@ public class Renderer {
             //if color
             shaderProgram.setUniform("material", mesh.getMaterial());
             mesh.render();
-
-            //dbz proof of concept AABB
-            //gameItem.getBoundingBox().transform(gameItem);// bb coords are being transformed from local to world every frame...
-            //not anymore, bb coords are updated upon movement (done in update like its supposed to)
-            if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)){
-                GraphUtils.drawAABB(shaderProgram, viewMatrix, new Vector4f(255,255,0,0), gameItem.getBoundingBox());
-            }
-            if(gameItem.nCollisions > 0){
-                GraphUtils.drawAABB(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
-            }
         }
-
-        if(true) renderGraphUtils(viewMatrix);
 
         shaderProgram.unbind();
     }
@@ -205,11 +143,6 @@ public class Renderer {
         dir.mul(viewMatrix);
         currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
         shaderProgram.setUniform("directionalLight", currDirLight);
-    }
-
-    private void renderGraphUtils(Matrix4f viewMatrix) {
-        //GraphUtils.drawGrid(shaderProgram, transformation, viewMatrix, new Vector3f(0,0,0),20);
-        GraphUtils.drawAxis(shaderProgram, transformation, viewMatrix);
     }
 
     public void cleanup() {

@@ -1,9 +1,10 @@
-package net.sknv.engine;
+package net.sknv.engine.entities;
 
+import net.sknv.engine.BoundingBox;
 import net.sknv.engine.graph.Mesh;
 import org.joml.Vector3f;
 
-public class GameItem {
+public class GameItem implements IEntity{
 
     private Mesh mesh;
     protected Vector3f pos;

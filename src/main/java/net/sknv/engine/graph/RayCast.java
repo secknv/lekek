@@ -1,6 +1,6 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.GameItem;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;

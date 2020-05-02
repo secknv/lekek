@@ -1,10 +1,8 @@
 package net.sknv.game;
 
-import net.sknv.engine.GameItem;
-import net.sknv.engine.IGameLogic;
-import net.sknv.engine.MouseInput;
-import net.sknv.engine.Window;
+import net.sknv.engine.*;
 import net.sknv.engine.collisions.SPCollision;
+import net.sknv.engine.entities.GameItem;
 import net.sknv.engine.graph.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -100,11 +98,11 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     @Override
-    public void update(Window window, float interval, MouseInput mouseInput) {
+    public void update(float interval, MouseInput mouseInput) {
         cancerCode();
         collisionTesting();
         movePlayer();
-        moveCamera(window, mouseInput);
+        moveCamera(mouseInput);
     }
 
     private void initGameItems() throws Exception{
@@ -112,13 +110,13 @@ public class UltimateKekGame implements IGameLogic {
 
         Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
         Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
-        Mesh boid = OBJLoader.loadMesh("/models/boid.obj");
+        Mesh line = SimpleMesh.line();
 
         Texture texture = new Texture("src/main/resources/textures/lebloq.png");
         Material material = new Material(texture, reflectance);
         cube.setMaterial(material);
+
         kek.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
-        boid.setMaterial(new Material(new Vector4f(0f, 1f, 1f, 1f), 0.5f));
 
         float scale = .25f;
 
@@ -146,11 +144,7 @@ public class UltimateKekGame implements IGameLogic {
         gameItem5.setPos(.6f, 0, .6f);
         gameItem5.setScale(scale);
 
-        Boid b = new Boid(boid);
-        b.setPos(-2, 0, 0);
-        b.setScale(.1f);
-
-        gameItems = new ArrayList<>(Arrays.asList(new GameItem[]{gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5, b}));
+        gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5));
     }
 
     private void initLighting() {
@@ -194,13 +188,9 @@ public class UltimateKekGame implements IGameLogic {
         }
     }
 
-    private void moveCamera(Window window, MouseInput mouseInput) {
-        if (!menu && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
+    private void moveCamera(MouseInput mouseInput) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRot(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
-
-            glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-        }
     }
 
     private void movePlayer() {
@@ -259,8 +249,8 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     @Override
-    public void render(Window window, MouseInput mouseInput) {
-        renderer.render(window, mouseInput, camera, gameItems, ambientLight, pointLightList, spotLightList, directionalLight);
+    public void render(Window window) {
+        renderer.render(window, camera, gameItems, ambientLight, pointLightList, spotLightList, directionalLight);
     }
 
     @Override

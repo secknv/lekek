@@ -3,7 +3,7 @@ package net.sknv.engine.collisions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import net.sknv.engine.BoundingBox;
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.GameItem;
 import org.joml.Vector3f;
 import java.util.*;
 
@@ -28,8 +28,8 @@ public class SPCollision implements ISweepPrune{
                     zCollisions.remove(bb2);
                     //throw new Exception("Object Colliding"); if spawning colliding item isn't allowed
                     collisionPairs.put(bb,bb2, 3);
-                    bb.gameItem.nCollisions += 1;
-                    bb2.gameItem.nCollisions += 1;
+                    bb.entity.nCollisions += 1;
+                    bb2.entity.nCollisions += 1;
                 } else {
                     collisionPairs.put(bb, bb2, 1);
                 }

@@ -1,6 +1,6 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.GameItem;
 import net.sknv.engine.Utils;
 
 import java.nio.charset.Charset;

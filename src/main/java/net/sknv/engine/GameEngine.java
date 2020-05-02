@@ -48,13 +48,16 @@ public class GameEngine implements Runnable {
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
 
+            // read input
             input();
 
             while (accumulator >= interval) {
+                // update game state
                 update(interval);
                 accumulator -= interval;
             }
 
+            // render game
             render();
 
             if (!window.isVsync()) {
@@ -84,11 +87,11 @@ public class GameEngine implements Runnable {
     }
 
     protected void update(float interval) {
-        gameLogic.update(window, interval, mouseInput);
+        gameLogic.update(interval, mouseInput);
     }
 
     protected void render() {
-        gameLogic.render(window, mouseInput);
+        gameLogic.render(window);
         window.update();
     }
 }
