@@ -41,12 +41,20 @@ public class Mesh {
             glBindVertexArray(vaoId);
 
             // Position VBO #0
+            // Generate VBO and get ID
             int vboId = glGenBuffers();
             vboIdList.add(vboId);
+
+            // create FloatBuffer
             posbuff = MemoryUtil.memAllocFloat(pos.length);
+            // fill FloatBuffer and flip it for reading
             posbuff.put(pos).flip();
+
+            // Bind VBO (specifying type)
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            // Store data in VBO
             glBufferData(GL_ARRAY_BUFFER, posbuff, GL_STATIC_DRAW);
+            // Put VBO in one of the VAO's attribute lists
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
             // texture coords VBO #1
