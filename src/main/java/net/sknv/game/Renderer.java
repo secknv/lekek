@@ -1,9 +1,6 @@
 package net.sknv.game;
 
-import net.sknv.engine.GameItem;
-import net.sknv.engine.MouseInput;
-import net.sknv.engine.Utils;
-import net.sknv.engine.Window;
+import net.sknv.engine.*;
 import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -124,9 +121,7 @@ public class Renderer {
         RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.accel);
         RayCast boidR = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
 
-        //boidC.drawScaledRay(1, viewMatrix);
-
-        boid.drawSelfAxis(shaderProgram, viewMatrix);
+        boidC.drawScaledRay(1, viewMatrix);
 
 
 

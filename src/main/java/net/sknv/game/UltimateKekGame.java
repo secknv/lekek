@@ -68,17 +68,8 @@ public class UltimateKekGame implements IGameLogic {
 
         if(cameraInc.length()!=0) cameraInc.normalize();
 
-        /*
         Boid b = (Boid) gameItems.get(6);
-        //b.accel = new Vector3f(0,0, -.1f);
-        //b.rotate(0, -1f, 0);
-        if (window.isKeyPressed(GLFW_KEY_UP)) b.inUp();
-        if (window.isKeyPressed(GLFW_KEY_DOWN)) b.inDown();
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) b.inLeft();
-        if (window.isKeyPressed(GLFW_KEY_RIGHT)) b.inRight();
-        //if (gameItems.get(movableItem).accel.length()!=0) gameItems.get(movableItem).accel.normalize();
-        if (window.isKeyPressed(GLFW_KEY_R)) b.rotate(0, 10f, 0);
-        */
+        b.accel = new Vector3f(0,0, 0f);
 
         GameItem movableItem = gameItems.get(4);
         if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.accel.z -= .1;
@@ -139,12 +130,13 @@ public class UltimateKekGame implements IGameLogic {
         gameItem3.setScale(scale);
 
         GameItem gameItem4 = new GameItem(cube);
-        gameItem4.setPos(1f, 0, 1f);
+        gameItem4.setPos(2f, 0, 2f);
         gameItem4.setScale(scale);
 
         GameItem gameItem5 = new GameItem(cube);
         gameItem5.setPos(.6f, 0, .6f);
         gameItem5.setScale(scale);
+
 
         Boid b = new Boid(boid);
         b.setPos(-2, 0, 0);
@@ -184,7 +176,7 @@ public class UltimateKekGame implements IGameLogic {
     private void initCollisions() {
         for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
             GameItem gameItem = iterator.next();
-            gameItem.getBoundingBox().transform(gameItem);// converts bb coords from local to world
+            gameItem.getBoundingBox().transform(gameItem.getPos());// converts bb coords from local to world
             try {
                 sweepPrune.addItem(gameItem);
             } catch (Exception e){
@@ -244,15 +236,24 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     private void collisionTesting() {
-        for(GameItem gi : gameItems){
-            if(gi.accel.length() != 0){ //game item has acceleration
+        for(GameItem gameItem : gameItems){
+            if(gameItem.accel.length() != 0){ //game item has acceleration
                 //check for collisions wip
-                if(sweepPrune.updateItem(gi) > 0){
-                    //gi.immobilize(); for collisions
-                    gi.move(); // for no collisions
+
+                Vector3f nextPos = new Vector3f(0,0,0); //move these 3lines to somewhere else in game logic movement calc (?)
+                nextPos.add(gameItem.getPos());
+                nextPos.add(gameItem.accel.mul(0.1f));
+
+                if(sweepPrune.updateItem(gameItem, nextPos) > 0){
+                    //for no collisions
+                    //gameItem.setPos(nextPos);
+                    //gameItem.accel.zero();
+                    //for collision
+                    gameItem.accel.zero();
                 } else {
                     //perform movement
-                    gi.move();
+                    gameItem.setPos(nextPos);
+                    gameItem.accel.zero();
                 }
             }
         }

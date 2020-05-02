@@ -1,7 +1,6 @@
 package net.sknv.engine;
 
 import net.sknv.engine.collisions.EndPoint;
-import net.sknv.engine.graph.Transformation;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -11,8 +10,6 @@ public class BoundingBox {
     public Vector3f min, max, rot;
     public Vector3f tmin, tmax, trot;
     public EndPoint xMin, xMax, yMin, yMax, zMin, zMax;
-    private float[] triangles; //...
-    private Transformation transformation = new Transformation();
 
     public BoundingBox(GameItem gameItem, Vector3f min, Vector3f max) {//AABB
         this.gameItem = gameItem;
@@ -50,13 +47,13 @@ public class BoundingBox {
         return rot;
     }
 
-    public void transform(GameItem gameItem) {
+    public void transform(Vector3f position) {
         Vector4f min = new Vector4f(this.min.x, this.min.y, this.min.z, 1f);
         Vector4f max = new Vector4f(this.max.x, this.max.y, this.max.z, 1f);
 
         //this view matrix ignores rotation so that we always get the same AABB for rotated items (maybe change AABB limits according to rot?...)
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(gameItem.getPos()).scale(gameItem.getScale());
+        modelViewMatrix.identity().translate(position).scale(gameItem.getScale());
 
         modelViewMatrix.transform(min);
         modelViewMatrix.transform(max);
@@ -70,5 +67,14 @@ public class BoundingBox {
         this.yMax.position = tmax.y;
         this.zMin.position = tmin.z;
         this.zMax.position = tmax.z;
+    }
+
+    @Override
+    public String toString() {
+        return "BoundingBox{" +
+                "gameItem=" + gameItem +
+                ", tmin=" + tmin +
+                ", tmax=" + tmax +
+                '}';
     }
 }

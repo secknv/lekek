@@ -6,10 +6,9 @@ import org.joml.Vector3f;
 public class GameItem {
 
     private Mesh mesh;
-    protected Vector3f pos;
-    protected Vector3f prevPos;
     private Vector3f rot;
     private float scale;
+    protected Vector3f pos;
     protected BoundingBox boundingBox;
     public Vector3f accel;
     public int nCollisions;
@@ -17,7 +16,6 @@ public class GameItem {
     public GameItem() { //skill que dbz mandou has been officialized
         accel = new Vector3f(0, 0, 0);
         pos = new Vector3f(0, 0, 0);
-        prevPos = new Vector3f(0, 0, 0);
         rot = new Vector3f(0, 0, 0);
         scale = 1;
     }
@@ -31,8 +29,6 @@ public class GameItem {
     public Vector3f getPos() {
         return pos;
     }
-
-    public Vector3f getPrevPos() { return prevPos; }
 
     public Vector3f getRot() {
         return rot;
@@ -54,14 +50,21 @@ public class GameItem {
         this.pos.x = x;
         this.pos.y = y;
         this.pos.z = z;
-        boundingBox.transform(this);
+        boundingBox.transform(pos);
+    }
+
+    public void setPos(Vector3f pos){
+        this.pos.x = pos.x;
+        this.pos.y = pos.y;
+        this.pos.z = pos.z;
+        boundingBox.transform(pos);
     }
 
     public void setRot(float x, float y, float z) {
         this.rot.x = x;
         this.rot.y = y;
         this.rot.z = z;
-        boundingBox.transform(this);
+        boundingBox.transform(pos);
     }
 
     public void setScale(float scale) {
@@ -74,23 +77,6 @@ public class GameItem {
 
     public void setBoundingBox(BoundingBox boundingBox) {
         this.boundingBox = boundingBox;
-    }
-
-    public Vector3f tryMove(){
-        prevPos = new Vector3f(pos.x, pos.y, pos.z);
-        pos = pos.add(accel.mul(0.1f));
-        boundingBox.transform(this);
-        return accel;
-    }
-
-    public void move() {
-        accel.zero();
-    }
-
-    public void immobilize() {
-        pos = prevPos;
-        boundingBox.transform(this);
-        accel.zero();
     }
 
     public void rotate(float x, float y, float z) {

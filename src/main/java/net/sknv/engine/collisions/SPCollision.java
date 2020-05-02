@@ -28,8 +28,6 @@ public class SPCollision implements ISweepPrune{
                     zCollisions.remove(bb2);
                     //throw new Exception("Object Colliding"); if spawning colliding item isn't allowed
                     collisionPairs.put(bb,bb2, 3);
-                    bb.gameItem.nCollisions += 1;
-                    bb2.gameItem.nCollisions += 1;
                 } else {
                     collisionPairs.put(bb, bb2, 1);
                 }
@@ -60,15 +58,17 @@ public class SPCollision implements ISweepPrune{
     }
 
     @Override
-    public int updateItem(GameItem gameItem) {
+    public int updateItem(GameItem gameItem, Vector3f nextPos) {
         BoundingBox bb = gameItem.getBoundingBox();
         final int[] nColl = {0};
 
-        Vector3f accel = gameItem.tryMove();
+        Vector3f accel = gameItem.accel;
+        BoundingBox nextBb = gameItem.getBoundingBox();
+        nextBb.transform(nextPos);
 
-        if(accel.x!=0) tryMoveX(gameItem, bb);
-        if(accel.y!=0) tryMoveY(gameItem, bb);
-        if(accel.z!=0) tryMoveZ(gameItem, bb);
+        if(accel.x!=0) tryMoveX(gameItem, nextBb);
+        if(accel.y!=0) tryMoveY(gameItem, nextBb);
+        if(accel.z!=0) tryMoveZ(gameItem, nextBb);
 
         xAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
         yAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
@@ -80,6 +80,8 @@ public class SPCollision implements ISweepPrune{
             if (integer == 3){
                 if(testCollision(bb, boundingBox)){
                     nColl[0]++;
+                    //boundingBox.gameItem.nCollisions++;
+
                 }
             }
         });
@@ -89,6 +91,8 @@ public class SPCollision implements ISweepPrune{
             if (integer == 3){
                 if(testCollision(bb, boundingBox)) {
                     nColl[0]++;
+                    //boundingBox.gameItem.nCollisions++;
+
                 }
             }
         });
@@ -96,7 +100,7 @@ public class SPCollision implements ISweepPrune{
         if (nColl[0] != 0) System.out.println("collision");
         gameItem.nCollisions = nColl[0];
 
-        return gameItem.nCollisions;
+        return nColl[0];
     }
 
     @Override

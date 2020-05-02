@@ -27,7 +27,6 @@ public class RayCast {
         direction.mul(k, end);
         origin.add(end, end);
         GraphUtils.drawLine(shader, viewMatrix, new Vector4f(255,255,0,0), origin, end);
-        System.out.println(origin + " " + end);
     }
 
     public Vector3f intersectPlane(Vector3f origin, Vector3f normal){
