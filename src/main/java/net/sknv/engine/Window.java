@@ -4,6 +4,8 @@ import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GLUtil;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -12,11 +14,15 @@ public class Window {
 
     private final String title;
 
-    private static int width, height;
+    private int width;
+
+    private int height;
 
     private long windowHandle;
 
-    private boolean resized, vsync;
+    private boolean resized;
+
+    private boolean vsync;
 
     public Window(String title, int width, int height, boolean vsync) {
         this.title = title;
@@ -27,54 +33,72 @@ public class Window {
     }
 
     public void init() {
-
+        // Setup an error callback. The default implementation
+        // will print the error message in System.err.
         GLFWErrorCallback.createPrint(System.err).set();
 
+        // Initialize GLFW. Most GLFW functions will not work before doing this.
         if (!glfwInit()) {
-            throw new IllegalStateException("Unable to initialise GLFW");
+            throw new IllegalStateException("Unable to initialize GLFW");
         }
 
-        glfwDefaultWindowHints();
+        glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
-        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+        // Create the window
         windowHandle = glfwCreateWindow(width, height, title, NULL, NULL);
-
         if (windowHandle == NULL) {
-            throw new RuntimeException("Failed to create GLFW window!");
+            throw new RuntimeException("Failed to create the GLFW window");
         }
 
+        // Setup resize callback
         glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
-           this.width = width;
-           this.height = height;
-           this.setResized(true);
+            this.width = width;
+            this.height = height;
+            this.setResized(true);
         });
 
+        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
-           if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-               glfwSetWindowShouldClose(window, true);
-           }
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+            }
         });
 
+        // Get the resolution of the primary monitor
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        // Center our window
+        glfwSetWindowPos(
+                windowHandle,
+                (vidmode.width() - width) / 2,
+                (vidmode.height() - height) / 2
+        );
 
-        glfwSetWindowPos(windowHandle, (vidmode.width() - width)/2, (vidmode.height() - height)/2);
-
+        // Make the OpenGL context current
         glfwMakeContextCurrent(windowHandle);
 
-        if (isVsync()) glfwSwapInterval(1);
+        if (isVsync()) {
+            // Enable v-sync
+            glfwSwapInterval(1);
+        }
 
+        // Make the window visible
         glfwShowWindow(windowHandle);
 
         GL.createCapabilities();
 
-        glClearColor(0.0f, 0.0f,0.0f, 0.0f);
-
+        // Set the clear color
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glEnable(GL_DEPTH_TEST);
+    }
+
+    public long getWindowHandle() {
+        return windowHandle;
     }
 
     public void setClearColor(float r, float g, float b, float alpha) {
@@ -120,13 +144,5 @@ public class Window {
     public void update() {
         glfwSwapBuffers(windowHandle);
         glfwPollEvents();
-    }
-
-    public long getWindowHandle() {
-        return windowHandle;
-    }
-
-    public Vector2f getCenter() {
-        return new Vector2f(width/2, height/2);
     }
 }

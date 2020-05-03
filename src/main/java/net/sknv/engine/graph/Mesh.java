@@ -1,8 +1,5 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.BoundingBox;
-import net.sknv.engine.entities.GameItem;
-import net.sknv.engine.entities.IEntity;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
@@ -22,37 +19,18 @@ public class Mesh {
     public final List<Integer> vboIdList;
 
     public final int vertexCount;
-    public final float[] pos;
 
     private Material material;
 
     private int drawMode;
 
-    // for the AABB
-    public Vector3f min;
-    public Vector3f max;
-
     public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx) {
-        this.pos = pos;
         this.drawMode = GL_TRIANGLES;
+
         FloatBuffer posbuff = null;
         FloatBuffer textCoordsBuff = null;
         FloatBuffer vecNormalsBuffer = null;
         IntBuffer idxbuff = null;
-
-        // for AABB
-        min = new Vector3f(pos[0], pos[1], pos[2]);
-        max = new Vector3f(pos[0], pos[1], pos[2]);
-        for(int i=0; i!=this.pos.length; i+=3){
-            if(pos[i]<min.x) min.x = pos[i];
-            if(pos[i+1]<min.y) min.y = pos[i+1];
-            if(pos[i+2]<min.z) min.z = pos[i+2];
-
-            if(pos[i]>max.x) max.x = pos[i];
-            if(pos[i+1]>max.y) max.y = pos[i+1];
-            if(pos[i+2]>max.z) max.z = pos[i+2];
-        }
-        // END AABB
 
         try {
             vertexCount = idx.length;
@@ -175,6 +153,8 @@ public class Mesh {
             * - stride: distance between vertices (is there any other data between vertices? - no, so pass 0)
             * - pointer: offset at the beginning of the data
             * */
+            //todo: explain glEnableVertexAttribArray
+            glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
             // End of Positions VBO
@@ -192,6 +172,7 @@ public class Mesh {
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, textCoordsBuff, GL_STATIC_DRAW);
             // Put this VBO in attribute list #1
+            glEnableVertexAttribArray(1);
             glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 
             // End of Texture Coords VBO
@@ -207,6 +188,7 @@ public class Mesh {
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
             // Put this VBO in attribute list #2
+            glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
 
             // End of Vertex Normals VBO
@@ -279,7 +261,7 @@ public class Mesh {
             //tell openGL to use first texture bank and bind texture
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture.getId());
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
         else {
             //for test models
@@ -288,21 +270,15 @@ public class Mesh {
 
         //draw mesh
         glBindVertexArray(getVaoId());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
 
         glDrawElements(drawMode, getVertexCount(), GL_UNSIGNED_INT, 0);
 
         //restore state
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    public void deleteBuffers() {
+    public void cleanUp() {
         glDisableVertexAttribArray(0);
 
         // Delete the VBOs
@@ -311,18 +287,14 @@ public class Mesh {
             glDeleteBuffers(vboId);
         }
 
-        // Delete the VAO
-        glBindVertexArray(0);
-        glDeleteVertexArrays(vaoId);
-    }
-
-    public void cleanUp() {
-        deleteBuffers();
-
         // Delete the texture
         Texture texture = material.getTexture();
         if (texture != null) {
             texture.cleanup();
         }
+
+        // Delete the VAO
+        glBindVertexArray(0);
+        glDeleteVertexArrays(vaoId);
     }
 }

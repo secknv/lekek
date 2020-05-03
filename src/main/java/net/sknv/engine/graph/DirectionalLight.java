@@ -3,7 +3,10 @@ package net.sknv.engine.graph;
 import org.joml.Vector3f;
 
 public class DirectionalLight {
-    private Vector3f color, direction;
+
+    private Vector3f color;
+
+    private Vector3f direction;
 
     private float intensity;
 
@@ -14,7 +17,7 @@ public class DirectionalLight {
     }
 
     public DirectionalLight(DirectionalLight light) {
-        this(new Vector3f((light.getColor())), new Vector3f(light.getDirection()), light.getIntensity());
+        this(new Vector3f(light.getColor()), new Vector3f(light.getDirection()), light.getIntensity());
     }
 
     public Vector3f getColor() {

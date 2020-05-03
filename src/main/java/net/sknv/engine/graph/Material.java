@@ -1,16 +1,21 @@
 package net.sknv.engine.graph;
 
+import net.sknv.engine.graph.Texture;
 import org.joml.Vector4f;
 
 public class Material {
 
     private static final Vector4f DEFAULT_COLOR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-    private  Vector4f ambientColor, diffuseColor, specularColor;
+    private Vector4f ambientColor;
 
-    private Texture texture;
+    private Vector4f diffuseColor;
+
+    private Vector4f specularColor;
 
     private float reflectance;
+
+    private Texture texture;
 
     public Material() {
         this.ambientColor = DEFAULT_COLOR;
@@ -64,6 +69,18 @@ public class Material {
         this.specularColor = specularColor;
     }
 
+    public float getReflectance() {
+        return reflectance;
+    }
+
+    public void setReflectance(float reflectance) {
+        this.reflectance = reflectance;
+    }
+
+    public boolean isTextured() {
+        return this.texture != null;
+    }
+
     public Texture getTexture() {
         return texture;
     }
@@ -72,15 +89,4 @@ public class Material {
         this.texture = texture;
     }
 
-    public boolean isTextured() {
-        return this.texture != null;
-    }
-
-    public float getReflectance() {
-        return reflectance;
-    }
-
-    public void setReflectance(float reflectance) {
-        this.reflectance = reflectance;
-    }
 }

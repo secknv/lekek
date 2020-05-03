@@ -3,11 +3,15 @@ package net.sknv.engine;
 public class GameEngine implements Runnable {
 
     public static final int TARGET_FPS = 75;
-    public static final int TARGET_UPS = 60;
+
+    public static final int TARGET_UPS = 30;
 
     private final Window window;
+
     private final Timer timer;
+
     private final IGameLogic gameLogic;
+
     private final MouseInput mouseInput;
 
     public GameEngine(String windowTitle, int width, int height, boolean vsync, IGameLogic gameLogic) throws Exception {
@@ -31,7 +35,7 @@ public class GameEngine implements Runnable {
         }
     }
 
-    protected void init() throws Exception{
+    protected void init() throws Exception {
         window.init();
         timer.init();
         mouseInput.init(window);
@@ -71,7 +75,7 @@ public class GameEngine implements Runnable {
     }
 
     private void sync() {
-        float loopSlot = 1f/TARGET_FPS;
+        float loopSlot = 1f / TARGET_FPS;
         double endTime = timer.getLastLoopTime() + loopSlot;
         while (timer.getTime() < endTime) {
             try {

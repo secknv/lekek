@@ -5,9 +5,9 @@ import org.joml.Vector3f;
 public class SpotLight {
 
     private PointLight pointLight;
+
     private Vector3f coneDirection;
 
-    //in radians
     private float cutOff;
 
     public SpotLight(PointLight pointLight, Vector3f coneDirection, float cutOffAngle) {
@@ -16,9 +16,11 @@ public class SpotLight {
         setCutOffAngle(cutOffAngle);
     }
 
-    public SpotLight(SpotLight light) {
-        this(new PointLight(light.getPointLight()), new Vector3f(light.getConeDirection()), 0);
-        setCutOff(light.getCutOff());
+    public SpotLight(SpotLight spotLight) {
+        this(new PointLight(spotLight.getPointLight()),
+                new Vector3f(spotLight.getConeDirection()),
+                0);
+        setCutOff(spotLight.getCutOff());
     }
 
     public PointLight getPointLight() {
@@ -41,13 +43,12 @@ public class SpotLight {
         return cutOff;
     }
 
-    //use with radians
     public void setCutOff(float cutOff) {
         this.cutOff = cutOff;
     }
 
-    //use with degrees
     public final void setCutOffAngle(float cutOffAngle) {
         this.setCutOff((float)Math.cos(Math.toRadians(cutOffAngle)));
     }
+
 }
