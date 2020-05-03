@@ -26,12 +26,15 @@ public class Mesh {
 
     private Material material;
 
+    private int drawMode;
+
     // for the AABB
     public Vector3f min;
     public Vector3f max;
 
     public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx) {
         this.pos = pos;
+        this.drawMode = GL_TRIANGLES;
         FloatBuffer posbuff = null;
         FloatBuffer textCoordsBuff = null;
         FloatBuffer vecNormalsBuffer = null;
@@ -249,6 +252,11 @@ public class Mesh {
         }
     }
 
+    public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx, int drawMode) {
+        this(pos, textCoords, normals, idx);
+        this.drawMode = drawMode;
+    }
+
     public Material getMaterial() {
         return material;
     }
@@ -284,7 +292,7 @@ public class Mesh {
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
 
-        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+        glDrawElements(drawMode, getVertexCount(), GL_UNSIGNED_INT, 0);
 
         //restore state
         glDisableVertexAttribArray(0);
