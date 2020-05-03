@@ -7,18 +7,18 @@ import org.joml.Vector3f;
 public class GameItem implements IEntity{
 
     private Mesh mesh;
-    protected Vector3f pos;
-    protected Vector3f prevPos;
-    private Vector3f rot;
+
+    private final Vector3f pos;
+    private final Vector3f rot;
+
     private float scale;
-    protected BoundingBox boundingBox;
-    public Vector3f accel;
+
+    private BoundingBox boundingBox;
+
     public int nCollisions;
 
-    public GameItem() { //skill que dbz mandou has been officialized
-        accel = new Vector3f(0, 0, 0);
+    public GameItem() {
         pos = new Vector3f(0, 0, 0);
-        prevPos = new Vector3f(0, 0, 0);
         rot = new Vector3f(0, 0, 0);
         scale = 1;
     }
@@ -26,14 +26,13 @@ public class GameItem implements IEntity{
     public GameItem(Mesh mesh) {
         this();
         this.mesh = mesh;
-        this.boundingBox = mesh.getAABB(this);
+
+        boundingBox = new BoundingBox(this, mesh.min, mesh.max);
     }
 
     public Vector3f getPos() {
         return pos;
     }
-
-    public Vector3f getPrevPos() { return prevPos; }
 
     public Vector3f getRot() {
         return rot;
@@ -75,26 +74,5 @@ public class GameItem implements IEntity{
 
     public void setBoundingBox(BoundingBox boundingBox) {
         this.boundingBox = boundingBox;
-    }
-
-    public Vector3f tryMove(){
-        prevPos = new Vector3f(pos.x, pos.y, pos.z);
-        pos = pos.add(accel.mul(0.1f));
-        boundingBox.transform(this);
-        return accel;
-    }
-
-    public void move() {
-        accel.zero();
-    }
-
-    public void immobilize() {
-        pos = prevPos;
-        boundingBox.transform(this);
-        accel.zero();
-    }
-
-    public void rotate(float x, float y, float z) {
-        setRot(rot.x + x, rot.y + y, rot.z + z);
     }
 }

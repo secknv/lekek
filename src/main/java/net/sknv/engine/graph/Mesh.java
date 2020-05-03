@@ -26,12 +26,30 @@ public class Mesh {
 
     private Material material;
 
+    // for the AABB
+    public Vector3f min;
+    public Vector3f max;
+
     public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx) {
         this.pos = pos;
         FloatBuffer posbuff = null;
         FloatBuffer textCoordsBuff = null;
         FloatBuffer vecNormalsBuffer = null;
         IntBuffer idxbuff = null;
+
+        // for AABB
+        min = new Vector3f(pos[0], pos[1], pos[2]);
+        max = new Vector3f(pos[0], pos[1], pos[2]);
+        for(int i=0; i!=this.pos.length; i+=3){
+            if(pos[i]<min.x) min.x = pos[i];
+            if(pos[i+1]<min.y) min.y = pos[i+1];
+            if(pos[i+2]<min.z) min.z = pos[i+2];
+
+            if(pos[i]>max.x) max.x = pos[i];
+            if(pos[i+1]>max.y) max.y = pos[i+1];
+            if(pos[i+2]>max.z) max.z = pos[i+2];
+        }
+        // END AABB
 
         try {
             vertexCount = idx.length;
@@ -45,7 +63,10 @@ public class Mesh {
             * Usually we store different sets of data in each list like, for example:
             * - vertex positions on list #0 (Positions VBO)
             * - texture coordinates on list #1 (Texture Coords VBO)
-            * - triangle normals on list #2 (Triangle Normals VBO)
+            * - vertex normals on list #2 (Vertex Normals VBO)
+            *
+            * Vertex normals are vectors assigned to each vertex, calculated using the normal vectors of the
+            * surrounding triangles. These vectors will be used for lighting calculations.
             *
             * There is also a special set of data that is not stored in the attribute lists (Indices VBO).
             *
@@ -175,7 +196,7 @@ public class Mesh {
 
             // Vertex Normals VBO - attribute list #2
             // ---------------------------------------------------------------------------------------------------------
-            // todo: explain this
+
             vboId = glGenBuffers();
             vboIdList.add(vboId);
             vecNormalsBuffer = MemoryUtil.memAllocFloat(normals.length);
@@ -295,21 +316,5 @@ public class Mesh {
         if (texture != null) {
             texture.cleanup();
         }
-    }
-
-    public BoundingBox getAABB(IEntity entity) {
-        //calculate AABB
-        Vector3f min = new Vector3f(pos[0], pos[1], pos[2]);
-        Vector3f max = new Vector3f(pos[0], pos[1], pos[2]);
-        for(int i=0; i!=this.pos.length; i+=3){
-            if(pos[i]<min.x) min.x = pos[i];
-            if(pos[i+1]<min.y) min.y = pos[i+1];
-            if(pos[i+2]<min.z) min.z = pos[i+2];
-
-            if(pos[i]>max.x) max.x = pos[i];
-            if(pos[i+1]>max.y) max.y = pos[i+1];
-            if(pos[i+2]>max.z) max.z = pos[i+2];
-        }
-        return new BoundingBox(entity, min, max);
     }
 }
