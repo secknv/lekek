@@ -5,6 +5,14 @@ import net.sknv.engine.graph.Mesh;
 import org.joml.Vector3f;
 
 public class GameItem implements IEntity{
+    //todo: plan:
+    /*
+    * game item is a general class
+    * all items extend game item
+    * delete IEntity interface because it's job is being done by GameItem
+    * Create specific subclass to add AABB - GameItems should not have AABB cus of TextItem
+    *
+    * */
 
     private Mesh mesh;
 

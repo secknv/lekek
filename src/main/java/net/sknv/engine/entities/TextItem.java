@@ -1,9 +1,13 @@
-package net.sknv.engine.graph;
+package net.sknv.engine.entities;
 
 import net.sknv.engine.entities.GameItem;
 import net.sknv.engine.Utils;
+import net.sknv.engine.graph.Material;
+import net.sknv.engine.graph.Mesh;
+import net.sknv.engine.graph.Texture;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +29,7 @@ public class TextItem extends GameItem {
     }
 
     private Mesh buildMesh(Texture texture, int numCols, int numRows) {
-        byte[] chars = text.getBytes(Charset.forName("ISO-8859-1"));
+        byte[] chars = text.getBytes(StandardCharsets.ISO_8859_1);
         int numChars = chars.length;
 
         List<Float> positions = new ArrayList<>();

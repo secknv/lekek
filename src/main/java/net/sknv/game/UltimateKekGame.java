@@ -110,7 +110,6 @@ public class UltimateKekGame implements IGameLogic {
 
         Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
         Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
-        Mesh line = SimpleMesh.line();
 
         Texture texture = new Texture("src/main/resources/textures/lebloq.png");
         Material material = new Material(texture, reflectance);
