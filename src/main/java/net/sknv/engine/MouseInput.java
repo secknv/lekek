@@ -6,10 +6,9 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class MouseInput {
 
-    private final Vector2d previousPos;
+    private final Vector2d previousPos, currentPos;
 
-    private final Vector2d currentPos;
-
+    //will hold mouse displacement vector
     private final Vector2f displVec;
 
     private boolean inWindow = false;
@@ -27,9 +26,11 @@ public class MouseInput {
             currentPos.x = xpos;
             currentPos.y = ypos;
         });
+
         glfwSetCursorEnterCallback(window.getWindowHandle(), (windowHandle, entered) -> {
             inWindow = entered;
         });
+
         glfwSetMouseButtonCallback(window.getWindowHandle(), (windowHandle, button, action, mode) -> {
             leftClicked = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS;
             rightClicked = button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS;
@@ -46,6 +47,7 @@ public class MouseInput {
     public void input(Window window) {
         displVec.x = 0;
         displVec.y = 0;
+
         if (previousPos.x > 0 && previousPos.y > 0 && inWindow) {
             double deltaX = currentPos.x - previousPos.x;
             double deltaY = currentPos.y - previousPos.y;
@@ -59,8 +61,10 @@ public class MouseInput {
                 displVec.x = (float) deltaY;
             }
         }
+
         previousPos.x = currentPos.x;
         previousPos.y = currentPos.y;
+        glfwSetCursorPos(window.getWindowHandle(), previousPos.x, previousPos.y);
     }
 
     public boolean isLeftClicked() {
@@ -69,5 +73,13 @@ public class MouseInput {
 
     public boolean isRightClicked() {
         return rightClicked;
+    }
+
+    public Vector2d getPos() {
+        return currentPos;
+    }
+
+    public Vector2d getPrevPos() {
+        return previousPos;
     }
 }
