@@ -34,6 +34,9 @@ public class MouseInput {
             leftClicked = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS;
             rightClicked = button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS;
         });
+
+        // Disable cursor
+        glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
     public Vector2f getDisplVec() {

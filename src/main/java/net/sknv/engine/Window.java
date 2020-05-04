@@ -2,9 +2,9 @@ package net.sknv.engine;
 
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GLUtil;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -63,12 +63,6 @@ public class Window {
             this.setResized(true);
         });
 
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-            }
-        });
 
         // Get the resolution of the primary monitor
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -104,11 +98,15 @@ public class Window {
     public void setClearColor(float r, float g, float b, float alpha) {
         glClearColor(r, g, b, alpha);
     }
-
+    /**
+     * Returns true as long as the key is being pressed.
+     * */
     public boolean isKeyPressed(int keyCode) {
         return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
     }
-
+    public void setKeyCallback(GLFWKeyCallbackI callback) {
+        glfwSetKeyCallback(windowHandle, callback);
+    }
     public boolean windowShouldClose() {
         return glfwWindowShouldClose(windowHandle);
     }
@@ -144,5 +142,9 @@ public class Window {
     public void update() {
         glfwSwapBuffers(windowHandle);
         glfwPollEvents();
+    }
+
+    public Vector2f getCenter() {
+        return new Vector2f(width/2f, height/2f);
     }
 }
