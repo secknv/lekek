@@ -54,7 +54,7 @@ public class MeshUtils {
         float[] posArr = new float[3 * 4 * size];
 
         Vector3f start = new Vector3f();
-        origin.add((float) -size / 2, 0f, (float) -size / 2, start);
+        origin.add(-size/2f, 0f, -size/2f, start);
 
         for (int i = 0; i != 4 * size; i++) {
             if (i < size) {
