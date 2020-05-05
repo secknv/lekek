@@ -8,6 +8,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.glGetError;
 
 public class UltimateKekGame implements IGameLogic {
 
@@ -78,11 +79,14 @@ public class UltimateKekGame implements IGameLogic {
 
         Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
         Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
+        Mesh test = MeshUtils.buildQuad(new Vector4f(1f, 0, 0,1f), new Vector3f(0, 1, 0), new Vector3f(0, 0, 0), new Vector3f(1, 0, 0), new Vector3f(1, 1, 0));
 
+        //Setting texture for cube
         Texture texture = new Texture("src/main/resources/textures/lebloq.png");
         Material material = new Material(texture, reflectance);
         cube.setMaterial(material);
 
+        // Setting red color for kek
         kek.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
 
         float scale = .25f;
@@ -95,8 +99,9 @@ public class UltimateKekGame implements IGameLogic {
         gameItem1.setPosition(0, 0, .6f);
         gameItem1.setScale(scale);
 
-        GameItem gameItem2 = new GameItem(cube);
-        gameItem2.setPosition(0f, 0, 0);
+        // Testing new MeshUtils
+        GameItem gameItem2 = new GameItem(test);
+        gameItem2.setPosition(0, 0, -5);
         gameItem2.setScale(scale);
 
         gameItems = new GameItem[]{gameItem0, gameItem1, gameItem2};

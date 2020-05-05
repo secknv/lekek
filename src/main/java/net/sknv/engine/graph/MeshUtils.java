@@ -28,13 +28,11 @@ public class MeshUtils {
             posArr[3*i+1] = points.get(i).y;
             posArr[3*i+2] = points.get(i).z;
         }
-        System.out.println(Arrays.toString(posArr));
 
         int[] indicesArr = {0, 1, 3, 3, 1, 2};
 
         Mesh mesh = new Mesh(posArr, textCoordsArr, normals, indicesArr);
-        mesh.setMaterial(new Material(color, 0));
-        System.out.println("works till here");
+        mesh.setMaterial(new Material(color, 0.5f));
         return mesh;
     }
 }
