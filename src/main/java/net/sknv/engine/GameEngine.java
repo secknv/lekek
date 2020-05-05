@@ -91,7 +91,7 @@ public class GameEngine implements Runnable {
     }
 
     protected void update(float interval) {
-        gameLogic.update(interval, mouseInput);
+        gameLogic.update(window, mouseInput, interval);
     }
 
     protected void render() {

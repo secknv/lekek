@@ -6,9 +6,6 @@ import net.sknv.engine.graph.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
-
-import java.text.NumberFormat;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -17,58 +14,50 @@ public class UltimateKekGame implements IGameLogic {
     private static final float MOUSE_SENSITIVITY = 0.8f;
     private static final float CAMERA_POS_STEP = 0.05f;
 
-    private final Vector3f cameraInc;
-    private Vector2f cameraRotVec;
+    private final Vector3f cameraPosInc;
+    private final Vector2f cameraRotInc;
 
     private final Renderer renderer;
-
     private final Camera camera;
 
     private GameItem[] gameItems;
 
     private Vector3f ambientLight;
-    private boolean menu;
+
+    private boolean menu = false;
 
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera();
-        cameraInc = new Vector3f(0, 0, 0);
+        cameraPosInc = new Vector3f(0, 0, 0);
+        cameraRotInc = new Vector2f(0, 0);
     }
 
     @Override
     public void init(Window window) throws Exception {
         renderer.init(window);
-        initGameItems();
-        initLights();
-
-
         setKeyCallbacks(window);
+
+        initLights();
+        initGameItems();
     }
 
     @Override
     public void input(Window window, MouseInput mouseInput) {
-        cameraInc.zero();
-        if (window.isKeyPressed(GLFW_KEY_W)) cameraInc.z = -1;
-        if (window.isKeyPressed(GLFW_KEY_S)) cameraInc.z = (cameraInc.z < 0 ? 0 : 1);
-        if (window.isKeyPressed(GLFW_KEY_A)) cameraInc.x = -1;
-        if (window.isKeyPressed(GLFW_KEY_D)) cameraInc.x = (cameraInc.x < 0 ? 0 : 1);
-        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraInc.y = -1;
-        if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraInc.y = (cameraInc.y < 0 ? 0 : 1);
+        cameraPosInc.zero();
+        if (window.isKeyPressed(GLFW_KEY_W)) cameraPosInc.z = -1;
+        if (window.isKeyPressed(GLFW_KEY_S)) cameraPosInc.z = (cameraPosInc.z < 0 ? 0 : 1);
+        if (window.isKeyPressed(GLFW_KEY_A)) cameraPosInc.x = -1;
+        if (window.isKeyPressed(GLFW_KEY_D)) cameraPosInc.x = (cameraPosInc.x < 0 ? 0 : 1);
+        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraPosInc.y = -1;
+        if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraPosInc.y = (cameraPosInc.y < 0 ? 0 : 1);
 
-        if(cameraInc.length()!=0) cameraInc.normalize();
-
-
-        if (!menu && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
-            glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-        }
+        if(cameraPosInc.length()!=0) cameraPosInc.normalize();
     }
 
     @Override
-    public void update(float interval, MouseInput mouseInput) {
-        // Update camera position
-        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
-        cameraRotVec = mouseInput.getDisplVec();
-        camera.moveRotation(cameraRotVec.x * MOUSE_SENSITIVITY, cameraRotVec.y * MOUSE_SENSITIVITY, 0);
+    public void update(Window window, MouseInput mouseInput, float interval) {
+        moveCamera(window, mouseInput);
     }
 
     @Override
@@ -116,6 +105,7 @@ public class UltimateKekGame implements IGameLogic {
     private void initLights() {
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
     }
+
     /**
      * Use the body of this method to set the key callbacks
      * Use key callbacks for single press actions, like opening a menu with "P"
@@ -140,6 +130,19 @@ public class UltimateKekGame implements IGameLogic {
                 glfwSetWindowShouldClose(windowHandle, true);
             }
         });
+    }
+
+    private void moveCamera(Window window, MouseInput mouseInput) {
+        // moves camera pos
+        camera.movePosition(cameraPosInc.x * CAMERA_POS_STEP, cameraPosInc.y * CAMERA_POS_STEP, cameraPosInc.z * CAMERA_POS_STEP);
+
+        // rotates camera
+        if (!menu && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
+            Vector2f rotVec = mouseInput.getDisplVec();
+            camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+
+            glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
+        }
     }
 
 }

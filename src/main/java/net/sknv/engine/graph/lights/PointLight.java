@@ -1,4 +1,4 @@
-package net.sknv.engine.graph;
+package net.sknv.engine.graph.lights;
 
 import org.joml.Vector3f;
 
