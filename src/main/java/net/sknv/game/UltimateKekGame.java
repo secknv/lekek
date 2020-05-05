@@ -1,14 +1,13 @@
 package net.sknv.game;
 
 import net.sknv.engine.*;
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.GameItem;
 import net.sknv.engine.graph.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.glGetError;
 
 public class UltimateKekGame implements IGameLogic {
 

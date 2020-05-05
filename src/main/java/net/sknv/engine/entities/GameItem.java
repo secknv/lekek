@@ -1,4 +1,4 @@
-package net.sknv.engine;
+package net.sknv.engine.entities;
 
 import net.sknv.engine.graph.Mesh;
 import org.joml.Vector3f;
@@ -7,11 +7,11 @@ public class GameItem {
 
     private final Mesh mesh;
 
-    private final Vector3f position;
+    protected final Vector3f position;
 
-    private float scale;
+    protected float scale;
 
-    private final Vector3f rotation;
+    protected final Vector3f rotation;
 
     public GameItem(Mesh mesh) {
         this.mesh = mesh;

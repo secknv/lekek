@@ -15,14 +15,11 @@ import static org.lwjgl.opengl.GL30.*;
 public class Mesh {
 
     public final int vaoId;
-
     public final List<Integer> vboIdList;
-
     public final int vertexCount;
-
     private Material material;
-
     private int drawMode;
+    private Vector3f min, max;
 
     public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx) {
         this.drawMode = GL_TRIANGLES;
@@ -31,6 +28,19 @@ public class Mesh {
         FloatBuffer textCoordsBuff = null;
         FloatBuffer vecNormalsBuffer = null;
         IntBuffer idxbuff = null;
+
+        //generate values for bounding box
+        min = new Vector3f(pos[0], pos[1], pos[2]);
+        max = new Vector3f(pos[0], pos[1], pos[2]);
+        for(int i=0; i!=pos.length; i+=3){
+            if(pos[i]<min.x) min.x = pos[i];
+            if(pos[i+1]<min.y) min.y = pos[i+1];
+            if(pos[i+2]<min.z) min.z = pos[i+2];
+
+            if(pos[i]>max.x) max.x = pos[i];
+            if(pos[i+1]>max.y) max.y = pos[i+1];
+            if(pos[i+2]>max.z) max.z = pos[i+2];
+        }
 
         try {
             vertexCount = idx.length;
@@ -296,5 +306,13 @@ public class Mesh {
         // Delete the VAO
         glBindVertexArray(0);
         glDeleteVertexArrays(vaoId);
+    }
+
+    public Vector3f getMin() {
+        return min;
+    }
+
+    public Vector3f getMax() {
+        return max;
     }
 }

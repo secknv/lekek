@@ -1,6 +1,6 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.MovableItem;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -19,14 +19,14 @@ public class RayCast {
     public void drawNormalisedRay(Matrix4f viewMatrix){
         Vector3f ray = new Vector3f();
         origin.add(direction, ray);
-        GraphUtils.drawLine(shader, viewMatrix, new Vector4f(255,255,0,0), origin, ray);
+        //GraphUtils.drawLine(shader, viewMatrix, new Vector4f(255,255,0,0), origin, ray);
     }
 
     public void drawScaledRay(int k, Matrix4f viewMatrix) {
         Vector3f end = new Vector3f();
         direction.mul(k, end);
         origin.add(end, end);
-        GraphUtils.drawLine(shader, viewMatrix, new Vector4f(255,255,0,0), origin, end);
+        //GraphUtils.drawLine(shader, viewMatrix, new Vector4f(255,255,0,0), origin, end);
     }
 
     public Vector3f intersectPlane(Vector3f origin, Vector3f normal){
@@ -102,9 +102,9 @@ public class RayCast {
         return true;
     }
 
-    public boolean intersectsItem(GameItem gameItem) {
-        Vector3f min = gameItem.getBoundingBox().tmin;
-        Vector3f max = gameItem.getBoundingBox().tmax;
+    public boolean intersectsItem(MovableItem movableItem) {
+        Vector3f min = movableItem.getBoundingBox().tmin;
+        Vector3f max = movableItem.getBoundingBox().tmax;
 
         Vector3f[] vertex = new Vector3f[]{
                 min, new Vector3f(max.x, min.y, min.z), new Vector3f(min.x, min.y, max.z),

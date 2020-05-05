@@ -1,18 +1,20 @@
 package net.sknv.engine;
 
 import net.sknv.engine.collisions.EndPoint;
+import net.sknv.engine.entities.MovableItem;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class BoundingBox {
-    public GameItem gameItem;
+    // todo: FIX spahget! MovableItem has this.BoundingBox, and BoundingBox has this.MovableItem ????
+    public MovableItem movableItem;
     public Vector3f min, max, rot;
     public Vector3f tmin, tmax, trot;
     public EndPoint xMin, xMax, yMin, yMax, zMin, zMax;
 
-    public BoundingBox(GameItem gameItem, Vector3f min, Vector3f max) {//AABB
-        this.gameItem = gameItem;
+    public BoundingBox(MovableItem movableItem, Vector3f min, Vector3f max) {//AABB
+        this.movableItem = movableItem;
         this.min = min;
         this.max = max;
         this.rot = null;
@@ -53,7 +55,7 @@ public class BoundingBox {
 
         //this view matrix ignores rotation so that we always get the same AABB for rotated items (maybe change AABB limits according to rot?...)
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(position).scale(gameItem.getScale());
+        modelViewMatrix.identity().translate(position).scale(movableItem.getScale());
 
         modelViewMatrix.transform(min);
         modelViewMatrix.transform(max);
@@ -72,7 +74,7 @@ public class BoundingBox {
     @Override
     public String toString() {
         return "BoundingBox{" +
-                "gameItem=" + gameItem +
+                "movableItem=" + movableItem +
                 ", tmin=" + tmin +
                 ", tmax=" + tmax +
                 '}';

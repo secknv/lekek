@@ -3,7 +3,7 @@ package net.sknv.engine.collisions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import net.sknv.engine.BoundingBox;
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.MovableItem;
 import org.joml.Vector3f;
 import java.util.*;
 
@@ -15,12 +15,12 @@ public class SPCollision implements ISweepPrune{
     private int nItems = 0;
 
     @Override
-    public void addItem(GameItem gameItem) throws Exception {//adds a game item to the sweep and prune algorithm (wip)
-        BoundingBox bb = gameItem.getBoundingBox();
+    public void addItem(MovableItem movableItem) throws Exception {//adds a game item to the sweep and prune algorithm (wip)
+        BoundingBox bb = movableItem.getBoundingBox();
         if(nItems!=0){
-            Set<BoundingBox> xCollisions = checkX(gameItem);
-            Set<BoundingBox> yCollisions = checkY(gameItem);
-            Set<BoundingBox> zCollisions = checkZ(gameItem);
+            Set<BoundingBox> xCollisions = checkX(movableItem);
+            Set<BoundingBox> yCollisions = checkY(movableItem);
+            Set<BoundingBox> zCollisions = checkZ(movableItem);
 
             for (BoundingBox bb2 : xCollisions){
                 if (yCollisions.contains(bb2) && zCollisions.contains(bb2)){
@@ -49,26 +49,26 @@ public class SPCollision implements ISweepPrune{
                 }
             }
 
-            insertItem(gameItem);
+            insertItem(movableItem);
         } else {
-            insertItem(gameItem);
+            insertItem(movableItem);
         }
         nItems++;
         System.out.println(collisionPairs.values());
     }
 
     @Override
-    public int updateItem(GameItem gameItem, Vector3f nextPos) {
-        BoundingBox bb = gameItem.getBoundingBox();
+    public int updateItem(MovableItem movableItem, Vector3f nextPos) {
+        BoundingBox bb = movableItem.getBoundingBox();
         final int[] nColl = {0};
 
-        Vector3f accel = gameItem.accel;
-        BoundingBox nextBb = gameItem.getBoundingBox();
+        Vector3f accel = movableItem.accel;
+        BoundingBox nextBb = movableItem.getBoundingBox();
         nextBb.transform(nextPos);
 
-        if(accel.x!=0) tryMoveX(gameItem, nextBb);
-        if(accel.y!=0) tryMoveY(gameItem, nextBb);
-        if(accel.z!=0) tryMoveZ(gameItem, nextBb);
+        if(accel.x!=0) tryMoveX(movableItem, nextBb);
+        if(accel.y!=0) tryMoveY(movableItem, nextBb);
+        if(accel.z!=0) tryMoveZ(movableItem, nextBb);
 
         xAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
         yAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
@@ -80,7 +80,7 @@ public class SPCollision implements ISweepPrune{
             if (integer == 3){
                 if(testCollision(bb, boundingBox)){
                     nColl[0]++;
-                    //boundingBox.gameItem.nCollisions++;
+                    //boundingBox.movableItem.nCollisions++;
 
                 }
             }
@@ -91,38 +91,38 @@ public class SPCollision implements ISweepPrune{
             if (integer == 3){
                 if(testCollision(bb, boundingBox)) {
                     nColl[0]++;
-                    //boundingBox.gameItem.nCollisions++;
+                    //boundingBox.movableItem.nCollisions++;
 
                 }
             }
         });
 
         if (nColl[0] != 0) System.out.println("collision");
-        gameItem.nCollisions = nColl[0];
+        movableItem.nCollisions = nColl[0];
 
         return nColl[0];
     }
 
     @Override
-    public void removeItem(GameItem gameItem) {
+    public void removeItem(MovableItem movableItem) {
 
     }
 
-    private void insertItem(GameItem gameItem){
-        xAxis.add(gameItem.getBoundingBox().xMin);
-        xAxis.add(gameItem.getBoundingBox().xMax);
+    private void insertItem(MovableItem movableItem){
+        xAxis.add(movableItem.getBoundingBox().xMin);
+        xAxis.add(movableItem.getBoundingBox().xMax);
         xAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
-        yAxis.add(gameItem.getBoundingBox().yMin);
-        yAxis.add(gameItem.getBoundingBox().yMax);
+        yAxis.add(movableItem.getBoundingBox().yMin);
+        yAxis.add(movableItem.getBoundingBox().yMax);
         yAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
-        zAxis.add(gameItem.getBoundingBox().zMin);
-        zAxis.add(gameItem.getBoundingBox().zMax);
+        zAxis.add(movableItem.getBoundingBox().zMin);
+        zAxis.add(movableItem.getBoundingBox().zMax);
         zAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
     }
 
 
-    private Set<BoundingBox> checkX(GameItem gameItem) {
-        BoundingBox bb = gameItem.getBoundingBox();
+    private Set<BoundingBox> checkX(MovableItem movableItem) {
+        BoundingBox bb = movableItem.getBoundingBox();
         EndPoint min, max;
         Set<BoundingBox> possibleCollisions = new HashSet<>();
 
@@ -147,8 +147,8 @@ public class SPCollision implements ISweepPrune{
         return possibleCollisions;
     }
 
-    private Set<BoundingBox> checkY(GameItem gameItem) {
-        BoundingBox bb = gameItem.getBoundingBox();
+    private Set<BoundingBox> checkY(MovableItem movableItem) {
+        BoundingBox bb = movableItem.getBoundingBox();
         EndPoint min, max;
         Set<BoundingBox> possibleCollisions = new HashSet<>();
 
@@ -173,8 +173,8 @@ public class SPCollision implements ISweepPrune{
         return possibleCollisions;
     }
 
-    private Set<BoundingBox> checkZ(GameItem gameItem) {
-        BoundingBox bb = gameItem.getBoundingBox();
+    private Set<BoundingBox> checkZ(MovableItem movableItem) {
+        BoundingBox bb = movableItem.getBoundingBox();
         EndPoint min, max;
         Set<BoundingBox> possibleCollisions = new HashSet<>();
 
@@ -199,8 +199,8 @@ public class SPCollision implements ISweepPrune{
         return possibleCollisions;
     }
 
-    private void tryMoveX(GameItem gameItem, BoundingBox bb){
-        if (gameItem.accel.x > 0){
+    private void tryMoveX(MovableItem movableItem, BoundingBox bb){
+        if (movableItem.accel.x > 0){
             BoundingBox nextBb;
             int i = xAxis.indexOf(bb.xMax)+1;
             float value = bb.xMax.position;
@@ -224,7 +224,7 @@ public class SPCollision implements ISweepPrune{
                 }
                 i++;
             }
-        } else if(gameItem.accel.x < 0){
+        } else if(movableItem.accel.x < 0){
             BoundingBox prevBb;
             int i = xAxis.indexOf(bb.xMin)-1;
             float value = bb.xMin.position;
@@ -251,8 +251,8 @@ public class SPCollision implements ISweepPrune{
         }
     }
 
-    private void tryMoveY(GameItem gameItem, BoundingBox bb){
-        if (gameItem.accel.y > 0){
+    private void tryMoveY(MovableItem movableItem, BoundingBox bb){
+        if (movableItem.accel.y > 0){
             BoundingBox nextBb;
             int i = yAxis.indexOf(bb.yMax)+1;
             float value = 0;
@@ -278,7 +278,7 @@ public class SPCollision implements ISweepPrune{
                 }
                 i++;
             }
-        } else if(gameItem.accel.y < 0){
+        } else if(movableItem.accel.y < 0){
             BoundingBox prevBb;
             int i = yAxis.indexOf(bb.yMin)-1;
             float value = 0;
@@ -306,8 +306,8 @@ public class SPCollision implements ISweepPrune{
         }
     }
 
-    private void tryMoveZ(GameItem gameItem, BoundingBox bb){
-        if (gameItem.accel.z > 0){
+    private void tryMoveZ(MovableItem movableItem, BoundingBox bb){
+        if (movableItem.accel.z > 0){
             BoundingBox nextBb;
             int i = zAxis.indexOf(bb.zMax)+1;
             float value = bb.zMax.position;
@@ -331,7 +331,7 @@ public class SPCollision implements ISweepPrune{
                 }
                 i++;
             }
-        } else if(gameItem.accel.z < 0){
+        } else if(movableItem.accel.z < 0){
             BoundingBox prevBb;
             int i = zAxis.indexOf(bb.zMin)-1;
             float value = bb.zMin.position;
