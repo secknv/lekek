@@ -79,7 +79,6 @@ public class UltimateKekGame implements IGameLogic {
 
         Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
         Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
-        Mesh test = MeshUtils.buildQuad(new Vector4f(1f, 0, 0,1f), new Vector3f(0, 1, 0), new Vector3f(0, 0, 0), new Vector3f(1, 0, 0), new Vector3f(1, 1, 0));
 
         //Setting texture for cube
         Texture texture = new Texture("src/main/resources/textures/lebloq.png");
@@ -99,12 +98,10 @@ public class UltimateKekGame implements IGameLogic {
         gameItem1.setPosition(0, 0, .6f);
         gameItem1.setScale(scale);
 
-        // Testing new MeshUtils
-        GameItem gameItem2 = new GameItem(test);
-        gameItem2.setPosition(0, 0, -5);
-        gameItem2.setScale(scale);
+        // Grid
+        GameItem grid = new GameItem(MeshUtils.buildGrid(new Vector3f(), 20));
 
-        gameItems = new GameItem[]{gameItem0, gameItem1, gameItem2};
+        gameItems = new GameItem[]{gameItem0, gameItem1, grid};
     }
 
     private void initLights() {
