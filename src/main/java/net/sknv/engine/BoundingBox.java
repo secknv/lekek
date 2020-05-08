@@ -86,15 +86,15 @@ public class BoundingBox {
     public void translate(Vector3f v){
         System.out.println("---translating---\n" + this.toString());
         System.out.println("with vector " + v.x + " " + v.y + " " + v.z);
-        this.xMin.position += v.x;
-        this.xMax.position += v.x;
-        this.yMin.position += v.y;
-        this.yMax.position += v.y;
-        this.zMin.position += v.z;
-        this.zMax.position += v.z;
+        this.xMin.position = this.min.x + v.x;
+        this.xMax.position = this.max.x + v.x;
+        this.yMin.position = this.min.y + v.y;
+        this.yMax.position = this.max.y + v.y;
+        this.zMin.position = this.min.z + v.z;
+        this.zMax.position = this.max.z + v.z;
         System.out.println(this.toString());
         this.tmin = new Vector3f(xMin.position, yMin.position, zMin.position);
-        this.tmax = new Vector3f(xMax.position, xMin.position, zMax.position);
+        this.tmax = new Vector3f(xMax.position, yMax.position, zMax.position);
     }
 
     @Override

@@ -50,14 +50,14 @@ public class GameItem {
         this.pos.x = x;
         this.pos.y = y;
         this.pos.z = z;
-        boundingBox.translate(pos);
+        boundingBox.transform(pos);
     }
 
     public void setPos(Vector3f pos){
         this.pos.x = pos.x;
         this.pos.y = pos.y;
         this.pos.z = pos.z;
-        boundingBox.translate(pos);
+        boundingBox.transform(pos);
     }
 
     public void setRot(float x, float y, float z) {
