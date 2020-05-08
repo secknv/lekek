@@ -24,7 +24,7 @@ public class GameItem {
     public GameItem(Mesh mesh) {
         this();
         this.mesh = mesh;
-        this.boundingBox = mesh.getAABB(this);
+        this.boundingBox = new BoundingBox(this, mesh.getMin(), mesh.getMax());
     }
 
     public Vector3f getPos() {

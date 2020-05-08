@@ -63,8 +63,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, MouseInput mouseInput, Camera camera, ArrayList<GameItem> gameItems, Vector3f ambientLight,
-                       PointLight[] pointLightList, SpotLight[] spotLightList, DirectionalLight directionalLight) {
+    public void render(Window window, MouseInput mouseInput, Camera camera, ArrayList<GameItem> gameItems, Vector3f ambientLight, DirectionalLight directionalLight) {
         clear();
 
         if (window.isResized()) {
@@ -82,13 +81,13 @@ public class Renderer {
         Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
         //update light uniforms
-        renderLights(viewMatrix, ambientLight, pointLightList, spotLightList, directionalLight);
+        renderLights(viewMatrix, ambientLight, directionalLight);
 
         shaderProgram.setUniform("texture_sampler", 0);
 
         //dbz mark -------------------------------------------------------------------------------
         Vector3f worldRay = mouseInput.getWorldRay(projectionMatrix, viewMatrix);
-        Vector3f cameraPos = camera.getPos();
+        Vector3f cameraPos = camera.getPosition();
 
         //ray casting
         RayCast ray = new RayCast(shaderProgram, cameraPos, new Vector3f(worldRay.x, worldRay.y, worldRay.z));
@@ -156,43 +155,11 @@ public class Renderer {
         shaderProgram.unbind();
     }
 
-    private void renderLights(Matrix4f viewMatrix, Vector3f ambientLight, PointLight[] pointLightList, SpotLight[] spotLightList, DirectionalLight directionalLight) {
+    private void renderLights(Matrix4f viewMatrix, Vector3f ambientLight, DirectionalLight directionalLight) {
 
         //update light uniforms
         shaderProgram.setUniform("ambientLight", ambientLight);
         shaderProgram.setUniform("specularPower", specularPower);
-
-        //Process point lights
-        int numLights = pointLightList != null ? pointLightList.length : 0;
-        for (int i=0; i<numLights; i++) {
-            //get a copy of light object and transform pos to view coords
-            PointLight currPointLight = new PointLight(pointLightList[i]);
-            Vector3f lightPos = currPointLight.getPos();
-            Vector4f aux = new Vector4f(lightPos, 1);
-            aux.mul(viewMatrix);
-            lightPos.x = aux.x;
-            lightPos.y = aux.y;
-            lightPos.z = aux.z;
-            shaderProgram.setUniform("pointLights", currPointLight, i);
-        }
-
-        //Process spot lights
-        numLights = spotLightList != null ? spotLightList.length : 0;
-        for (int i=0; i<numLights; i++) {
-            //get a copy of light object and transform pos + dir to view coords
-            SpotLight currSpotLight = new SpotLight(spotLightList[i]);
-            Vector4f dir = new Vector4f(currSpotLight.getConeDirection(), 0);
-            dir.mul(viewMatrix);
-            currSpotLight.setConeDirection(new Vector3f(dir.x, dir.y, dir.z));
-
-            Vector3f lightPos = currSpotLight.getPointLight().getPos();
-            Vector4f aux = new Vector4f(lightPos, 1);
-            aux.mul(viewMatrix);
-            lightPos.x = aux.x;
-            lightPos.y = aux.y;
-            lightPos.z = aux.z;
-            shaderProgram.setUniform("spotLights", currSpotLight, i);
-        }
 
 
         //directional light and transform to view coords

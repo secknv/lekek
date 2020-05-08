@@ -96,44 +96,6 @@ public class ShaderProgram {
         glUniform4f(uniforms.get(uniformName), value.x, value.y, value.z, value.w);
     }
 
-    public void setUniform(String uniformName, PointLight[] pointLights) {
-        int numLights = pointLights != null ? pointLights.length : 0;
-        for (int i=0; i<numLights; i++) {
-            setUniform(uniformName, pointLights[i], i);
-        }
-    }
-
-    public void setUniform(String uniformName, PointLight pointLight, int index) {
-        setUniform(uniformName + "[" + index + "]", pointLight);
-    }
-
-    public void setUniform(String uniformName, PointLight pointLight) {
-        setUniform(uniformName + ".color", pointLight.getColor());
-        setUniform(uniformName + ".position", pointLight.getPos());
-        setUniform(uniformName + ".intensity", pointLight.getIntensity());
-        PointLight.Attenuation att = pointLight.getAttenuation();
-        setUniform(uniformName + ".att.constant", att.getConstant());
-        setUniform(uniformName + ".att.linear", att.getLinear());
-        setUniform(uniformName + ".att.exponent", att.getExponent());
-    }
-
-    public void setUniform(String uniformName, SpotLight[] spotLights) {
-        int numLights = spotLights != null ? spotLights.length : 0;
-        for (int i = 0; i < numLights; i++) {
-            setUniform(uniformName, spotLights[i], i);
-        }
-    }
-
-    public void setUniform(String uniformName, SpotLight spotLight, int index) {
-        setUniform(uniformName + "[" + index + "]", spotLight);
-    }
-
-    public void setUniform(String uniformName, SpotLight spotLight) {
-        setUniform(uniformName + ".pl", spotLight.getPointLight());
-        setUniform(uniformName + ".conedir", spotLight.getConeDirection());
-        setUniform(uniformName + ".cutoff", spotLight.getCutOff());
-    }
-
     public void setUniform(String uniformName, DirectionalLight dirLight) {
         setUniform(uniformName+".color", dirLight.getColor());
         setUniform(uniformName+".direction", dirLight.getDirection());
