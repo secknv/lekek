@@ -19,7 +19,8 @@ public class UltimateKekGame implements IGameLogic {
     private static final float MOUSE_SENSITIVITY = 0.8f;
     private static final float CAMERA_POS_STEP = 0.05f;
 
-    private final Vector3f cameraInc;
+    private final Vector3f cameraPosInc;
+    private final Vector2f cameraRotInc;
 
     private final Renderer renderer;
     private final Camera camera;
@@ -30,10 +31,8 @@ public class UltimateKekGame implements IGameLogic {
 
     //light stuff
     private Vector3f ambientLight;
-    private PointLight[] pointLightList;
-    private SpotLight[] spotLightList;
     private DirectionalLight directionalLight;
-    private float lightAngle, spotAngle, spotInc;
+    private float lightAngle;
 
     //collisions stuff
     private SPCollision sweepPrune = new SPCollision();
@@ -41,60 +40,46 @@ public class UltimateKekGame implements IGameLogic {
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera();
-        cameraInc = new Vector3f(0, 0, 0);
         lightAngle = -90;
-        spotAngle = 0;
-        spotInc = 1;
+
+        cameraPosInc = new Vector3f(0, 0, 0);
+        cameraRotInc = new Vector2f(0, 0);
     }
 
     @Override
     public void init(Window window) throws Exception {
         renderer.init(window);
+        setKeyCallbacks(window);
+
         initLighting();
         initGameItems();
+
         initCollisions();
     }
 
     @Override
     public void input(Window window, MouseInput mouseInput) {
-        cameraInc.zero();
+        cameraPosInc.zero();
+        if (window.isKeyPressed(GLFW_KEY_W)) cameraPosInc.z = -1;
+        if (window.isKeyPressed(GLFW_KEY_S)) cameraPosInc.z = (cameraPosInc.z < 0 ? 0 : 1);
+        if (window.isKeyPressed(GLFW_KEY_A)) cameraPosInc.x = -1;
+        if (window.isKeyPressed(GLFW_KEY_D)) cameraPosInc.x = (cameraPosInc.x < 0 ? 0 : 1);
+        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraPosInc.y = -1;
+        if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraPosInc.y = (cameraPosInc.y < 0 ? 0 : 1);
 
-        if (window.isKeyPressed(GLFW_KEY_W)) cameraInc.z += -1;
-        if (window.isKeyPressed(GLFW_KEY_S)) cameraInc.z += 1;
-        if (window.isKeyPressed(GLFW_KEY_A)) cameraInc.x += -1;
-        if (window.isKeyPressed(GLFW_KEY_D)) cameraInc.x += 1;
-        if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraInc.y += 1;
-        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraInc.y += -1;
-
-        if(cameraInc.length()!=0) cameraInc.normalize();
-
-        Boid b = (Boid) gameItems.get(6);
-        b.accel = new Vector3f(0,0, 0f);
+        if(cameraPosInc.length()!=0) cameraPosInc.normalize();
 
         GameItem movableItem = gameItems.get(4);
         if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.accel.z -= .1;
         if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.accel.z += .1;
         if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.accel.x -= .1;
         if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.accel.x += .1;
-
-        if (window.isKeyPressed(GLFW_KEY_P)) {
-            if(menu){
-                menu = false;
-                glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-                glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            } else {
-                menu = true;
-                glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-                glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            }
-        }
     }
 
     @Override
-    public void update(Window window, float interval, MouseInput mouseInput) {
-        cancerCode();
+    public void update(Window window, MouseInput mouseInput, float interval) {
         collisionTesting();
-        movePlayer();
+
         moveCamera(window, mouseInput);
     }
 
@@ -143,34 +128,15 @@ public class UltimateKekGame implements IGameLogic {
         b.setPos(-2, 0, 0);
         b.setScale(.1f);
 
-        gameItems = new ArrayList<>(Arrays.asList(new GameItem[]{gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5, b}));
+        gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5, b));
     }
 
     private void initLighting() {
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
 
-        // Point Light
-        Vector3f lightColor = new Vector3f(1, 0.5f, 0);
-        Vector3f lightPos = new Vector3f(0, 1, -2);
         float lightIntensity = 1.0f;
-        PointLight pointLight = new PointLight(lightColor, lightPos, lightIntensity);
-        PointLight.Attenuation att = new PointLight.Attenuation(0, 0, 0.1f);
-        pointLight.setAttenuation(att);
-        pointLightList = new PointLight[] {pointLight};
-
-        // Spot Light
-        lightColor = new Vector3f(1, 0, 1);
-        lightPos = new Vector3f(0, 0, -2);
-        lightIntensity = 1.0f;
-        pointLight = new PointLight(lightColor, lightPos, lightIntensity);
-        att = new PointLight.Attenuation(0, 0, 0.1f);
-        pointLight.setAttenuation(att);
-        Vector3f coneDir = new Vector3f(0, 0, -1);
-        SpotLight spotLight = new SpotLight(pointLight, coneDir, 140);
-        spotLightList = new SpotLight[] {spotLight};
-
-        lightPos = new Vector3f(-1, 0, 0);
-        lightColor = new Vector3f(1, 1, 1);
+        Vector3f lightPos = new Vector3f(-1, 0, 0);
+        Vector3f lightColor = new Vector3f(1, 1, 1);
         directionalLight = new DirectionalLight(lightColor, lightPos, lightIntensity);
     }
 
@@ -189,52 +155,16 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {
+        // moves camera pos
+        camera.movePosition(cameraPosInc.x * CAMERA_POS_STEP, cameraPosInc.y * CAMERA_POS_STEP, cameraPosInc.z * CAMERA_POS_STEP);
+
+        // rotates camera
         if (!menu && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
             Vector2f rotVec = mouseInput.getDisplVec();
-            camera.moveRot(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+            camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
 
             glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
         }
-    }
-
-    private void movePlayer() {
-        camera.movePos(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
-    }
-
-    private void cancerCode() {
-        /*spotAngle += spotInc * 0.05f;
-        if (spotAngle > 2) spotInc = -1;
-        else if (spotAngle < -2) spotInc = 1;
-        double spotAngleRad = Math.toRadians(spotAngle);
-        Vector3f coneDir = spotLightList[0].getConeDirection();
-        coneDir.y = (float) Math.sin(spotAngleRad);*/
-
-        //update directional light -------------------------------------------------------------------------------------
-
-        //number of seconds for the sun do to one full rotation
-        float fullCycleSeconds = 600f;
-
-        lightAngle += 1f/30f * (360/fullCycleSeconds);
-        if (lightAngle > 90) {
-            directionalLight.setIntensity(1);
-            if (lightAngle >= 270) {
-                lightAngle = -90;
-            }
-        }
-        else if (lightAngle <= -80 || lightAngle >= 80) {
-            float factor = 1 - (float)(Math.abs(lightAngle) - 80)/10.0f;
-            directionalLight.setIntensity(factor);
-            directionalLight.getColor().y = Math.max(factor, 0.9f);
-            directionalLight.getColor().z = Math.max(factor, 0.5f);
-        }
-        else {
-            directionalLight.setIntensity(1);
-            directionalLight.setColor(new Vector3f(1, 1, 1));
-        }
-        double angRad = Math.toRadians(lightAngle);
-        directionalLight.getDirection().x = (float)Math.sin(angRad);
-        directionalLight.getDirection().y = (float)Math.cos(angRad);
-        // end directional light ---------------------------------------------------------------------------------------
     }
 
     private void collisionTesting() {
@@ -263,12 +193,39 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void render(Window window, MouseInput mouseInput) {
-        renderer.render(window, mouseInput, camera, gameItems, ambientLight, pointLightList, spotLightList, directionalLight);
+        renderer.render(window, mouseInput, camera, gameItems, ambientLight, directionalLight);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
         for(GameItem item : gameItems) item.getMesh().cleanUp();
+    }
+
+    /**
+     * Use the body of this method to set the key callbacks
+     * Use key callbacks for single press actions, like opening a menu with "P"
+     *
+     * For movement keys, where you just want to know if the key IS being pressed,
+     * use window.isKeyPressed(key)
+     * */
+    private void setKeyCallbacks(Window window) {
+        window.setKeyCallback((windowHandle, key, scancode, action, mods) -> {
+            if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+                if(menu){
+                    menu = false;
+                    glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
+                    glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                } else {
+                    menu = true;
+                    glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
+                    glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                }
+            }
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+                glfwSetWindowShouldClose(windowHandle, true);
+            }
+
+        });
     }
 }

@@ -2,6 +2,7 @@ package net.sknv.engine;
 
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.glfw.GLFW.*;
@@ -81,8 +82,14 @@ public class Window {
         glClearColor(r, g, b, alpha);
     }
 
+    /**
+     * Returns true as long as the key is being pressed.
+     * */
     public boolean isKeyPressed(int keyCode) {
         return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
+    }
+    public void setKeyCallback(GLFWKeyCallbackI callback) {
+        glfwSetKeyCallback(windowHandle, callback);
     }
 
     public boolean windowShouldClose() {

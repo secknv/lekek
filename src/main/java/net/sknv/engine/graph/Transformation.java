@@ -22,8 +22,8 @@ public class Transformation {
     }
 
     public Matrix4f getViewMatrix(Camera camera) {
-        Vector3f cameraPos = camera.getPos();
-        Vector3f rot = camera.getRot();
+        Vector3f cameraPos = camera.getPosition();
+        Vector3f rot = camera.getRotation();
 
         viewMatrix.identity();
         //must rotate first so camera rotates over it's position
