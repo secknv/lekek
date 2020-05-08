@@ -10,6 +10,8 @@ project.ext.jomlVersion = "1.9.16"
 
 version '1.0-SNAPSHOT'
 
+compileJava.options.encoding = 'UTF-8'
+
 application {
     mainClassName = 'net.sknv.game.Main'
 
