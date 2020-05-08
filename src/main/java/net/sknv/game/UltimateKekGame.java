@@ -30,8 +30,6 @@ public class UltimateKekGame implements IGameLogic {
 
     //light stuff
     private Vector3f ambientLight;
-    private PointLight[] pointLightList;
-    private SpotLight[] spotLightList;
     private DirectionalLight directionalLight;
     private float lightAngle, spotAngle, spotInc;
 
@@ -91,7 +89,7 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     @Override
-    public void update(Window window, float interval, MouseInput mouseInput) {
+    public void update(Window window, MouseInput mouseInput, float interval) {
         cancerCode();
         collisionTesting();
         movePlayer();
@@ -149,28 +147,9 @@ public class UltimateKekGame implements IGameLogic {
     private void initLighting() {
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
 
-        // Point Light
-        Vector3f lightColor = new Vector3f(1, 0.5f, 0);
-        Vector3f lightPos = new Vector3f(0, 1, -2);
         float lightIntensity = 1.0f;
-        PointLight pointLight = new PointLight(lightColor, lightPos, lightIntensity);
-        PointLight.Attenuation att = new PointLight.Attenuation(0, 0, 0.1f);
-        pointLight.setAttenuation(att);
-        pointLightList = new PointLight[] {pointLight};
-
-        // Spot Light
-        lightColor = new Vector3f(1, 0, 1);
-        lightPos = new Vector3f(0, 0, -2);
-        lightIntensity = 1.0f;
-        pointLight = new PointLight(lightColor, lightPos, lightIntensity);
-        att = new PointLight.Attenuation(0, 0, 0.1f);
-        pointLight.setAttenuation(att);
-        Vector3f coneDir = new Vector3f(0, 0, -1);
-        SpotLight spotLight = new SpotLight(pointLight, coneDir, 140);
-        spotLightList = new SpotLight[] {spotLight};
-
-        lightPos = new Vector3f(-1, 0, 0);
-        lightColor = new Vector3f(1, 1, 1);
+        Vector3f lightPos = new Vector3f(-1, 0, 0);
+        Vector3f lightColor = new Vector3f(1, 1, 1);
         directionalLight = new DirectionalLight(lightColor, lightPos, lightIntensity);
     }
 
@@ -263,7 +242,7 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void render(Window window, MouseInput mouseInput) {
-        renderer.render(window, mouseInput, camera, gameItems, ambientLight, pointLightList, spotLightList, directionalLight);
+        renderer.render(window, mouseInput, camera, gameItems, ambientLight, directionalLight);
     }
 
     @Override
