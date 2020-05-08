@@ -1,6 +1,6 @@
-package net.sknv.engine;
+package net.sknv.engine.collisions;
 
-import net.sknv.engine.collisions.EndPoint;
+import net.sknv.engine.GameItem;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;

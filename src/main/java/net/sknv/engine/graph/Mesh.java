@@ -1,6 +1,6 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.BoundingBox;
+import net.sknv.engine.collisions.BoundingBox;
 import net.sknv.engine.GameItem;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;

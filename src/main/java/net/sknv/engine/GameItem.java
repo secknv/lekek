@@ -1,5 +1,6 @@
 package net.sknv.engine;
 
+import net.sknv.engine.collisions.BoundingBox;
 import net.sknv.engine.graph.Mesh;
 import org.joml.Vector3f;
 

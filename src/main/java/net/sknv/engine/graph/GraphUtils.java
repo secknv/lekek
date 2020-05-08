@@ -1,6 +1,6 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.BoundingBox;
+import net.sknv.engine.collisions.BoundingBox;
 import net.sknv.engine.GameItem;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

@@ -252,6 +252,7 @@ public class UltimateKekGame implements IGameLogic {
                     //gameItem.accel.zero();
                     //for collision
                     gameItem.accel.zero();
+                    gameItem.getBoundingBox().transform(gameItem.getPos());
                 } else {
                     //perform movement
                     gameItem.setPos(nextPos);

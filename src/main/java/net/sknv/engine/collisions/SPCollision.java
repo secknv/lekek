@@ -2,7 +2,6 @@ package net.sknv.engine.collisions;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import net.sknv.engine.BoundingBox;
 import net.sknv.engine.GameItem;
 import org.joml.Vector3f;
 import java.util.*;
@@ -97,7 +96,7 @@ public class SPCollision implements ISweepPrune{
             }
         });
 
-        if (nColl[0] != 0) //System.out.println("collision");
+        //if (nColl[0] != 0) System.out.println("collision");
         gameItem.nCollisions = nColl[0];
 
         return nColl[0];

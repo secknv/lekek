@@ -1,7 +1,5 @@
 package net.sknv.engine.collisions;
 
-import net.sknv.engine.BoundingBox;
-
 public class EndPoint {
     private BoundingBox box; //AABB
     public float position;
