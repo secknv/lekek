@@ -113,12 +113,13 @@ public class UltimateKekGame implements IGameLogic {
 
         float scale = .25f;
 
+        System.out.println("Creating items");
         GameItem gameItem0 = new GameItem(kek);
         gameItem0.setPos(0, 0, -6);
         gameItem0.setScale(.5f);
 
         GameItem gameItem1 = new GameItem(cube);
-        gameItem1.setPos(0, 0, .6f);
+        gameItem1.setPos(0, 0, .5f);
         gameItem1.setScale(scale);
 
         GameItem gameItem2 = new GameItem(cube);
@@ -126,15 +127,15 @@ public class UltimateKekGame implements IGameLogic {
         gameItem2.setScale(scale);
 
         GameItem gameItem3 = new GameItem(cube);
-        gameItem3.setPos(0.6f, 0, 0);
+        gameItem3.setPos(0.5f, 0, 0);
         gameItem3.setScale(scale);
 
         GameItem gameItem4 = new GameItem(cube);
-        gameItem4.setPos(2f, 0, 2f);
+        gameItem4.setPos(1f, 0, .6f);
         gameItem4.setScale(scale);
 
         GameItem gameItem5 = new GameItem(cube);
-        gameItem5.setPos(.6f, 0, .6f);
+        gameItem5.setPos(.5f, 0, .5f);
         gameItem5.setScale(scale);
 
 
@@ -176,6 +177,7 @@ public class UltimateKekGame implements IGameLogic {
     private void initCollisions() {
         for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
             GameItem gameItem = iterator.next();
+            System.out.println("converting local to world");
             gameItem.getBoundingBox().transform(gameItem.getPos());// converts bb coords from local to world
             try {
                 sweepPrune.addItem(gameItem);

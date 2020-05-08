@@ -97,7 +97,7 @@ public class SPCollision implements ISweepPrune{
             }
         });
 
-        if (nColl[0] != 0) System.out.println("collision");
+        if (nColl[0] != 0) //System.out.println("collision");
         gameItem.nCollisions = nColl[0];
 
         return nColl[0];

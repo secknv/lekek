@@ -144,6 +144,7 @@ public class Renderer {
             //not anymore, bb coords are updated upon movement (done in update like its supposed to)
             if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)){
                 GraphUtils.drawAABB(shaderProgram, viewMatrix, new Vector4f(255,255,0,0), gameItem.getBoundingBox());
+                System.out.println(gameItem.getBoundingBox());
             }
             if(gameItem.nCollisions > 0){
                 GraphUtils.drawAABB(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
