@@ -87,7 +87,7 @@ public class Renderer {
 
         //dbz mark -------------------------------------------------------------------------------
         Vector3f worldRay = mouseInput.getWorldRay(projectionMatrix, viewMatrix);
-        Vector3f cameraPos = camera.getPos();
+        Vector3f cameraPos = camera.getPosition();
 
         //ray casting
         RayCast ray = new RayCast(shaderProgram, cameraPos, new Vector3f(worldRay.x, worldRay.y, worldRay.z));
