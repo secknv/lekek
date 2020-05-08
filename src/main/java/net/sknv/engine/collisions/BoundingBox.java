@@ -5,40 +5,14 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-public class BoundingBox {
+public abstract class BoundingBox {
     public GameItem gameItem;
-    public Vector3f min, max, rot;
-    public Vector3f tmin, tmax, trot;
-    public EndPoint xMin, xMax, yMin, yMax, zMin, zMax;
+    public Vector3f min, max;
 
     public BoundingBox(GameItem gameItem, Vector3f min, Vector3f max) {//AABB
         this.gameItem = gameItem;
         this.min = min;
         this.max = max;
-        this.rot = null;
-        this.xMin = new EndPoint(this, min.x, true);
-        this.xMax = new EndPoint(this, max.x, false);
-        this.yMin = new EndPoint(this, min.y, true);
-        this.yMax = new EndPoint(this, max.y, false);
-        this.zMin = new EndPoint(this, min.z, true);
-        this.zMax = new EndPoint(this, max.z, false);
-
-        this.tmin = min;
-        this.tmax = max;
-    }
-    public BoundingBox(Vector3f min, Vector3f max) {
-        this.min = min;
-        this.max = max;
-        this.rot = null;
-        this.xMin = new EndPoint(this, min.x, true);
-        this.xMax = new EndPoint(this, max.x, false);
-        this.yMin = new EndPoint(this, min.y, true);
-        this.yMax = new EndPoint(this, max.y, false);
-        this.zMin = new EndPoint(this, min.z, true);
-        this.zMax = new EndPoint(this, max.z, false);
-
-        this.tmin = min;
-        this.tmax = max;
     }
 
     public Vector3f getMin() {
@@ -47,10 +21,6 @@ public class BoundingBox {
 
     public Vector3f getMax() {
         return max;
-    }
-
-    public Vector3f getRot() {
-        return rot;
     }
 
     public void transform(Vector3f position) {
@@ -66,23 +36,13 @@ public class BoundingBox {
         modelViewMatrix.transform(min);
         modelViewMatrix.transform(max);
 
-        Vector3f tmin, tmax;
-        tmin = new Vector3f(min.x, min.y, min.z);
-        tmax = new Vector3f(max.x, max.y, max.z);
-
         System.out.println("min " + min.x + "," + min.y + "," + min.z + "  max " + max.x + "," + max.y + "," + max.z);
 
-        this.xMin.position = tmin.x;
-        this.xMax.position = tmax.x;
-        this.yMin.position = tmin.y;
-        this.yMax.position = tmax.y;
-        this.zMin.position = tmin.z;
-        this.zMax.position = tmax.z;
-
-        this.tmin = tmin;
-        this.tmax = tmax;
+        this.min = new Vector3f(min.x, min.y, min.z);
+        this.max = new Vector3f(max.x, max.y, max.z);
     }
 
+    /*
     public void translate(Vector3f v){
         System.out.println("---translating---\n" + this.toString());
         System.out.println("with vector " + v.x + " " + v.y + " " + v.z);
@@ -96,9 +56,10 @@ public class BoundingBox {
         this.tmin = new Vector3f(xMin.position, yMin.position, zMin.position);
         this.tmax = new Vector3f(xMax.position, yMax.position, zMax.position);
     }
+     */
 
     @Override
     public String toString() {
-        return "min " + xMin.position + "," + yMin.position + "," + zMin.position + "  max " + xMax.position + "," + yMax.position + "," + zMax.position;
+        return "min " + min.x + "," + min.y + "," + min.z + "  max " + max.x + "," + max.y + "," + max.z;
     }
 }
