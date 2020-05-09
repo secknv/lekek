@@ -58,6 +58,8 @@ public class SPCollision implements ISweepPrune{
 
     @Override
     public int updateItem(GameItem gameItem, Vector3f step) {
+        sortAxis();
+
         BoundingBox bb = gameItem.getBoundingBox();
         Vector3f nextMin = new Vector3f(), nextMax = new Vector3f();
 
@@ -67,10 +69,6 @@ public class SPCollision implements ISweepPrune{
         if(step.x!=0) tryMoveX(gameItem, step);
         if(step.y!=0) tryMoveY(gameItem, step);
         if(step.z!=0) tryMoveZ(gameItem, step);
-
-        xAxis.sort((e1, e2) -> Float.compare(e1.getPosition().x, e2.getPosition().x));
-        yAxis.sort((e1, e2) -> Float.compare(e1.getPosition().y, e2.getPosition().y));
-        zAxis.sort((e1, e2) -> Float.compare(e1.getPosition().z, e2.getPosition().z));
 
         //maybe wont work for multiple updates (vese mais tarde)
         final int[] nColl = {0};
@@ -378,6 +376,12 @@ public class SPCollision implements ISweepPrune{
 
     private boolean testCollisionZ(float min, float max, BoundingBox bb2) {
         return !(max<bb2.getMin().getPosition().z || min>bb2.getMax().getPosition().z);
+    }
+
+    public void sortAxis(){
+        xAxis.sort((e1, e2) -> Float.compare(e1.getPosition().x, e2.getPosition().x));
+        yAxis.sort((e1, e2) -> Float.compare(e1.getPosition().y, e2.getPosition().y));
+        zAxis.sort((e1, e2) -> Float.compare(e1.getPosition().z, e2.getPosition().z));
     }
 
     public void printAxis() {
