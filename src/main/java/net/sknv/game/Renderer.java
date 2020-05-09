@@ -7,9 +7,14 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import net.sknv.engine.graph.RayCast;
 
-import java.util.ArrayList;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 
 public class Renderer {
 
@@ -26,6 +31,8 @@ public class Renderer {
 
     private float specularPower;
     private boolean devMode;
+
+    private final LinkedBlockingQueue<AlienVAO> alienVAOQueue = new LinkedBlockingQueue<>();
 
     //spaghet
     private ArrayList<Vector3f> track = new ArrayList<>();
@@ -90,7 +97,7 @@ public class Renderer {
         Vector3f cameraPos = camera.getPosition();
 
         //ray casting
-        RayCast ray = new RayCast(shaderProgram, cameraPos, new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+        RayCast ray = new RayCast(this, shaderProgram, cameraPos, new Vector3f(worldRay.x, worldRay.y, worldRay.z));
 
         //ray casting triangle intersection test
         if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
@@ -116,9 +123,9 @@ public class Renderer {
          */
 
         //boid rays
-        RayCast boidL = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-        RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.accel);
-        RayCast boidR = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+        RayCast boidL = new RayCast(this, shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+        RayCast boidC = new RayCast(this, shaderProgram, boid.getPos(), boid.accel);
+        RayCast boidR = new RayCast(this, shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
 
         boidC.drawScaledRay(1, viewMatrix);
 
@@ -150,6 +157,28 @@ public class Renderer {
             }
         }
 
+        while (!alienVAOQueue.isEmpty()){
+            AlienVAO vao = alienVAOQueue.poll();
+
+            shaderProgram.setUniform("material", new Material(vao.getColor(), 0.5f));
+            shaderProgram.setUniform("modelViewMatrix", viewMatrix);
+
+            glBindVertexArray(vao.getVaoId());
+
+            glDrawElements(vao.getDrawMode(),vao.getVertexCount(), GL_UNSIGNED_INT, 0);
+
+            // Delete the VBOs
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            for (int vboId : vao.getVboIds()) {
+                glDeleteBuffers(vboId);
+            }
+
+            // Unbind and delete the VAO
+            glBindVertexArray(0);
+            glDeleteVertexArrays(vao.getVaoId());
+        }
+
+
         if(true) renderGraphUtils(viewMatrix);
 
         shaderProgram.unbind();
@@ -172,12 +201,15 @@ public class Renderer {
 
     private void renderGraphUtils(Matrix4f viewMatrix) {
         //GraphUtils.drawGrid(shaderProgram, transformation, viewMatrix, new Vector3f(0,0,0),20);
-        GraphUtils.drawAxis(shaderProgram, transformation, viewMatrix);
+        GraphUtils.drawAxis(this);
     }
 
     public void cleanup() {
         if (shaderProgram != null) {
             shaderProgram.cleanup();
         }
+    }
+    public void addAlienVAO(AlienVAO alienVAO) {
+        this.alienVAOQueue.offer(alienVAO);
     }
 }

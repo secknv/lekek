@@ -2,6 +2,7 @@ package net.sknv.engine.graph;
 
 import net.sknv.engine.BoundingBox;
 import net.sknv.engine.GameItem;
+import net.sknv.game.Renderer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -9,6 +10,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -18,10 +20,9 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class GraphUtils {
 
-    public static void drawLine(ShaderProgram shaderProgram, Matrix4f viewMatrix, Vector4f color, Vector3f i, Vector3f f){
+    public static void drawLine(Renderer renderer, Vector4f color, Vector3f i, Vector3f f){
 
-        shaderProgram.setUniform("material", new Material(color, 0.5f));
-        shaderProgram.setUniform("modelViewMatrix", viewMatrix);
+        ArrayList<Integer> vboIdList = new ArrayList<>();
 
         //setup vertex positions and buffer
         FloatBuffer posBuff = MemoryUtil.memAllocFloat(6);
@@ -46,18 +47,15 @@ public class GraphUtils {
         glBindBuffer(GL_ARRAY_BUFFER,0);
 
         // idx buffer
-        int vboId2 = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
+        vboId = glGenBuffers();
+        vboIdList.add(vboId);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
 
-        // VAO is ready to draw!
-
-        glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
-
-        // Unbind VAO after draw
+        // Unbid VAO
         glBindVertexArray(0);
-
-        glDeleteBuffers(vboId);
+        AlienVAO avao = new AlienVAO(vaoId, color, getIntArray(vboIdList), 2, GL_LINES);
+        renderer.addAlienVAO(avao);
     }
 
     public static void drawGrid(ShaderProgram shaderProgram,Transformation transformation, Matrix4f viewMatrix, Vector3f origin, int size){
@@ -71,7 +69,7 @@ public class GraphUtils {
         float[] pos = new float[3*4*size];
 
         Vector3f start = new Vector3f();
-        origin.add(-size/2, 0f, -size/2, start);
+        origin.add(-size/2f, 0f, -size/2f, start);
 
         for(int i=0; i!=4*size; i++){
             if(i<size){
@@ -248,14 +246,18 @@ public class GraphUtils {
         glDeleteBuffers(vboId);
     }
 
-    public static void drawAxis(ShaderProgram shaderProgram, Transformation transformation, Matrix4f viewMatrix) {
+    public static void drawAxis(Renderer renderer) {
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         glLineWidth(10f);
-        drawLine(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), new Vector3f(-20,0,0), new Vector3f(20,0,0));
-        drawLine(shaderProgram, viewMatrix, new Vector4f(0,255,0,0), new Vector3f(0,-20,0), new Vector3f(0,20,0));
-        drawLine(shaderProgram, viewMatrix, new Vector4f(0,0,255,0), new Vector3f(0,0,-20), new Vector3f(0,0,20));
+        drawLine(renderer, new Vector4f(255,0,0,0), new Vector3f(-20,0,0), new Vector3f(20,0,0));
+        drawLine(renderer, new Vector4f(0,255,0,0), new Vector3f(0,-20,0), new Vector3f(0,20,0));
+        drawLine(renderer, new Vector4f(0,0,255,0), new Vector3f(0,0,-20), new Vector3f(0,0,20));
         glDisable(GL_LINE_SMOOTH);
 
+    }
+
+    public static int[] getIntArray(ArrayList<Integer> list) {
+        return list.stream().mapToInt((Integer v) -> v).toArray();
     }
 }
