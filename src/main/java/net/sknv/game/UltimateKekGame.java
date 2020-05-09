@@ -173,23 +173,23 @@ public class UltimateKekGame implements IGameLogic {
             if(gameItem.getVelocity().length() != 0){ //game item has acceleration
                 //check for collisions wip
 
-                System.out.println(gameItem.getVelocity());
+                Vector3f step = gameItem.velocity.mul(0.1f);
 
                 Vector3f nextPos = new Vector3f(0,0,0); //move these 3lines to somewhere else in game logic movement calc (?)
                 nextPos.add(gameItem.getPos());
-                nextPos.add(gameItem.velocity.mul(0.1f));
+                nextPos.add(step);
 
-                if(sweepPrune.updateItem(gameItem, nextPos) > 0){
+                if(sweepPrune.updateItem(gameItem, step) > 0){ //nextPos
                     //for no collisions
                     //gameItem.setPos(nextPos);
                     //gameItem.accel.zero();
                     //for collision
+                    //gameItem.getBoundingBox().translate(gameItem.velocity.mul(-0.1f));
                     gameItem.velocity.zero();
-                    gameItem.getBoundingBox().translate(gameItem.getPos());
                 } else {
                     //perform movement
                     gameItem.setPos(nextPos);
-                    gameItem.getBoundingBox().translate(gameItem.getPos());
+                    gameItem.getBoundingBox().translate(step);
                     gameItem.velocity.zero();
                 }
             }

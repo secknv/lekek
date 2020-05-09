@@ -27,28 +27,20 @@ public abstract class BoundingBox {
         Vector4f min = new Vector4f(this.min.getPosition().x, this.min.getPosition().y, this.min.getPosition().z, 1f);
         Vector4f max = new Vector4f(this.max.getPosition().x, this.max.getPosition().y, this.max.getPosition().z, 1f);
 
-        System.out.println("----transforming------\nmin " + min.x + "," + min.y + "," + min.z + "  max " + max.x + "," + max.y + "," + max.z);
-
         //this view matrix ignores rotation so that we always get the same AABB for rotated items (maybe change AABB limits according to rot?...)
         Matrix4f modelViewMatrix = new Matrix4f();
         modelViewMatrix.identity().translate(position).scale(gameItem.getScale());
 
         modelViewMatrix.transform(min);
         modelViewMatrix.transform(max);
-
-        System.out.println("min " + min.x + "," + min.y + "," + min.z + "  max " + max.x + "," + max.y + "," + max.z);
-
+        
         this.min.setPosition(new Vector3f(min.x, min.y, min.z));
         this.max.setPosition(new Vector3f(max.x, max.y, max.z));
     }
 
-    public void translate(Vector3f v){
-        System.out.println("---translating---\n" + this.toString());
-        System.out.println("with vector " + v.x + " " + v.y + " " + v.z);
-        this.min.setPosition(this.min.getPosition().add(v));
-        this.max.setPosition(this.max.getPosition().add(v));
-        System.out.println(this.toString());
-
+    public void translate(Vector3f step){
+        this.min.getPosition().add(step);
+        this.max.getPosition().add(step);
     }
 
     @Override
