@@ -31,28 +31,32 @@ public class GraphUtils {
         IntBuffer idxBuff = MemoryUtil.memAllocInt(2);
         idxBuff.put(new int[]{0,1}).flip();
 
+        // get VAO
         int vaoId = glGenVertexArrays();
         glBindVertexArray(vaoId);
 
+        // pos buffer
         int vboId = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
         glBufferData(GL_ARRAY_BUFFER, posBuff, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(0);
 
+        // Unbind attribute list VBOs -> only the Positions VBO in this case
+        glBindBuffer(GL_ARRAY_BUFFER,0);
 
+        // idx buffer
         int vboId2 = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
+        // VAO is ready to draw!
+
         glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
+
+        // Unbind VAO after draw
         glBindVertexArray(0);
 
-        glBindBuffer(GL_ARRAY_BUFFER,0);
         glDeleteBuffers(vboId);
     }
 

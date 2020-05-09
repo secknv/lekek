@@ -163,9 +163,9 @@ public class Mesh {
              * - stride: distance between vertices (is there any other data between vertices? - no, so pass 0)
              * - pointer: offset at the beginning of the data
              * */
-            //todo: explain glEnableVertexAttribArray
-            glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+            // Enable attribute list #0
+            glEnableVertexAttribArray(0);
 
             // End of Positions VBO
             // ---------------------------------------------------------------------------------------------------------
@@ -182,8 +182,9 @@ public class Mesh {
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, textCoordsBuff, GL_STATIC_DRAW);
             // Put this VBO in attribute list #1
-            glEnableVertexAttribArray(1);
             glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+            // Enable attribute list #1
+            glEnableVertexAttribArray(1);
 
             // End of Texture Coords VBO
             // ---------------------------------------------------------------------------------------------------------
@@ -198,11 +199,15 @@ public class Mesh {
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
             // Put this VBO in attribute list #2
-            glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+            // Enable attribute list #2
+            glEnableVertexAttribArray(2);
 
             // End of Vertex Normals VBO
             // ---------------------------------------------------------------------------------------------------------
+
+            // Unbind attribute list VBOs by binding the ID "0"
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
 
             // Index VBO - special case!
             // ---------------------------------------------------------------------------------------------------------
@@ -218,9 +223,6 @@ public class Mesh {
 
             // End of Index VBO
             // ---------------------------------------------------------------------------------------------------------
-
-            // Unbind attribute list VBOs by binding the ID "0"
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
 
             // Unbind VAO by binding the ID "0"
             glBindVertexArray(0);
@@ -289,7 +291,6 @@ public class Mesh {
     }
 
     public void cleanUp() {
-        glDisableVertexAttribArray(0);
 
         // Delete the VBOs
         glBindBuffer(GL_ARRAY_BUFFER, 0);
