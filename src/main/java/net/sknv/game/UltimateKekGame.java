@@ -16,7 +16,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class UltimateKekGame implements IGameLogic {
 
-    private static final float MOUSE_SENSITIVITY = 0.8f;
+    private static final float MOUSE_SENSITIVITY = 0.4f;
     private static final float CAMERA_POS_STEP = 0.05f;
 
     private final Vector3f cameraPosInc;
@@ -162,7 +162,6 @@ public class UltimateKekGame implements IGameLogic {
         if (!menu && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
-
             glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
         }
     }
