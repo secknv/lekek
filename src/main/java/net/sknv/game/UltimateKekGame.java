@@ -123,12 +123,13 @@ public class UltimateKekGame implements IGameLogic {
         gameItem5.setPos(.5f, 0, .5f);
         gameItem5.setScale(scale);
 
-
+        /*
         Boid b = new Boid(boid);
         b.setPos(-2, 0, 0);
         b.setScale(.1f);
+         */
 
-        gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5, b));
+        gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5));
     }
 
     private void initLighting() {
@@ -169,8 +170,10 @@ public class UltimateKekGame implements IGameLogic {
 
     private void collisionTesting() {
         for(GameItem gameItem : gameItems){
-            if(gameItem.velocity.length() != 0){ //game item has acceleration
+            if(gameItem.getVelocity().length() != 0){ //game item has acceleration
                 //check for collisions wip
+
+                System.out.println(gameItem.getVelocity());
 
                 Vector3f nextPos = new Vector3f(0,0,0); //move these 3lines to somewhere else in game logic movement calc (?)
                 nextPos.add(gameItem.getPos());
@@ -186,6 +189,7 @@ public class UltimateKekGame implements IGameLogic {
                 } else {
                     //perform movement
                     gameItem.setPos(nextPos);
+                    gameItem.getBoundingBox().translate(gameItem.getPos());
                     gameItem.velocity.zero();
                 }
             }

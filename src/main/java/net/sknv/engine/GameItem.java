@@ -44,6 +44,10 @@ public class GameItem {
         return mesh;
     }
 
+    public Vector3f getVelocity() {
+        return velocity;
+    }
+
     public BoundingBox getBoundingBox() {
         return boundingBox;
     }
@@ -52,20 +56,21 @@ public class GameItem {
         this.pos.x = x;
         this.pos.y = y;
         this.pos.z = z;
-        boundingBox.translate(pos);
+        //boundingBox.transform(pos);
     }
 
     public void setPos(Vector3f pos){
         this.pos.x = pos.x;
         this.pos.y = pos.y;
         this.pos.z = pos.z;
-        boundingBox.translate(pos);
+        //boundingBox.transform(pos);
     }
 
     public void setRot(float x, float y, float z) {
         this.rot.x = x;
         this.rot.y = y;
         this.rot.z = z;
+        //boundingBox.transform(pos);
     }
 
     public void setScale(float scale) {
