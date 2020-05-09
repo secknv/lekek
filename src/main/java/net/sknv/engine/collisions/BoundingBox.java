@@ -33,7 +33,7 @@ public abstract class BoundingBox {
 
         modelViewMatrix.transform(min);
         modelViewMatrix.transform(max);
-        
+
         this.min.setPosition(new Vector3f(min.x, min.y, min.z));
         this.max.setPosition(new Vector3f(max.x, max.y, max.z));
     }

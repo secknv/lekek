@@ -59,7 +59,10 @@ public class SPCollision implements ISweepPrune{
     @Override
     public int updateItem(GameItem gameItem, Vector3f step) {
         BoundingBox bb = gameItem.getBoundingBox();
-        final int[] nColl = {0};
+        Vector3f nextMin = new Vector3f(), nextMax = new Vector3f();
+
+        nextMin.add(bb.getMin().getPosition()).add(step);
+        nextMax.add(bb.getMax().getPosition()).add(step);
 
         if(step.x!=0) tryMoveX(gameItem, step);
         if(step.y!=0) tryMoveY(gameItem, step);
@@ -70,25 +73,20 @@ public class SPCollision implements ISweepPrune{
         zAxis.sort((e1, e2) -> Float.compare(e1.getPosition().z, e2.getPosition().z));
 
         //maybe wont work for multiple updates (vese mais tarde)
+        final int[] nColl = {0};
         Map<BoundingBox, Integer> pairs = collisionPairs.column(bb);
         pairs.forEach((boundingBox, integer) -> {
             if (integer == 3){
-                if(testCollision(bb, boundingBox)){
+                if(testCollision(nextMin, nextMax, boundingBox))
                     nColl[0]++;
-                    //boundingBox.gameItem.nCollisions++;
-
-                }
             }
         });
 
         Map<BoundingBox, Integer> pairs2 = collisionPairs.row(bb);
         pairs2.forEach((boundingBox, integer) -> {
             if (integer == 3){
-                if(testCollision(bb, boundingBox)) {
+                if(testCollision(nextMin, nextMax, boundingBox))
                     nColl[0]++;
-                    //boundingBox.gameItem.nCollisions++;
-
-                }
             }
         });
 
@@ -203,47 +201,39 @@ public class SPCollision implements ISweepPrune{
         float nextMin = bb.getMin().getPosition().x + step.x;
         float nextMax = bb.getMax().getPosition().x + step.x;
 
-        if (gameItem.velocity.x > 0){
+        if (step.x > 0){
             BoundingBox nextBb;
             int i = xAxis.indexOf(bb.getMax())+1;
-            while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).getPosition().x <= nextMax) {
-                if (nextMax > xAxis.get(i).getPosition().x) {
-                    nextBb = xAxis.get(i).getBB();
-                    if (xAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, nextBb)) {//collision
-                        incCollisions(bb, nextBb);
-                    }
+            while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).getPosition().x < nextMax) {
+                nextBb = xAxis.get(i).getBB();
+                if (xAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, nextBb)) {//collision
+                    incCollisions(bb, nextBb);
                 }
                 i++;
             }
             i = xAxis.indexOf(bb.getMin())+1;
-            while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).getPosition().x <= nextMin) {
-                if (nextMax > xAxis.get(i).getPosition().x) {
-                    nextBb = xAxis.get(i).getBB();
-                    if (!xAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, nextBb)) {//out collision
-                        decCollisions(bb, nextBb);
-                    }
+            while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).getPosition().x < nextMin) {
+                nextBb = xAxis.get(i).getBB();
+                if (!xAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, nextBb)) {//out collision
+                    decCollisions(bb, nextBb);
                 }
                 i++;
             }
-        } else if(gameItem.velocity.x < 0){
+        } else if(step.x < 0){
             BoundingBox prevBb;
             int i = xAxis.indexOf(bb.getMin())-1;
             while (i > -1 && i < xAxis.size()-1 && xAxis.get(i).getPosition().x >= nextMin) {
-                if (nextMin < xAxis.get(i).getPosition().x) {
-                    prevBb = xAxis.get(i).getBB();
-                    if (!xAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, prevBb)) {//collision
-                        incCollisions(bb, prevBb);
-                    }
+                prevBb = xAxis.get(i).getBB();
+                if (!xAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, prevBb)) {//collision
+                    incCollisions(bb, prevBb);
                 }
                 i--;
             }
             i = xAxis.indexOf(bb.getMax())-1;
             while (i > -1 && i < xAxis.size()-1 && xAxis.get(i).getPosition().x >= nextMax) {
-                if (nextMax < xAxis.get(i).getPosition().x) {
-                    prevBb = xAxis.get(i).getBB();
-                    if (xAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, prevBb)) {//out collision
-                        decCollisions(bb, prevBb);
-                    }
+                prevBb = xAxis.get(i).getBB();
+                if (xAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, prevBb)) {//out collision
+                    decCollisions(bb, prevBb);
                 }
                 i--;
             }
@@ -258,8 +248,7 @@ public class SPCollision implements ISweepPrune{
         if (gameItem.velocity.y > 0){
             BoundingBox nextBb;
             int i = yAxis.indexOf(bb.getMax())+1;
-            float value = bb.getMax().getPosition().y;
-            while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).getPosition().y <= value) {
+            while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).getPosition().y < nextMax) {
                 if (bb.getMax().getPosition().y > yAxis.get(i).getPosition().y) {
                     nextBb = yAxis.get(i).getBB();
                     if (yAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, nextBb)) {//collision
@@ -269,8 +258,7 @@ public class SPCollision implements ISweepPrune{
                 i++;
             }
             i = yAxis.indexOf(bb.getMin())+1;
-            value = bb.getMin().getPosition().y;
-            while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).getPosition().y <= value) {
+            while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).getPosition().y < nextMin) {
                 if (bb.getMax().getPosition().y > yAxis.get(i).getPosition().y) {
                     nextBb = yAxis.get(i).getBB();
                     if (!yAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, nextBb)) {//out collision
@@ -282,8 +270,7 @@ public class SPCollision implements ISweepPrune{
         } else if(gameItem.velocity.y < 0){
             BoundingBox prevBb;
             int i = yAxis.indexOf(bb.getMin())-1;
-            float value = bb.getMin().getPosition().y;
-            while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).getPosition().y >= value) {
+            while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).getPosition().y >= nextMin) {
                 if (bb.getMin().getPosition().y < yAxis.get(i).getPosition().y) {
                     prevBb = yAxis.get(i).getBB();
                     if (!yAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, prevBb)) {//collision
@@ -293,8 +280,7 @@ public class SPCollision implements ISweepPrune{
                 i--;
             }
             i = yAxis.indexOf(bb.getMax())-1;
-            value = bb.getMax().getPosition().y;
-            while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).getPosition().y >= value) {
+            while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).getPosition().y >= nextMax) {
                 if (bb.getMax().getPosition().y < yAxis.get(i).getPosition().y) {
                     prevBb = yAxis.get(i).getBB();
                     if (yAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, prevBb)) {//out collision
@@ -314,22 +300,18 @@ public class SPCollision implements ISweepPrune{
         if (gameItem.velocity.z > 0){
             BoundingBox nextBb;
             int i = zAxis.indexOf(bb.getMax())+1;
-            while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).getPosition().z <= nextMax) {
-                if (nextMax > zAxis.get(i).getPosition().z) {
-                    nextBb = zAxis.get(i).getBB();
-                    if (zAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, nextBb)) {//collision
-                        incCollisions(bb, nextBb);
-                    }
+            while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).getPosition().z < nextMax) {
+                nextBb = zAxis.get(i).getBB();
+                if (zAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, nextBb)) {//collision
+                    incCollisions(bb, nextBb);
                 }
                 i++;
             }
             i = zAxis.indexOf(bb.getMin())+1;
-            while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).getPosition().z <= nextMin) {
-                if (nextMax > zAxis.get(i).getPosition().z) {
-                    nextBb = zAxis.get(i).getBB();
-                    if (!zAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, nextBb)) {//out collision
-                        decCollisions(bb, nextBb);
-                    }
+            while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).getPosition().z < nextMin) {
+                nextBb = zAxis.get(i).getBB();
+                if (!zAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, nextBb)) {//out collision
+                    decCollisions(bb, nextBb);
                 }
                 i++;
             }
@@ -337,21 +319,17 @@ public class SPCollision implements ISweepPrune{
             BoundingBox prevBb;
             int i = zAxis.indexOf(bb.getMin())-1;
             while (i > -1 && i < zAxis.size()-1 && zAxis.get(i).getPosition().z >= nextMin) {
-                if (nextMin < zAxis.get(i).getPosition().z) {
-                    prevBb = zAxis.get(i).getBB();
-                    if (!zAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, prevBb)) {//collision
-                        incCollisions(bb, prevBb);
-                    }
+                prevBb = zAxis.get(i).getBB();
+                if (!zAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, prevBb)) {//collision
+                    incCollisions(bb, prevBb);
                 }
                 i--;
             }
             i = zAxis.indexOf(bb.getMax())-1;
             while (i > -1 && i < zAxis.size()-1 && zAxis.get(i).getPosition().z >= nextMax) {
-                if (nextMax < zAxis.get(i).getPosition().z) {
-                    prevBb = zAxis.get(i).getBB();
-                    if (zAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, prevBb)) {//out collision
-                        decCollisions(bb, prevBb);
-                    }
+                prevBb = zAxis.get(i).getBB();
+                if (zAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, prevBb)) {//out collision
+                    decCollisions(bb, prevBb);
                 }
                 i--;
             }
@@ -386,22 +364,20 @@ public class SPCollision implements ISweepPrune{
         if(collisionPairs.get(bb, bb2) > 0) collisionPairs.put(bb, bb2, collisionPairs.get(bb, bb2) - 1);
     }
 
-    private boolean testCollision(BoundingBox bb, BoundingBox bb2) {
-        return testCollisionX(bb.getMin().getPosition().x, bb.getMax().getPosition().x, bb2)
-                && testCollisionY(bb.getMin().getPosition().y, bb.getMax().getPosition().y, bb2)
-                && testCollisionZ(bb.getMin().getPosition().z, bb.getMax().getPosition().z, bb2);
+    private boolean testCollision(Vector3f min, Vector3f max, BoundingBox bb2) {
+        return testCollisionX(min.x, max.x, bb2) && testCollisionY(min.y, max.y, bb2) && testCollisionZ(min.z, max.z, bb2);
     }
 
     private boolean testCollisionX(float min, float max, BoundingBox bb2) {
-        return !(max<=bb2.getMin().getPosition().x || min>=bb2.getMax().getPosition().x);
+        return !(max<bb2.getMin().getPosition().x || min>bb2.getMax().getPosition().x);
     }
 
     private boolean testCollisionY(float min, float max, BoundingBox bb2) {
-        return !(max<=bb2.getMin().getPosition().y || min>=bb2.getMax().getPosition().y);
+        return !(max<bb2.getMin().getPosition().y || min>bb2.getMax().getPosition().y);
     }
 
     private boolean testCollisionZ(float min, float max, BoundingBox bb2) {
-        return !(max<=bb2.getMin().getPosition().z || min>=bb2.getMax().getPosition().z);
+        return !(max<bb2.getMin().getPosition().z || min>bb2.getMax().getPosition().z);
     }
 
     public void printAxis() {

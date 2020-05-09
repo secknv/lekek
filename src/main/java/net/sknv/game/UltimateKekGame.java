@@ -180,11 +180,7 @@ public class UltimateKekGame implements IGameLogic {
                 nextPos.add(step);
 
                 if(sweepPrune.updateItem(gameItem, step) > 0){ //nextPos
-                    //for no collisions
-                    //gameItem.setPos(nextPos);
-                    //gameItem.accel.zero();
                     //for collision
-                    //gameItem.getBoundingBox().translate(gameItem.velocity.mul(-0.1f));
                     gameItem.velocity.zero();
                 } else {
                     //perform movement
