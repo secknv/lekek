@@ -1,12 +1,14 @@
 package net.sknv.engine.collisions;
 
-public class EndPoint {
-    private BoundingBox box; //AABB
-    public float position;
-    public boolean isMin;
+import org.joml.Vector3f;
 
-    public EndPoint(BoundingBox box, float position, boolean isMin) {
-        this.box = box;
+public class EndPoint {
+    private BoundingBox boundingBox; //AABB
+    private Vector3f position;
+    private boolean isMin;
+
+    public EndPoint(BoundingBox box, Vector3f position, boolean isMin) {
+        this.boundingBox = box;
         this.position = position;
         this.isMin = isMin;
     }
@@ -17,7 +19,20 @@ public class EndPoint {
         return  position + " " + min;
     }
 
-    public BoundingBox getBox() {
-        return box;
+    public Vector3f getPosition() {
+        return position;
     }
+
+    public void setPosition(Vector3f position) {
+        this.position = position;
+    }
+
+    public boolean isMin() {
+        return isMin;
+    }
+
+    public BoundingBox getBB() {
+        return boundingBox;
+    }
+
 }

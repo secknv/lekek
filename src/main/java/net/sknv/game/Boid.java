@@ -8,7 +8,7 @@ public class Boid extends GameItem {
 
     public Boid(Mesh mesh) {
         super(mesh);
-        accel = new Vector3f( 0, 0, 0);
+        velocity = new Vector3f( 0, 0, 0);
     }
 
 }

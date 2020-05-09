@@ -7,25 +7,25 @@ import org.joml.Vector4f;
 
 public abstract class BoundingBox {
     public GameItem gameItem;
-    public Vector3f min, max;
+    public EndPoint min, max;
 
     public BoundingBox(GameItem gameItem, Vector3f min, Vector3f max) {//AABB
         this.gameItem = gameItem;
-        this.min = min;
-        this.max = max;
+        this.min = new EndPoint(this, min, true);
+        this.max = new EndPoint(this, max, false);
     }
 
-    public Vector3f getMin() {
+    public EndPoint getMin() {
         return min;
     }
 
-    public Vector3f getMax() {
+    public EndPoint getMax() {
         return max;
     }
 
     public void transform(Vector3f position) {
-        Vector4f min = new Vector4f(this.min.x, this.min.y, this.min.z, 1f);
-        Vector4f max = new Vector4f(this.max.x, this.max.y, this.max.z, 1f);
+        Vector4f min = new Vector4f(this.min.getPosition().x, this.min.getPosition().y, this.min.getPosition().z, 1f);
+        Vector4f max = new Vector4f(this.max.getPosition().x, this.max.getPosition().y, this.max.getPosition().z, 1f);
 
         System.out.println("----transforming------\nmin " + min.x + "," + min.y + "," + min.z + "  max " + max.x + "," + max.y + "," + max.z);
 
@@ -38,28 +38,22 @@ public abstract class BoundingBox {
 
         System.out.println("min " + min.x + "," + min.y + "," + min.z + "  max " + max.x + "," + max.y + "," + max.z);
 
-        this.min = new Vector3f(min.x, min.y, min.z);
-        this.max = new Vector3f(max.x, max.y, max.z);
+        this.min.setPosition(new Vector3f(min.x, min.y, min.z));
+        this.max.setPosition(new Vector3f(max.x, max.y, max.z));
     }
 
-    /*
     public void translate(Vector3f v){
         System.out.println("---translating---\n" + this.toString());
         System.out.println("with vector " + v.x + " " + v.y + " " + v.z);
-        this.xMin.position = this.min.x + v.x;
-        this.xMax.position = this.max.x + v.x;
-        this.yMin.position = this.min.y + v.y;
-        this.yMax.position = this.max.y + v.y;
-        this.zMin.position = this.min.z + v.z;
-        this.zMax.position = this.max.z + v.z;
+        this.min.setPosition(this.min.getPosition().add(v));
+        this.max.setPosition(this.max.getPosition().add(v));
         System.out.println(this.toString());
-        this.tmin = new Vector3f(xMin.position, yMin.position, zMin.position);
-        this.tmax = new Vector3f(xMax.position, yMax.position, zMax.position);
+
     }
-     */
 
     @Override
     public String toString() {
-        return "min " + min.x + "," + min.y + "," + min.z + "  max " + max.x + "," + max.y + "," + max.z;
+        return "min " + min.getPosition().x + "," + min.getPosition().y + "," + min.getPosition().z +
+                "\tmax " + max.getPosition().x + "," + max.getPosition().y + "," + max.getPosition().z;
     }
 }

@@ -70,10 +70,10 @@ public class UltimateKekGame implements IGameLogic {
         if(cameraPosInc.length()!=0) cameraPosInc.normalize();
 
         GameItem movableItem = gameItems.get(4);
-        if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.accel.z -= .1;
-        if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.accel.z += .1;
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.accel.x -= .1;
-        if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.accel.x += .1;
+        if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.velocity.z -= .1;
+        if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.velocity.z += .1;
+        if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.velocity.x -= .1;
+        if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.velocity.x += .1;
     }
 
     @Override
@@ -169,24 +169,24 @@ public class UltimateKekGame implements IGameLogic {
 
     private void collisionTesting() {
         for(GameItem gameItem : gameItems){
-            if(gameItem.accel.length() != 0){ //game item has acceleration
+            if(gameItem.velocity.length() != 0){ //game item has acceleration
                 //check for collisions wip
 
                 Vector3f nextPos = new Vector3f(0,0,0); //move these 3lines to somewhere else in game logic movement calc (?)
                 nextPos.add(gameItem.getPos());
-                nextPos.add(gameItem.accel.mul(0.1f));
+                nextPos.add(gameItem.velocity.mul(0.1f));
 
                 if(sweepPrune.updateItem(gameItem, nextPos) > 0){
                     //for no collisions
                     //gameItem.setPos(nextPos);
                     //gameItem.accel.zero();
                     //for collision
-                    gameItem.accel.zero();
-                    gameItem.getBoundingBox().transform(gameItem.getPos());
+                    gameItem.velocity.zero();
+                    gameItem.getBoundingBox().translate(gameItem.getPos());
                 } else {
                     //perform movement
                     gameItem.setPos(nextPos);
-                    gameItem.accel.zero();
+                    gameItem.velocity.zero();
                 }
             }
         }

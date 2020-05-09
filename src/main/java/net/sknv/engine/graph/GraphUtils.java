@@ -181,8 +181,8 @@ public class GraphUtils {
         shaderProgram.setUniform("material", new Material(color, 0.5f));
         shaderProgram.setUniform("modelViewMatrix", viewMatrix);
 
-        Vector3f min = bb.tmin;
-        Vector3f max = bb.tmax;
+        Vector3f min = bb.getMin().getPosition();
+        Vector3f max = bb.getMax().getPosition();
 
         //setup vertex positions and buffer
         FloatBuffer posBuff = MemoryUtil.memAllocFloat(8*3);

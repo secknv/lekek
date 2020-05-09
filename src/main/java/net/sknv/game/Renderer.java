@@ -117,7 +117,7 @@ public class Renderer {
 
         //boid rays
         RayCast boidL = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-        RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.accel);
+        RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.velocity);
         RayCast boidR = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
 
         boidC.drawScaledRay(1, viewMatrix);
