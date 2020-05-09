@@ -9,7 +9,7 @@ public class AlienVAO {
     private final int vertexCount;
     private final Vector4f color;
 
-    public AlienVAO(int vaoId, Vector4f color, int[] vboIds, int vertexCount, int drawMode){
+    public AlienVAO(int vaoId, Vector4f color, int[] vboIds, int vertexCount, int drawMode) {
         this.vaoId = vaoId;
         this.vboIds = vboIds;
         this.drawMode = drawMode;
@@ -23,15 +23,12 @@ public class AlienVAO {
     public Vector4f getColor() {
         return color;
     }
-
     public int[] getVboIds() {
         return vboIds;
     }
-
     public int getDrawMode() {
         return drawMode;
     }
-
     public int getVertexCount() {
         return vertexCount;
     }
