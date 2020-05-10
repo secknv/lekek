@@ -2,22 +2,27 @@ package net.sknv.engine.graph;
 
 import org.joml.Vector4f;
 
+import java.util.Optional;
+
 public class Material {
 
     private static final Vector4f DEFAULT_COLOR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-    private  Vector4f ambientColor, diffuseColor, specularColor;
+    private Vector4f ambientColor, diffuseColor, specularColor;
 
     private Texture texture;
 
     private float reflectance;
 
+    private WebColor webColor;
+
     public Material() {
-        this.ambientColor = DEFAULT_COLOR;
-        this.diffuseColor = DEFAULT_COLOR;
-        this.specularColor = DEFAULT_COLOR;
-        this.texture = null;
-        this.reflectance = 0;
+        this(DEFAULT_COLOR, DEFAULT_COLOR, DEFAULT_COLOR, null, 0);
+    }
+
+    public Material(WebColor color, float alpha, float reflectance) {
+        this(new Vector4f(color.getVector3f(), alpha), reflectance);
+        this.webColor = color;
     }
 
     public Material(Vector4f color, float reflectance) {
@@ -38,6 +43,7 @@ public class Material {
         this.specularColor = specularColor;
         this.texture = texture;
         this.reflectance = reflectance;
+        this.webColor = null;
     }
 
     public Vector4f getAmbientColor() {
@@ -82,5 +88,12 @@ public class Material {
 
     public void setReflectance(float reflectance) {
         this.reflectance = reflectance;
+    }
+
+    @Override
+    public String toString() {
+        return "Material{" +
+                "color=" + (webColor==null?"Unknown":webColor.toString()) +
+                '}';
     }
 }

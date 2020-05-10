@@ -89,7 +89,8 @@ public class GameItem {
     @Override
     public String toString() {
         return "GameItem{" +
-                "pos=" + pos +
+                "color=" + this.mesh.getMaterial() +
+                ", pos=" + pos +
                 ", boundingBox=" + boundingBox +
                 ", nCollisions=" + nCollisions +
                 '}';
