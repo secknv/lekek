@@ -103,15 +103,15 @@ public class UltimateKekGame implements IGameLogic {
         gameItem0.setPos(0, 0, -6);
         gameItem0.setScale(.5f);
 
-        GameItem gameItem1 = new GameItem(cube);
+        GameItem gameItem1 = new GameItem(MeshUtils.generateCube(WebColor.Blue));
         gameItem1.setPos(0, 0, .5f);
         gameItem1.setScale(scale);
 
-        GameItem gameItem2 = new GameItem(cube);
+        GameItem gameItem2 = new GameItem(MeshUtils.generateCube(WebColor.Green));
         gameItem2.setPos(0f, 0, 0);
         gameItem2.setScale(scale);
 
-        GameItem gameItem3 = new GameItem(cube);
+        GameItem gameItem3 = new GameItem(MeshUtils.generateCube(WebColor.Red));
         gameItem3.setPos(0.5f, 0, 0);
         gameItem3.setScale(scale);
 
@@ -119,7 +119,7 @@ public class UltimateKekGame implements IGameLogic {
         gameItem4.setPos(1f, 0, .6f);
         gameItem4.setScale(scale);
 
-        GameItem gameItem5 = new GameItem(cube);
+        GameItem gameItem5 = new GameItem(MeshUtils.generateCube(WebColor.Purple));
         gameItem5.setPos(.5f, 0, .5f);
         gameItem5.setScale(scale);
 
