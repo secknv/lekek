@@ -104,8 +104,8 @@ public class RayCast {
     }
 
     public boolean intersectsItem(GameItem gameItem) {
-        Vector3f min = gameItem.getBoundingBox().tmin;
-        Vector3f max = gameItem.getBoundingBox().tmax;
+        Vector3f min = gameItem.getBoundingBox().getMin().getPosition();
+        Vector3f max = gameItem.getBoundingBox().getMax().getPosition();
 
         Vector3f[] vertex = new Vector3f[]{
                 min, new Vector3f(max.x, min.y, min.z), new Vector3f(min.x, min.y, max.z),

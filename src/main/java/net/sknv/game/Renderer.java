@@ -105,7 +105,8 @@ public class Renderer {
             GraphUtils.drawQuad(this, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
         }
 
-        Boid boid = (Boid) gameItems.get(6);
+        //Boid boid = (Boid) gameItems.get(6);
+
         //tracking line
         /*
         Vector3f t = new Vector3f(boid.getPos().x, boid.getPos().y, boid.getPos().z);
@@ -120,13 +121,14 @@ public class Renderer {
             }
         }
          */
-
+        /*
         //boid rays
-        RayCast boidL = new RayCast(this, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-        RayCast boidC = new RayCast(this, boid.getPos(), boid.accel);
-        RayCast boidR = new RayCast(this, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+        RayCast boidL = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+        RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.velocity);
+        RayCast boidR = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
 
-        boidC.drawScaledRay(1);
+        boidC.drawScaledRay(1, viewMatrix);
+         */
 
 
 

@@ -1,6 +1,8 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.BoundingBox;
+import net.sknv.engine.collisions.BoundingBox;
+import net.sknv.engine.GameItem;
+import org.joml.Matrix4f;
 import net.sknv.game.Renderer;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -85,8 +87,8 @@ public class GraphUtils {
 
     public static void drawAABB(Renderer renderer, Vector4f color, BoundingBox bb) {
 
-        Vector3f min = bb.tmin;
-        Vector3f max = bb.tmax;
+        Vector3f min = bb.getMin().getPosition();
+        Vector3f max = bb.getMax().getPosition();
 
         // Create Positions Array
         float[] posArray = new float[] {

@@ -2,7 +2,6 @@ package net.sknv.engine.collisions;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import net.sknv.engine.BoundingBox;
 import net.sknv.engine.GameItem;
 import org.joml.Vector3f;
 import java.util.*;
@@ -58,42 +57,38 @@ public class SPCollision implements ISweepPrune{
     }
 
     @Override
-    public int updateItem(GameItem gameItem, Vector3f nextPos) {
+    public int updateItem(GameItem gameItem, Vector3f step) {
+        sortAxis();
+        //System.out.println(collisionPairs.values());
+
         BoundingBox bb = gameItem.getBoundingBox();
-        final int[] nColl = {0};
+        Vector3f nextMin = new Vector3f(), nextMax = new Vector3f();
 
-        Vector3f accel = gameItem.accel;
-        BoundingBox nextBb = gameItem.getBoundingBox();
-        nextBb.transform(nextPos);
+        nextMin.add(bb.getMin().getPosition()).add(step);
+        nextMax.add(bb.getMax().getPosition()).add(step);
 
-        if(accel.x!=0) tryMoveX(gameItem, nextBb);
-        if(accel.y!=0) tryMoveY(gameItem, nextBb);
-        if(accel.z!=0) tryMoveZ(gameItem, nextBb);
+        if(step.x!=0) tryMoveX(gameItem, step);
+        if(step.y!=0) tryMoveY(gameItem, step);
+        if(step.z!=0) tryMoveZ(gameItem, step);
 
-        xAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
-        yAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
-        zAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
-
+        System.out.println("------------");
         //maybe wont work for multiple updates (vese mais tarde)
+        final int[] nColl = {0};
         Map<BoundingBox, Integer> pairs = collisionPairs.column(bb);
         pairs.forEach((boundingBox, integer) -> {
+            System.out.println(boundingBox.gameItem +" "+ integer);
             if (integer == 3){
-                if(testCollision(bb, boundingBox)){
+                if(testCollision(nextMin, nextMax, boundingBox))
                     nColl[0]++;
-                    //boundingBox.gameItem.nCollisions++;
-
-                }
             }
         });
 
         Map<BoundingBox, Integer> pairs2 = collisionPairs.row(bb);
         pairs2.forEach((boundingBox, integer) -> {
+            System.out.println(boundingBox.gameItem +" "+ integer);
             if (integer == 3){
-                if(testCollision(bb, boundingBox)) {
+                if(testCollision(nextMin, nextMax, boundingBox))
                     nColl[0]++;
-                    //boundingBox.gameItem.nCollisions++;
-
-                }
             }
         });
 
@@ -109,15 +104,19 @@ public class SPCollision implements ISweepPrune{
     }
 
     private void insertItem(GameItem gameItem){
-        xAxis.add(gameItem.getBoundingBox().xMin);
-        xAxis.add(gameItem.getBoundingBox().xMax);
-        xAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
-        yAxis.add(gameItem.getBoundingBox().yMin);
-        yAxis.add(gameItem.getBoundingBox().yMax);
-        yAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
-        zAxis.add(gameItem.getBoundingBox().zMin);
-        zAxis.add(gameItem.getBoundingBox().zMax);
-        zAxis.sort((e1, e2) -> Float.compare(e1.position, e2.position));
+        BoundingBox bb = gameItem.getBoundingBox();
+
+        xAxis.add(bb.min);
+        xAxis.add(bb.max);
+        xAxis.sort((e1, e2) -> Float.compare(e1.getPosition().x, e2.getPosition().x));
+
+        yAxis.add(bb.min);
+        yAxis.add(bb.max);
+        yAxis.sort((e1, e2) -> Float.compare(e1.getPosition().z, e2.getPosition().z));
+
+        zAxis.add(bb.min);
+        zAxis.add(bb.max);
+        zAxis.sort((e1, e2) -> Float.compare(e1.getPosition().z, e2.getPosition().z));
     }
 
 
@@ -128,19 +127,19 @@ public class SPCollision implements ISweepPrune{
 
         int i=0;
         while (i!= xAxis.size()){
-            if (xAxis.get(i).isMin){//min
+            if (xAxis.get(i).isMin()){//min
                 min = xAxis.get(i);
-                max = min.getBox().xMax;
+                max = min.getBB().getMax();
 
             } else {//max
                 max = xAxis.get(i);
-                min = max.getBox().xMin;
+                min = max.getBB().getMin();
             }
 
-            if (bb.xMin.position <= min.position){
-                if(bb.xMax.position >= min.position ) possibleCollisions.add(min.getBox());
+            if (bb.getMin().getPosition().x <= min.getPosition().x){
+                if(bb.getMax().getPosition().x >= min.getPosition().x ) possibleCollisions.add(min.getBB());
             } else {
-                if (bb.xMin.position <= max.position) possibleCollisions.add(min.getBox());
+                if(bb.getMin().getPosition().x <= max.getPosition().x) possibleCollisions.add(min.getBB());
             }
             i++;
         }
@@ -154,19 +153,19 @@ public class SPCollision implements ISweepPrune{
 
         int i=0;
         while (i!= yAxis.size()){
-            if (yAxis.get(i).isMin){//min
+            if (yAxis.get(i).isMin()){//min
                 min = yAxis.get(i);
-                max = min.getBox().yMax;
+                max = min.getBB().getMax();
 
             } else {//max
                 max = yAxis.get(i);
-                min = max.getBox().yMin;
+                min = max.getBB().getMin();
             }
 
-            if (bb.yMin.position <= min.position){
-                if(bb.yMax.position >= min.position ) possibleCollisions.add(min.getBox());
+            if (bb.getMin().getPosition().y <= min.getPosition().y){
+                if(bb.getMax().getPosition().y >= min.getPosition().y) possibleCollisions.add(min.getBB());
             } else {
-                if (bb.yMin.position <= max.position) possibleCollisions.add(min.getBox());
+                if(bb.getMin().getPosition().y <= max.getPosition().y) possibleCollisions.add(min.getBB());
             }
             i++;
         }
@@ -180,69 +179,113 @@ public class SPCollision implements ISweepPrune{
 
         int i=0;
         while (i!= zAxis.size()){
-            if (zAxis.get(i).isMin){//min
+            if (zAxis.get(i).isMin()){//min
                 min = zAxis.get(i);
-                max = min.getBox().zMax;
+                max = min.getBB().getMax();
 
             } else {//max
                 max = zAxis.get(i);
-                min = max.getBox().zMin;
+                min = max.getBB().getMin();
             }
 
-            if (bb.zMin.position <= min.position){
-                if(bb.zMax.position >= min.position ) possibleCollisions.add(min.getBox());
+            if (bb.getMin().getPosition().z <= min.getPosition().z){
+                if(bb.getMax().getPosition().z >= min.getPosition().z) possibleCollisions.add(min.getBB());
             } else {
-                if (bb.zMin.position <= max.position) possibleCollisions.add(min.getBox());
+                if(bb.getMin().getPosition().z <= max.getPosition().z) possibleCollisions.add(min.getBB());
             }
             i++;
         }
         return possibleCollisions;
     }
 
-    private void tryMoveX(GameItem gameItem, BoundingBox bb){
-        if (gameItem.accel.x > 0){
+    private void tryMoveX(GameItem gameItem, Vector3f step){
+        BoundingBox bb = gameItem.getBoundingBox();
+        float nextMin = bb.getMin().getPosition().x + step.x;
+        float nextMax = bb.getMax().getPosition().x + step.x;
+
+        if (step.x > 0){
             BoundingBox nextBb;
-            int i = xAxis.indexOf(bb.xMax)+1;
-            float value = bb.xMax.position;
-            while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).position <= value) {
-                if (bb.xMax.position > xAxis.get(i).position) {
-                    nextBb = xAxis.get(i).getBox();
-                    if (xAxis.get(i).isMin && testCollisionX(bb, nextBb)) {//collision
+            int i = xAxis.indexOf(bb.getMax())+1;
+            while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).getPosition().x < nextMax) {
+                nextBb = xAxis.get(i).getBB();
+                if (xAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, nextBb)) {//collision
+                    incCollisions(bb, nextBb);
+                }
+                i++;
+            }
+            i = xAxis.indexOf(bb.getMin())+1;
+            while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).getPosition().x < nextMin) {
+                nextBb = xAxis.get(i).getBB();
+                if (!xAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, nextBb)) {//out collision
+                    decCollisions(bb, nextBb);
+                }
+                i++;
+            }
+        } else if(step.x < 0){
+            BoundingBox prevBb;
+            int i = xAxis.indexOf(bb.getMin())-1;
+            while (i > -1 && i < xAxis.size()-1 && xAxis.get(i).getPosition().x >= nextMin) {
+                prevBb = xAxis.get(i).getBB();
+                if (!xAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, prevBb)) {//collision
+                    incCollisions(bb, prevBb);
+                }
+                i--;
+            }
+            i = xAxis.indexOf(bb.getMax())-1;
+            while (i > -1 && i < xAxis.size()-1 && xAxis.get(i).getPosition().x >= nextMax) {
+                prevBb = xAxis.get(i).getBB();
+                if (xAxis.get(i).isMin() && !testCollisionX(nextMin, nextMax, prevBb)) {//out collision
+                    decCollisions(bb, prevBb);
+                }
+                i--;
+            }
+        }
+    }
+
+    private void tryMoveY(GameItem gameItem, Vector3f step){
+        BoundingBox bb = gameItem.getBoundingBox();
+        float nextMin = bb.getMin().getPosition().y + step.y;
+        float nextMax = bb.getMax().getPosition().y + step.y;
+
+        if (gameItem.velocity.y > 0){
+            BoundingBox nextBb;
+            int i = yAxis.indexOf(bb.getMax())+1;
+            while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).getPosition().y < nextMax) {
+                if (bb.getMax().getPosition().y > yAxis.get(i).getPosition().y) {
+                    nextBb = yAxis.get(i).getBB();
+                    if (yAxis.get(i).isMin() && testCollisionY(nextMin, nextMax, nextBb)) {//collision
                         incCollisions(bb, nextBb);
                     }
                 }
                 i++;
             }
-            i = xAxis.indexOf(bb.xMin)+1;
-            value = bb.xMin.position;
-            while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).position <= value) {
-                if (bb.xMin.position > xAxis.get(i).position) {
-                    nextBb = xAxis.get(i).getBox();
-                    if (!xAxis.get(i).isMin && !testCollisionX(bb, nextBb)) {//out collision
+            i = yAxis.indexOf(bb.getMin())+1;
+            while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).getPosition().y < nextMin) {
+                if (bb.getMax().getPosition().y > yAxis.get(i).getPosition().y) {
+                    nextBb = yAxis.get(i).getBB();
+                    if (!yAxis.get(i).isMin() && !testCollisionY(nextMin, nextMax, nextBb)) {//out collision
                         decCollisions(bb, nextBb);
                     }
                 }
                 i++;
             }
-        } else if(gameItem.accel.x < 0){
+        } else if(gameItem.velocity.y < 0){
             BoundingBox prevBb;
-            int i = xAxis.indexOf(bb.xMin)-1;
-            float value = bb.xMin.position;
-            while (i > -1 && i < xAxis.size()-1 && xAxis.get(i).position >= value) {
-                if (bb.xMin.position < xAxis.get(i).position) {
-                    prevBb = xAxis.get(i).getBox();
-                    if (!xAxis.get(i).isMin && testCollisionX(bb, prevBb)) {//collision
+            int i = yAxis.indexOf(bb.getMin())-1;
+            while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).getPosition().y >= nextMin) {
+                if (bb.getMin().getPosition().y < yAxis.get(i).getPosition().y) {
+                    prevBb = yAxis.get(i).getBB();
+                    if (!yAxis.get(i).isMin() && testCollisionY(nextMin, nextMax, prevBb)) {//collision
                         incCollisions(bb, prevBb);
                     }
                 }
                 i--;
             }
-            i = xAxis.indexOf(bb.xMax)-1;
-            value = bb.xMax.position;
-            while (i > -1 && i < xAxis.size()-1 && xAxis.get(i).position >= value) {
-                if (bb.xMax.position < xAxis.get(i).position) {
-                    prevBb = xAxis.get(i).getBox();
-                    if (xAxis.get(i).isMin && !testCollisionX(bb, prevBb)) {//out collision
+            i = yAxis.indexOf(bb.getMax())-1;
+            while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).getPosition().y >= nextMax) {
+                if (bb.getMax().getPosition().y < yAxis.get(i).getPosition().y) {
+                    prevBb = yAxis.get(i).getBB();
+                    if (yAxis.get(i).isMin() && !testCollisionY(nextMin, nextMax, prevBb)) {//out collision
                         decCollisions(bb, prevBb);
                     }
                 }
@@ -251,107 +294,44 @@ public class SPCollision implements ISweepPrune{
         }
     }
 
-    private void tryMoveY(GameItem gameItem, BoundingBox bb){
-        if (gameItem.accel.y > 0){
-            BoundingBox nextBb;
-            int i = yAxis.indexOf(bb.yMax)+1;
-            float value = 0;
-            if(i>-1 && i<yAxis.size()-1) value = yAxis.get(i).position;
-            while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).position <= value) {
-                if (bb.yMax.position > yAxis.get(i).position) {
-                    nextBb = yAxis.get(i).getBox();
-                    if (yAxis.get(i).isMin && testCollisionY(bb, nextBb)) {//collision
-                        incCollisions(bb, nextBb);
-                    }
-                }
-                i++;
-            }
+    private void tryMoveZ(GameItem gameItem, Vector3f step){
+        BoundingBox bb = gameItem.getBoundingBox();
+        float nextMin = bb.getMin().getPosition().z + step.z;
+        float nextMax = bb.getMax().getPosition().z + step.z;
 
-            i = yAxis.indexOf(bb.yMin)+1;
-            if (i>-1 && i<yAxis.size()-1)value = yAxis.get(i).position;
-            while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).position <= value) {
-                if (bb.yMin.position > yAxis.get(i).position) {
-                    nextBb = yAxis.get(i).getBox();
-                    if (!yAxis.get(i).isMin && !testCollisionY(bb, nextBb)){//out collision
-                        decCollisions(bb, nextBb);
-                    }
-                }
-                i++;
-            }
-        } else if(gameItem.accel.y < 0){
-            BoundingBox prevBb;
-            int i = yAxis.indexOf(bb.yMin)-1;
-            float value = 0;
-            if(i>-1 && i<yAxis.size()-1) value = yAxis.get(i).position;
-            while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).position >= value) {
-                if (bb.yMin.position < yAxis.get(i).position) {
-                    prevBb = yAxis.get(i).getBox();
-                    if (!yAxis.get(i).isMin && testCollisionY(bb, prevBb)) {//collision
-                        incCollisions(bb, prevBb);
-                    }
-                }
-                i--;
-            }
-            i = yAxis.indexOf(bb.yMax)-1;
-            if(i>-1 && i<yAxis.size()-1) value = yAxis.get(i).position;
-            while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).position >= value) {
-                if (bb.yMax.position < yAxis.get(i).position) {
-                    prevBb = yAxis.get(i).getBox();
-                    if (yAxis.get(i).isMin && !testCollisionY(bb, prevBb)) {//out collision
-                        decCollisions(bb, prevBb);
-                    }
-                }
-                i--;
-            }
-        }
-    }
-
-    private void tryMoveZ(GameItem gameItem, BoundingBox bb){
-        if (gameItem.accel.z > 0){
+        if (step.z > 0){
             BoundingBox nextBb;
-            int i = zAxis.indexOf(bb.zMax)+1;
-            float value = bb.zMax.position;
-            while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).position <= value) {
-                if (bb.zMax.position > zAxis.get(i).position) {
-                    nextBb = zAxis.get(i).getBox();
-                    if (zAxis.get(i).isMin && testCollisionZ(bb, nextBb)) {//collision
-                        incCollisions(bb, nextBb);
-                    }
+            int i = zAxis.indexOf(bb.getMax())+1;
+            while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).getPosition().z < nextMax) {
+                nextBb = zAxis.get(i).getBB();
+                if (zAxis.get(i).isMin() && testCollisionZ(nextMin, nextMax, nextBb)) {//collision
+                    incCollisions(bb, nextBb);
                 }
                 i++;
             }
-            i = zAxis.indexOf(bb.zMin)+1;
-            value = bb.zMin.position;
-            while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).position <= value) {
-                if (bb.zMin.position > zAxis.get(i).position) {
-                    nextBb = zAxis.get(i).getBox();
-                    if (!zAxis.get(i).isMin && !testCollisionZ(bb, nextBb) ) {//out collision
-                        decCollisions(bb, nextBb);
-                    }
+            i = zAxis.indexOf(bb.getMin())+1;
+            while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).getPosition().z < nextMin) {
+                nextBb = zAxis.get(i).getBB();
+                if (!zAxis.get(i).isMin() && !testCollisionZ(nextMin, nextMax, nextBb)) {//out collision
+                    decCollisions(bb, nextBb);
                 }
                 i++;
             }
-        } else if(gameItem.accel.z < 0){
+        } else if(step.z < 0){
             BoundingBox prevBb;
-            int i = zAxis.indexOf(bb.zMin)-1;
-            float value = bb.zMin.position;
-            while (i > -1 && i < zAxis.size()-1 && zAxis.get(i).position >= value) {
-                if (bb.zMin.position < zAxis.get(i).position) {
-                    prevBb = zAxis.get(i).getBox();
-                    if (!zAxis.get(i).isMin && testCollisionZ(bb, prevBb)) {//collision
-                        incCollisions(bb, prevBb);
-                    }
+            int i = zAxis.indexOf(bb.getMin())-1;
+            while (i > -1 && i < zAxis.size()-1 && zAxis.get(i).getPosition().z >= nextMin) {
+                prevBb = zAxis.get(i).getBB();
+                if (!zAxis.get(i).isMin() && testCollisionZ(nextMin, nextMax, prevBb)) {//collision
+                    incCollisions(bb, prevBb);
                 }
                 i--;
             }
-            i = zAxis.indexOf(bb.zMax)-1;
-            value = bb.zMax.position;
-            while (i > -1 && i < zAxis.size()-1 && zAxis.get(i).position >= value) {
-                if (bb.zMax.position < zAxis.get(i).position) {
-                    prevBb = zAxis.get(i).getBox();
-                    if (zAxis.get(i).isMin && !testCollisionZ(bb, prevBb)) {//out collision
-                        decCollisions(bb, prevBb);
-                    }
+            i = zAxis.indexOf(bb.getMax())-1;
+            while (i > -1 && i < zAxis.size()-1 && zAxis.get(i).getPosition().z >= nextMax) {
+                prevBb = zAxis.get(i).getBB();
+                if (zAxis.get(i).isMin() && !testCollisionZ(nextMin, nextMax, prevBb)) {//out collision
+                    decCollisions(bb, prevBb);
                 }
                 i--;
             }
@@ -379,27 +359,33 @@ public class SPCollision implements ISweepPrune{
     }
 
     private void increment(BoundingBox bb, BoundingBox bb2) {
-        if(collisionPairs.get(bb, bb2) < 3) collisionPairs.put(bb, bb2, collisionPairs.get(bb, bb2) + 1);
+        if (collisionPairs.get(bb,bb2)<3) collisionPairs.put(bb, bb2, collisionPairs.get(bb, bb2) + 1);
     }
 
     private void decrement(BoundingBox bb, BoundingBox bb2) {
-        if(collisionPairs.get(bb, bb2) > 0) collisionPairs.put(bb, bb2, collisionPairs.get(bb, bb2) - 1);
+        if (collisionPairs.get(bb,bb2)>0) collisionPairs.put(bb, bb2, collisionPairs.get(bb, bb2) - 1);
     }
 
-    private boolean testCollision(BoundingBox bb, BoundingBox bb2) {
-        return testCollisionX(bb, bb2) && testCollisionY(bb, bb2) && testCollisionZ(bb, bb2);
+    private boolean testCollision(Vector3f min, Vector3f max, BoundingBox bb2) {
+        return testCollisionX(min.x, max.x, bb2) && testCollisionY(min.y, max.y, bb2) && testCollisionZ(min.z, max.z, bb2);
     }
 
-    private boolean testCollisionX(BoundingBox bb, BoundingBox bb2){
-        return !(bb.xMax.position<=bb2.xMin.position || bb.xMin.position>=bb2.xMax.position);
+    private boolean testCollisionX(float min, float max, BoundingBox bb2) {
+        return !(max<bb2.getMin().getPosition().x || min>bb2.getMax().getPosition().x);
     }
 
-    private boolean testCollisionY(BoundingBox bb, BoundingBox bb2){
-        return !(bb.yMax.position<=bb2.yMin.position || bb.yMin.position>=bb2.yMax.position);
+    private boolean testCollisionY(float min, float max, BoundingBox bb2) {
+        return !(max<bb2.getMin().getPosition().y || min>bb2.getMax().getPosition().y);
     }
 
-    private boolean testCollisionZ(BoundingBox bb, BoundingBox bb2){
-        return !(bb.zMax.position<=bb2.zMin.position || bb.zMin.position>=bb2.zMax.position);
+    private boolean testCollisionZ(float min, float max, BoundingBox bb2) {
+        return !(max<bb2.getMin().getPosition().z || min>bb2.getMax().getPosition().z);
+    }
+
+    public void sortAxis(){
+        xAxis.sort((e1, e2) -> Float.compare(e1.getPosition().x, e2.getPosition().x));
+        yAxis.sort((e1, e2) -> Float.compare(e1.getPosition().y, e2.getPosition().y));
+        zAxis.sort((e1, e2) -> Float.compare(e1.getPosition().z, e2.getPosition().z));
     }
 
     public void printAxis() {

@@ -70,10 +70,10 @@ public class UltimateKekGame implements IGameLogic {
         if(cameraPosInc.length()!=0) cameraPosInc.normalize();
 
         GameItem movableItem = gameItems.get(4);
-        if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.accel.z -= .1;
-        if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.accel.z += .1;
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.accel.x -= .1;
-        if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.accel.x += .1;
+        if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.velocity.z -= .1;
+        if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.velocity.z += .1;
+        if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.velocity.x -= .1;
+        if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.velocity.x += .1;
     }
 
     @Override
@@ -123,12 +123,13 @@ public class UltimateKekGame implements IGameLogic {
         gameItem5.setPos(.5f, 0, .5f);
         gameItem5.setScale(scale);
 
-
+        /*
         Boid b = new Boid(boid);
         b.setPos(-2, 0, 0);
         b.setScale(.1f);
+         */
 
-        gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5, b));
+        gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5));
     }
 
     private void initLighting() {
@@ -168,24 +169,23 @@ public class UltimateKekGame implements IGameLogic {
 
     private void collisionTesting() {
         for(GameItem gameItem : gameItems){
-            if(gameItem.accel.length() != 0){ //game item has acceleration
+            if(gameItem.getVelocity().length() != 0){ //game item has acceleration
                 //check for collisions wip
+
+                Vector3f step = gameItem.velocity.mul(0.1f);
 
                 Vector3f nextPos = new Vector3f(0,0,0); //move these 3lines to somewhere else in game logic movement calc (?)
                 nextPos.add(gameItem.getPos());
-                nextPos.add(gameItem.accel.mul(0.1f));
+                nextPos.add(step);
 
-                if(sweepPrune.updateItem(gameItem, nextPos) > 0){
-                    //for no collisions
-                    //gameItem.setPos(nextPos);
-                    //gameItem.accel.zero();
+                if(sweepPrune.updateItem(gameItem, step) > 0){ //nextPos
                     //for collision
-                    gameItem.accel.zero();
-                    gameItem.getBoundingBox().transform(gameItem.getPos());
+                    gameItem.velocity.zero();
                 } else {
                     //perform movement
                     gameItem.setPos(nextPos);
-                    gameItem.accel.zero();
+                    gameItem.getBoundingBox().translate(step);
+                    gameItem.velocity.zero();
                 }
             }
         }
