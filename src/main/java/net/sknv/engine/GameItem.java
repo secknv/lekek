@@ -85,4 +85,13 @@ public class GameItem {
     public void rotate(float x, float y, float z) {
         setRot(rot.x + x, rot.y + y, rot.z + z);
     }
+
+    @Override
+    public String toString() {
+        return "GameItem{" +
+                "pos=" + pos +
+                ", boundingBox=" + boundingBox +
+                ", nCollisions=" + nCollisions +
+                '}';
+    }
 }
