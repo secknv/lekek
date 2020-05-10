@@ -3,12 +3,14 @@ package net.sknv.engine.graph;
 import net.sknv.engine.collisions.BoundingBox;
 import net.sknv.engine.GameItem;
 import org.joml.Matrix4f;
+import net.sknv.game.Renderer;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -18,175 +20,78 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class GraphUtils {
 
-    public static void drawLine(ShaderProgram shaderProgram, Matrix4f viewMatrix, Vector4f color, Vector3f i, Vector3f f){
+    public static void drawLine(Vector3f i, Vector3f f, Renderer renderer, Vector4f color){
 
-        shaderProgram.setUniform("material", new Material(color, 0.5f));
-        shaderProgram.setUniform("modelViewMatrix", viewMatrix);
+        // create Positions Array
+        float[] posArray = new float[]{i.x,i.y,i.z,f.x,f.y,f.z};
 
-        //setup vertex positions and buffer
-        FloatBuffer posBuff = MemoryUtil.memAllocFloat(6);
-        posBuff.put(new float[]{i.x,i.y,i.z,f.x,f.y,f.z}).flip();
+        // Create Indices Array
+        int[] idxArray = new int[]{0,1};
 
-        //setup indexes and buffer
-        IntBuffer idxBuff = MemoryUtil.memAllocInt(2);
-        idxBuff.put(new int[]{0,1}).flip();
-
-        int vaoId = glGenVertexArrays();
-        glBindVertexArray(vaoId);
-
-        int vboId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        glBufferData(GL_ARRAY_BUFFER, posBuff, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-
-
-        int vboId2 = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, 0);
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glBindVertexArray(0);
-
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-        glDeleteBuffers(vboId);
+        // Generate AlienVAO and add it to the render queue
+        renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_LINES));
     }
 
-    public static void drawGrid(ShaderProgram shaderProgram,Transformation transformation, Matrix4f viewMatrix, Vector3f origin, int size){
-
-        shaderProgram.setUniform("material", new Material(new Vector4f(10f, 10f, 10f,0f), 0f));
-
-        GameItem gi = new GameItem();
-        shaderProgram.setUniform("modelViewMatrix", transformation.getModelViewMatrix( gi, viewMatrix));
-
-        //setup vertex positions
-        float[] pos = new float[3*4*size];
-
+    public static void drawGrid(Renderer renderer, Vector3f origin, int size){
         Vector3f start = new Vector3f();
-        origin.add(-size/2, 0f, -size/2, start);
+        origin.add(-size/2f, 0f, -size/2f, start);
 
+        // Create Positions Array
+        float[] posArray = new float[3*4*size];
         for(int i=0; i!=4*size; i++){
             if(i<size){
-                pos[3*i] = start.x; pos[3*i+1] = start.y; pos[3*i+2] = start.z;
+                posArray[3*i] = start.x; posArray[3*i+1] = start.y; posArray[3*i+2] = start.z;
                 start.add(new Vector3f(1,0,0));
             } else if (i<2*size){
-                pos[3*i] = start.x; pos[3*i+1] = start.y; pos[3*i+2] = start.z;
+                posArray[3*i] = start.x; posArray[3*i+1] = start.y; posArray[3*i+2] = start.z;
                 start.add(new Vector3f(0,0,1));
             } else if (i<3*size){
-                pos[3*i] = start.x; pos[3*i+1] = start.y; pos[3*i+2] = start.z;
+                posArray[3*i] = start.x; posArray[3*i+1] = start.y; posArray[3*i+2] = start.z;
                 start.add(new Vector3f(-1,0,0));
             } else {
-                pos[3*i] = start.x; pos[3*i+1] = start.y; pos[3*i+2] = start.z;
+                posArray[3*i] = start.x; posArray[3*i+1] = start.y; posArray[3*i+2] = start.z;
                 start.add(new Vector3f(0,0,-1));
             }
         }
 
-        //buffer vertex positions
-        FloatBuffer posBuff = MemoryUtil.memAllocFloat(pos.length);
-        posBuff.put(pos).flip();
-
-
-        //setup indexes array
-        int[] idx = new int[4*(size+1)];
-        idx[idx.length-1] = 0;
-        idx[idx.length-2] = size;
-        for (int i=0; i!=(idx.length/2)-1; i++){
-            idx[i*2]=i;
-            if(i<size+1) idx[i*2+1]=3*size-i;
-            else idx[i*2+1]=5*size-i;
+        // Create Indices Array
+        int[] idxArray = new int[4*(size+1)];
+        idxArray[idxArray.length-1] = 0;
+        idxArray[idxArray.length-2] = size;
+        for (int i=0; i!=(idxArray.length/2)-1; i++){
+            idxArray[i*2]=i;
+            if(i<size+1) idxArray[i*2+1]=3*size-i;
+            else idxArray[i*2+1]=5*size-i;
         }
 
-        IntBuffer idxBuff = MemoryUtil.memAllocInt(idx.length);
-        idxBuff.put(idx).flip();
-
-        int vaoId = glGenVertexArrays();
-        glBindVertexArray(vaoId);
-
-        int vboId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        glBufferData(GL_ARRAY_BUFFER, posBuff, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-
-        int vboId2 = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glDrawElements(GL_LINES, idx.length, GL_UNSIGNED_INT, 0);
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glBindVertexArray(0);
-
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-        glDeleteBuffers(vboId);
+        renderer.addAlienVAO(generateAVAO(posArray, idxArray, new Vector4f(1, 0, 0, 1), GL_LINES));
     }
 
-    public static void drawQuad(ShaderProgram shaderProgram, Transformation transformation, Matrix4f viewMatrix, Vector4f color,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){
+    public static void drawQuad(Renderer renderer, Vector4f color,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){
 
-        shaderProgram.setUniform("material", new Material(color, .5f));
-
-        GameItem gi = new GameItem();
-        shaderProgram.setUniform("modelViewMatrix", transformation.getModelViewMatrix( gi, viewMatrix));
-
-        //setup vertex positions and buffer
-
-        FloatBuffer posBuff = MemoryUtil.memAllocFloat(12);
-        posBuff.put(new float[]{
+        // Create Positions Array
+        float[] posArray = new float[]{
                 p1.x, p1.y, p1.z,
                 p2.x, p2.y, p2.z,
                 p3.x, p3.y, p3.z,
                 p4.x, p4.y, p4.z,
-        }).flip();
+        };
 
-        //setup indexes array and buffer
-        IntBuffer idxBuff = MemoryUtil.memAllocInt(6);
-        idxBuff.put(new int[]{
+        // Create Indices Array
+        int[] idxArray = new int[]{
                 0,1,2,
                 0,2,3,
-        }).flip();
-
-        int vaoId = glGenVertexArrays();
-        glBindVertexArray(vaoId);
-
-        int vboId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        glBufferData(GL_ARRAY_BUFFER, posBuff, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-
-
-        int vboId2 = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
-
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glBindVertexArray(0);
-
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-        glDeleteBuffers(vboId);
-
+        };
+        renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_TRIANGLES));
     }
 
-    public static void drawAABB(ShaderProgram shaderProgram, Matrix4f viewMatrix, Vector4f color, BoundingBox bb) {
-        shaderProgram.setUniform("material", new Material(color, 0.5f));
-        shaderProgram.setUniform("modelViewMatrix", viewMatrix);
+    public static void drawAABB(Renderer renderer, Vector4f color, BoundingBox bb) {
 
         Vector3f min = bb.getMin().getPosition();
         Vector3f max = bb.getMax().getPosition();
 
-        //setup vertex positions and buffer
-        FloatBuffer posBuff = MemoryUtil.memAllocFloat(8*3);
-        posBuff.put(new float[]{
+        // Create Positions Array
+        float[] posArray = new float[] {
                 min.x, min.y, min.z,
                 max.x, min.y, min.z,
                 min.x, max.y, min.z,
@@ -196,11 +101,10 @@ public class GraphUtils {
                 max.x, min.y, max.z,
                 max.x, max.y, min.z,
                 max.x, max.y, max.z,
-        }).flip();
+        };
 
-        //setup indexes and buffer
-        IntBuffer idxBuff = MemoryUtil.memAllocInt(24);
-        idxBuff.put(new int[]{
+        // Create Indices Array
+        int[] idxArray = new int[] {
                 0,1,
                 0,2,
                 0,3,
@@ -217,41 +121,60 @@ public class GraphUtils {
                 4,7,
                 5,7,
                 6,7,
-        }).flip();
+        };
 
+        renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_LINES));
+    }
+
+    public static void drawAxis(Renderer renderer) {
+        // todo: fix the GL hints here
+        //glEnable(GL_LINE_SMOOTH);
+        //glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        drawLine(new Vector3f(-20,0,0), new Vector3f(20,0,0), renderer, new Vector4f(255,0,0,0));
+        drawLine(new Vector3f(0,-20,0), new Vector3f(0,20,0), renderer, new Vector4f(0,255,0,0));
+        drawLine(new Vector3f(0,0,-20), new Vector3f(0,0,20), renderer, new Vector4f(0,0,255,0));
+        //glDisable(GL_LINE_SMOOTH);
+    }
+
+    public static int[] getIntArray(ArrayList<Integer> list) {
+        return list.stream().mapToInt((Integer v) -> v).toArray();
+    }
+
+    public static AlienVAO generateAVAO(float[] pos, int[] idx, Vector4f color, int drawMode) {
+
+        ArrayList<Integer> vboIdList = new ArrayList<>();
+
+        //setup vertex positions and buffer
+        FloatBuffer posBuff = MemoryUtil.memAllocFloat(pos.length);
+        posBuff.put(pos).flip();
+
+        //setup indexes and buffer
+        IntBuffer idxBuff = MemoryUtil.memAllocInt(idx.length);
+        idxBuff.put(idx).flip();
+
+        // get VAO
         int vaoId = glGenVertexArrays();
         glBindVertexArray(vaoId);
 
+        // Positions VBO
         int vboId = glGenBuffers();
+        vboIdList.add(vboId);
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
         glBufferData(GL_ARRAY_BUFFER, posBuff, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-
-
-        int vboId2 = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId2);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-
         glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glBindVertexArray(0);
 
+        // Unbind attribute list VBOs -> only the Positions VBO in this case
         glBindBuffer(GL_ARRAY_BUFFER,0);
-        glDeleteBuffers(vboId);
-    }
 
-    public static void drawAxis(ShaderProgram shaderProgram, Transformation transformation, Matrix4f viewMatrix) {
-        glEnable(GL_LINE_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        glLineWidth(10f);
-        drawLine(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), new Vector3f(-20,0,0), new Vector3f(20,0,0));
-        drawLine(shaderProgram, viewMatrix, new Vector4f(0,255,0,0), new Vector3f(0,-20,0), new Vector3f(0,20,0));
-        drawLine(shaderProgram, viewMatrix, new Vector4f(0,0,255,0), new Vector3f(0,0,-20), new Vector3f(0,0,20));
-        glDisable(GL_LINE_SMOOTH);
+        // Indices VBO
+        vboId = glGenBuffers();
+        vboIdList.add(vboId);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuff, GL_STATIC_DRAW);
 
+        // Unbid VAO
+        glBindVertexArray(0);
+        return new AlienVAO(vaoId, color, getIntArray(vboIdList), idx.length, drawMode);
     }
 }
