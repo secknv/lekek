@@ -57,7 +57,7 @@ public class SPCollision implements ISweepPrune{
     }
 
     @Override
-    public int updateItem(GameItem gameItem, Vector3f step) {
+    public ArrayList<BoundingBox> updateItem(GameItem gameItem, Vector3f step) {
         sortAxis();
         //System.out.println(collisionPairs.values());
 
@@ -73,13 +73,13 @@ public class SPCollision implements ISweepPrune{
 
         System.out.println("------------");
         //maybe wont work for multiple updates (vese mais tarde)
-        final int[] nColl = {0};
+        ArrayList<BoundingBox> collidingBoxes = new ArrayList<>();
         Map<BoundingBox, Integer> pairs = collisionPairs.column(bb);
         pairs.forEach((boundingBox, integer) -> {
             System.out.println(boundingBox.gameItem +" "+ integer);
             if (integer == 3){
                 if(testCollision(nextMin, nextMax, boundingBox))
-                    nColl[0]++;
+                    collidingBoxes.add(boundingBox);
             }
         });
 
@@ -88,19 +88,24 @@ public class SPCollision implements ISweepPrune{
             System.out.println(boundingBox.gameItem +" "+ integer);
             if (integer == 3){
                 if(testCollision(nextMin, nextMax, boundingBox))
-                    nColl[0]++;
+                    collidingBoxes.add(boundingBox);
             }
         });
 
         //if (nColl[0] != 0) System.out.println("collision");
-        gameItem.nCollisions = nColl[0];
-
-        return nColl[0];
+        gameItem.nCollisions = collidingBoxes.size();
+        return collidingBoxes;
     }
 
     @Override
     public void removeItem(GameItem gameItem) {
-
+        BoundingBox bb = gameItem.getBoundingBox();
+        xAxis.remove(bb.min);
+        xAxis.remove(bb.max);
+        yAxis.remove(bb.min);
+        yAxis.remove(bb.max);
+        zAxis.remove(bb.min);
+        zAxis.remove(bb.max);
     }
 
     private void insertItem(GameItem gameItem){
