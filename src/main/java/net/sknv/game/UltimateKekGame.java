@@ -190,6 +190,7 @@ public class UltimateKekGame implements IGameLogic {
                     if(colX.isEmpty() && colY.isEmpty() && colZ.isEmpty()){
                         //collision, not performing the movement
                         gameItem.velocity.zero();
+                        GraphUtils.drawAABB(renderer, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
                     } else {
                         //partial collision, perform partial step
                         Vector3f partialStep = new Vector3f();

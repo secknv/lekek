@@ -56,8 +56,7 @@ public class SPCollision implements ISweepPrune{
         for(BoundingBox box : possibleCollisions){
             if (testCollision(nextMin, nextMax, box)) collidingBoxes.add(box);
         }
-        
-        gameItem.nCollisions = collidingBoxes.size();
+
         return collidingBoxes;
     }
 
