@@ -95,4 +95,11 @@ public class GameItem {
                 ", nCollisions=" + nCollisions +
                 '}';
     }
+
+    public void translate(Vector3f step) {
+        this.pos.x += step.x;
+        this.pos.y += step.y;
+        this.pos.z += step.z;
+        this.boundingBox.translate(step);
+    }
 }

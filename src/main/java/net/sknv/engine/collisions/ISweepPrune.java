@@ -8,6 +8,6 @@ import java.util.ArrayList;
 public interface ISweepPrune {
 
     void addItem(GameItem gameItem) throws Exception;
-    ArrayList<BoundingBox> updateItem(GameItem gameItem, Vector3f nextPos);
+    ArrayList<BoundingBox> checkStepCollisions(GameItem gameItem, Vector3f nextPos);
     void removeItem(GameItem gameItem);
 }

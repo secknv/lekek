@@ -172,21 +172,33 @@ public class UltimateKekGame implements IGameLogic {
         for(GameItem gameItem : gameItems){
             if(gameItem.getVelocity().length() != 0){ //game item has acceleration
 
+                //calculate step
                 Vector3f step = gameItem.velocity.mul(0.1f);
 
-                Vector3f nextPos = new Vector3f(0,0,0); //move these 3lines to somewhere else in game logic movement calc (?)
-                nextPos.add(gameItem.getPos());
-                nextPos.add(step);
+                ArrayList<BoundingBox> col = sweepPrune.checkStepCollisions(gameItem, step);
 
-                ArrayList<BoundingBox> col = sweepPrune.updateItem(gameItem, step);
-                if(col.size() > 0){ //nextPos
-                    //for collision
+                if(col.isEmpty()){
+                    //no collisions, perform movement
+                    gameItem.translate(step);
                     gameItem.velocity.zero();
                 } else {
-                    //perform movement
-                    gameItem.setPos(nextPos);
-                    gameItem.getBoundingBox().translate(step);
-                    gameItem.velocity.zero();
+                    //collisions
+                    ArrayList<BoundingBox> colX = sweepPrune.checkStepCollisions(gameItem, new Vector3f(step.x, 0, 0));
+                    ArrayList<BoundingBox> colY = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, step.y, 0));
+                    ArrayList<BoundingBox> colZ = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, 0, step.z));
+
+                    if(colX.isEmpty() && colY.isEmpty() && colZ.isEmpty()){
+                        //collision, not performing the movement
+                        gameItem.velocity.zero();
+                    } else {
+                        //partial collision, perform partial step
+                        Vector3f partialStep = new Vector3f();
+                        if (colX.isEmpty()) partialStep.x = step.x;
+                        if (colY.isEmpty()) partialStep.y = step.y;
+                        if (colZ.isEmpty()) partialStep.z = step.z;
+                        gameItem.translate(partialStep);
+                        gameItem.velocity.zero();
+                    }
                 }
             }
         }

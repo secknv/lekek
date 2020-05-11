@@ -1,7 +1,5 @@
 package net.sknv.engine.collisions;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import net.sknv.engine.GameItem;
 import org.joml.Vector3f;
 import java.util.*;
@@ -14,7 +12,6 @@ public class SPCollision implements ISweepPrune{
 
     @Override
     public void addItem(GameItem gameItem) throws Exception {//adds a game item to the sweep and prune algorithm (wip)
-        BoundingBox bb = gameItem.getBoundingBox();
         if(nItems!=0){
             Set<BoundingBox> xCollisions = checkX(gameItem);
             Set<BoundingBox> yCollisions = checkY(gameItem);
@@ -39,7 +36,7 @@ public class SPCollision implements ISweepPrune{
     }
 
     @Override
-    public ArrayList<BoundingBox> updateItem(GameItem gameItem, Vector3f step) {
+    public ArrayList<BoundingBox> checkStepCollisions(GameItem gameItem, Vector3f step) {
         sortAxis();
 
         BoundingBox bb = gameItem.getBoundingBox();
@@ -49,15 +46,17 @@ public class SPCollision implements ISweepPrune{
         nextMax.add(bb.getMax().getPosition()).add(step);
 
         HashSet<BoundingBox> possibleCollisions = new HashSet<>();
-        if(step.x!=0) possibleCollisions.addAll(tryMoveX(gameItem, step));
-        if(step.y!=0) possibleCollisions.addAll(tryMoveY(gameItem, step));
-        if(step.z!=0) possibleCollisions.addAll(tryMoveZ(gameItem, step));
+
+        if(step.x!=0) possibleCollisions.addAll(checkStepX(gameItem, step));
+        if(step.y!=0) possibleCollisions.addAll(checkStepY(gameItem, step));
+        if(step.z!=0) possibleCollisions.addAll(checkStepZ(gameItem, step));
 
         ArrayList<BoundingBox> collidingBoxes = new ArrayList<>();
+
         for(BoundingBox box : possibleCollisions){
             if (testCollision(nextMin, nextMax, box)) collidingBoxes.add(box);
         }
-
+        
         gameItem.nCollisions = collidingBoxes.size();
         return collidingBoxes;
     }
@@ -168,7 +167,7 @@ public class SPCollision implements ISweepPrune{
         return possibleCollisions;
     }
 
-    private HashSet<BoundingBox> tryMoveX(GameItem gameItem, Vector3f step){
+    private HashSet<BoundingBox> checkStepX(GameItem gameItem, Vector3f step){
         HashSet<BoundingBox> collisions = new HashSet<BoundingBox>();
         BoundingBox bb = gameItem.getBoundingBox();
         float nextMin = bb.getMin().getPosition().x + step.x;
@@ -199,7 +198,7 @@ public class SPCollision implements ISweepPrune{
         return collisions;
     }
 
-    private HashSet<BoundingBox> tryMoveY(GameItem gameItem, Vector3f step){
+    private HashSet<BoundingBox> checkStepY(GameItem gameItem, Vector3f step){
         HashSet<BoundingBox> collisions = new HashSet<BoundingBox>();
         BoundingBox bb = gameItem.getBoundingBox();
         float nextMin = bb.getMin().getPosition().y + step.y;
@@ -233,7 +232,7 @@ public class SPCollision implements ISweepPrune{
         return collisions;
     }
 
-    private HashSet<BoundingBox> tryMoveZ(GameItem gameItem, Vector3f step){
+    private HashSet<BoundingBox> checkStepZ(GameItem gameItem, Vector3f step){
         HashSet<BoundingBox> collisions = new HashSet<BoundingBox>();
         BoundingBox bb = gameItem.getBoundingBox();
         float nextMin = bb.getMin().getPosition().z + step.z;
@@ -255,7 +254,6 @@ public class SPCollision implements ISweepPrune{
             while (i > -1 && i < zAxis.size()-1 && zAxis.get(i).getPosition().z >= nextMin) {
                 prevBb = zAxis.get(i).getBB();
                 if (!zAxis.get(i).isMin() && testCollisionZ(nextMin, nextMax, prevBb)) {//collision
-                    //incCollisions(bb, prevBb);
                     collisions.add(prevBb);
                 }
                 i--;
