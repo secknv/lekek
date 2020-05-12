@@ -5,9 +5,9 @@ import org.joml.Vector3f;
 import java.util.*;
 
 public class SPCollision implements ISweepPrune{
-    private ArrayList<EndPoint> xAxis = new ArrayList<EndPoint>();
-    private ArrayList<EndPoint> yAxis = new ArrayList<EndPoint>();
-    private ArrayList<EndPoint> zAxis = new ArrayList<EndPoint>();
+    private ArrayList<EndPoint> xAxis = new ArrayList<>();
+    private ArrayList<EndPoint> yAxis = new ArrayList<>();
+    private ArrayList<EndPoint> zAxis = new ArrayList<>();
     private int nItems = 0;
 
     @Override
@@ -159,7 +159,7 @@ public class SPCollision implements ISweepPrune{
     }
 
     private HashSet<BoundingBox> checkStepX(GameItem gameItem, float stepX){
-        HashSet<BoundingBox> collisions = new HashSet<BoundingBox>();
+        HashSet<BoundingBox> collisions = new HashSet<>();
         BoundingBox bb = gameItem.getBoundingBox();
         float nextMin = bb.getMin().getPosition().x + stepX;
         float nextMax = bb.getMax().getPosition().x + stepX;
@@ -189,7 +189,7 @@ public class SPCollision implements ISweepPrune{
     }
 
     private HashSet<BoundingBox> checkStepY(GameItem gameItem, float stepY){
-        HashSet<BoundingBox> collisions = new HashSet<BoundingBox>();
+        HashSet<BoundingBox> collisions = new HashSet<>();
         BoundingBox bb = gameItem.getBoundingBox();
         float nextMin = bb.getMin().getPosition().y + stepY;
         float nextMax = bb.getMax().getPosition().y + stepY;
@@ -223,7 +223,7 @@ public class SPCollision implements ISweepPrune{
     }
 
     private HashSet<BoundingBox> checkStepZ(GameItem gameItem, float stepZ){
-        HashSet<BoundingBox> collisions = new HashSet<BoundingBox>();
+        HashSet<BoundingBox> collisions = new HashSet<>();
         BoundingBox bb = gameItem.getBoundingBox();
         float nextMin = bb.getMin().getPosition().z + stepZ;
         float nextMax = bb.getMax().getPosition().z + stepZ;
