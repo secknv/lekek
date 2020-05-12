@@ -175,7 +175,7 @@ public class UltimateKekGame implements IGameLogic {
                 //calculate step
                 Vector3f step = gameItem.velocity.mul(0.1f);
 
-                ArrayList<BoundingBox> col = sweepPrune.checkStepCollisions(gameItem, step);
+                Set<BoundingBox> col = sweepPrune.checkStepCollisions(gameItem, step);
 
                 if(col.isEmpty()){
                     //no collisions, perform movement
@@ -183,9 +183,9 @@ public class UltimateKekGame implements IGameLogic {
                     gameItem.velocity.zero();
                 } else {
                     //collisions
-                    ArrayList<BoundingBox> colX = sweepPrune.checkStepCollisions(gameItem, new Vector3f(step.x, 0, 0));
-                    ArrayList<BoundingBox> colY = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, step.y, 0));
-                    ArrayList<BoundingBox> colZ = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, 0, step.z));
+                    Set<BoundingBox> colX = sweepPrune.checkStepCollisions(gameItem, new Vector3f(step.x, 0, 0));
+                    Set<BoundingBox> colY = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, step.y, 0));
+                    Set<BoundingBox> colZ = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, 0, step.z));
 
                     if(colX.isEmpty() && colY.isEmpty() && colZ.isEmpty()){
                         //collision, not performing the movement

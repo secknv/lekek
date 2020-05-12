@@ -11,7 +11,7 @@ public class SPCollision implements ISweepPrune{
     private int nItems = 0;
 
     @Override
-    public Set<BoundingBox> addItem(GameItem gameItem) throws Exception {
+    public Set<BoundingBox> addItem(GameItem gameItem){
         Set<BoundingBox> xCollisions = checkAddX(gameItem);
         Set<BoundingBox> yCollisions = checkAddY(gameItem);
         Set<BoundingBox> zCollisions = checkAddZ(gameItem);
