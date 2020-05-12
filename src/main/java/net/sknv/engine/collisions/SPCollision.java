@@ -11,11 +11,11 @@ public class SPCollision implements ISweepPrune{
     private int nItems = 0;
 
     @Override
-    public void addItem(GameItem gameItem) throws Exception {//adds a game item to the sweep and prune algorithm (wip)
+    public void addItem(GameItem gameItem) throws Exception {//adds a game item to the sweep and prune algorithm
         if(nItems!=0){
-            Set<BoundingBox> xCollisions = checkX(gameItem);
-            Set<BoundingBox> yCollisions = checkY(gameItem);
-            Set<BoundingBox> zCollisions = checkZ(gameItem);
+            Set<BoundingBox> xCollisions = checkAddX(gameItem);
+            Set<BoundingBox> yCollisions = checkAddY(gameItem);
+            Set<BoundingBox> zCollisions = checkAddZ(gameItem);
 
             for (BoundingBox bb2 : xCollisions){
                 if (yCollisions.contains(bb2) && zCollisions.contains(bb2)){
@@ -47,9 +47,9 @@ public class SPCollision implements ISweepPrune{
 
         HashSet<BoundingBox> possibleCollisions = new HashSet<>();
 
-        if(step.x!=0) possibleCollisions.addAll(checkStepX(gameItem, step));
-        if(step.y!=0) possibleCollisions.addAll(checkStepY(gameItem, step));
-        if(step.z!=0) possibleCollisions.addAll(checkStepZ(gameItem, step));
+        if(step.x!=0) possibleCollisions.addAll(checkStepX(gameItem, step.x));
+        if(step.y!=0) possibleCollisions.addAll(checkStepY(gameItem, step.y));
+        if(step.z!=0) possibleCollisions.addAll(checkStepZ(gameItem, step.z));
 
         ArrayList<BoundingBox> collidingBoxes = new ArrayList<>();
 
@@ -88,7 +88,7 @@ public class SPCollision implements ISweepPrune{
     }
 
 
-    private Set<BoundingBox> checkX(GameItem gameItem) {
+    private Set<BoundingBox> checkAddX(GameItem gameItem) {
         BoundingBox bb = gameItem.getBoundingBox();
         EndPoint min, max;
         Set<BoundingBox> possibleCollisions = new HashSet<>();
@@ -114,7 +114,7 @@ public class SPCollision implements ISweepPrune{
         return possibleCollisions;
     }
 
-    private Set<BoundingBox> checkY(GameItem gameItem) {
+    private Set<BoundingBox> checkAddY(GameItem gameItem) {
         BoundingBox bb = gameItem.getBoundingBox();
         EndPoint min, max;
         Set<BoundingBox> possibleCollisions = new HashSet<>();
@@ -140,7 +140,7 @@ public class SPCollision implements ISweepPrune{
         return possibleCollisions;
     }
 
-    private Set<BoundingBox> checkZ(GameItem gameItem) {
+    private Set<BoundingBox> checkAddZ(GameItem gameItem) {
         BoundingBox bb = gameItem.getBoundingBox();
         EndPoint min, max;
         Set<BoundingBox> possibleCollisions = new HashSet<>();
@@ -166,13 +166,13 @@ public class SPCollision implements ISweepPrune{
         return possibleCollisions;
     }
 
-    private HashSet<BoundingBox> checkStepX(GameItem gameItem, Vector3f step){
+    private HashSet<BoundingBox> checkStepX(GameItem gameItem, float stepX){
         HashSet<BoundingBox> collisions = new HashSet<BoundingBox>();
         BoundingBox bb = gameItem.getBoundingBox();
-        float nextMin = bb.getMin().getPosition().x + step.x;
-        float nextMax = bb.getMax().getPosition().x + step.x;
+        float nextMin = bb.getMin().getPosition().x + stepX;
+        float nextMax = bb.getMax().getPosition().x + stepX;
 
-        if (step.x > 0){
+        if (stepX > 0){
             BoundingBox nextBb;
             int i = xAxis.indexOf(bb.getMax())+1;
             while (i < xAxis.size()-1 && i > -1 && xAxis.get(i).getPosition().x < nextMax) {
@@ -188,7 +188,6 @@ public class SPCollision implements ISweepPrune{
             while (i > -1 && i < xAxis.size()-1 && xAxis.get(i).getPosition().x >= nextMin) {
                 prevBb = xAxis.get(i).getBB();
                 if (!xAxis.get(i).isMin() && testCollisionX(nextMin, nextMax, prevBb)) {//collision
-                    //incCollisions(bb, prevBb);
                     collisions.add(prevBb);
                 }
                 i--;
@@ -197,13 +196,13 @@ public class SPCollision implements ISweepPrune{
         return collisions;
     }
 
-    private HashSet<BoundingBox> checkStepY(GameItem gameItem, Vector3f step){
+    private HashSet<BoundingBox> checkStepY(GameItem gameItem, float stepY){
         HashSet<BoundingBox> collisions = new HashSet<BoundingBox>();
         BoundingBox bb = gameItem.getBoundingBox();
-        float nextMin = bb.getMin().getPosition().y + step.y;
-        float nextMax = bb.getMax().getPosition().y + step.y;
+        float nextMin = bb.getMin().getPosition().y + stepY;
+        float nextMax = bb.getMax().getPosition().y + stepY;
 
-        if (gameItem.velocity.y > 0){
+        if (stepY > 0){
             BoundingBox nextBb;
             int i = yAxis.indexOf(bb.getMax())+1;
             while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).getPosition().y < nextMax) {
@@ -231,13 +230,13 @@ public class SPCollision implements ISweepPrune{
         return collisions;
     }
 
-    private HashSet<BoundingBox> checkStepZ(GameItem gameItem, Vector3f step){
+    private HashSet<BoundingBox> checkStepZ(GameItem gameItem, float stepZ){
         HashSet<BoundingBox> collisions = new HashSet<BoundingBox>();
         BoundingBox bb = gameItem.getBoundingBox();
-        float nextMin = bb.getMin().getPosition().z + step.z;
-        float nextMax = bb.getMax().getPosition().z + step.z;
+        float nextMin = bb.getMin().getPosition().z + stepZ;
+        float nextMax = bb.getMax().getPosition().z + stepZ;
 
-        if (step.z > 0){
+        if (stepZ > 0){
             BoundingBox nextBb;
             int i = zAxis.indexOf(bb.getMax())+1;
             while (i < zAxis.size()-1 && i > -1 && zAxis.get(i).getPosition().z < nextMax) {
@@ -283,9 +282,10 @@ public class SPCollision implements ISweepPrune{
         zAxis.sort((e1, e2) -> Float.compare(e1.getPosition().z, e2.getPosition().z));
     }
 
-    public void printAxis() {
-        System.out.println(xAxis);
-        System.out.println(yAxis);
-        System.out.println(zAxis);
+    @Override
+    public String toString() {
+        return "x= " + xAxis +
+                "y= " + yAxis +
+                "z= " + zAxis;
     }
 }
