@@ -11,23 +11,23 @@ public class SPCollision implements ISweepPrune{
     private int nItems = 0;
 
     @Override
-    public void addItem(GameItem gameItem) throws Exception {
-        if(nItems!=0){
-            Set<BoundingBox> xCollisions = checkAddX(gameItem);
-            Set<BoundingBox> yCollisions = checkAddY(gameItem);
-            Set<BoundingBox> zCollisions = checkAddZ(gameItem);
+    public Set<BoundingBox> addItem(GameItem gameItem) throws Exception {
+        Set<BoundingBox> xCollisions = checkAddX(gameItem);
+        Set<BoundingBox> yCollisions = checkAddY(gameItem);
+        Set<BoundingBox> zCollisions = checkAddZ(gameItem);
 
+        if(nItems>0){
             xCollisions.retainAll(yCollisions);
             xCollisions.retainAll(zCollisions);
-
             //if (!xCollisions.isEmpty()) throw new Exception("Object colliding"); //prevent adding colliding item
         }
+
         insertItem(gameItem);
-        nItems++;
+        return xCollisions;
     }
 
     @Override
-    public ArrayList<BoundingBox> checkStepCollisions(GameItem gameItem, Vector3f step) {
+    public Set<BoundingBox> checkStepCollisions(GameItem gameItem, Vector3f step) {
         sortAxis();
 
         BoundingBox bb = gameItem.getBoundingBox();
@@ -42,7 +42,7 @@ public class SPCollision implements ISweepPrune{
         if(step.y!=0) possibleCollisions.addAll(checkStepY(gameItem, step.y));
         if(step.z!=0) possibleCollisions.addAll(checkStepZ(gameItem, step.z));
 
-        ArrayList<BoundingBox> collidingBoxes = new ArrayList<>();
+        Set<BoundingBox> collidingBoxes = new HashSet<>();
 
         for(BoundingBox box : possibleCollisions){
             if (testCollision(nextMin, nextMax, box)) collidingBoxes.add(box);
@@ -75,6 +75,7 @@ public class SPCollision implements ISweepPrune{
         zAxis.add(bb.min);
         zAxis.add(bb.max);
 
+        nItems++;
         sortAxis();
     }
 
