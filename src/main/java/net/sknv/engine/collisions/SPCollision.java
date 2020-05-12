@@ -11,28 +11,19 @@ public class SPCollision implements ISweepPrune{
     private int nItems = 0;
 
     @Override
-    public void addItem(GameItem gameItem) throws Exception {//adds a game item to the sweep and prune algorithm
+    public void addItem(GameItem gameItem) throws Exception {
         if(nItems!=0){
             Set<BoundingBox> xCollisions = checkAddX(gameItem);
             Set<BoundingBox> yCollisions = checkAddY(gameItem);
             Set<BoundingBox> zCollisions = checkAddZ(gameItem);
 
-            for (BoundingBox bb2 : xCollisions){
-                if (yCollisions.contains(bb2) && zCollisions.contains(bb2)){
-                    yCollisions.remove(bb2);
-                    zCollisions.remove(bb2);
-                    //throw new Exception("Object Colliding"); if spawning colliding item isn't allowed
-                    //collisionPairs.put(bb,bb2, 3);
-                } else {
-                    //collisionPairs.put(bb, bb2, 1);
-                }
-            }
-            insertItem(gameItem);
-        } else {
-            insertItem(gameItem);
+            xCollisions.retainAll(yCollisions);
+            xCollisions.retainAll(zCollisions);
+
+            //if (!xCollisions.isEmpty()) throw new Exception("Object colliding"); //prevent adding colliding item
         }
+        insertItem(gameItem);
         nItems++;
-        //System.out.println(collisionPairs.values());
     }
 
     @Override
@@ -69,6 +60,7 @@ public class SPCollision implements ISweepPrune{
         yAxis.remove(bb.max);
         zAxis.remove(bb.min);
         zAxis.remove(bb.max);
+        nItems--;
     }
 
     private void insertItem(GameItem gameItem){
@@ -76,15 +68,14 @@ public class SPCollision implements ISweepPrune{
 
         xAxis.add(bb.min);
         xAxis.add(bb.max);
-        xAxis.sort((e1, e2) -> Float.compare(e1.getPosition().x, e2.getPosition().x));
 
         yAxis.add(bb.min);
         yAxis.add(bb.max);
-        yAxis.sort((e1, e2) -> Float.compare(e1.getPosition().z, e2.getPosition().z));
 
         zAxis.add(bb.min);
         zAxis.add(bb.max);
-        zAxis.sort((e1, e2) -> Float.compare(e1.getPosition().z, e2.getPosition().z));
+
+        sortAxis();
     }
 
 
