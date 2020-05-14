@@ -4,6 +4,7 @@ import net.sknv.engine.GameItem;
 import net.sknv.engine.IGameLogic;
 import net.sknv.engine.MouseInput;
 import net.sknv.engine.Window;
+import net.sknv.engine.collisions.BoundingBox;
 import net.sknv.engine.collisions.SPCollision;
 import net.sknv.engine.graph.*;
 import org.joml.Vector2f;
@@ -16,7 +17,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class UltimateKekGame implements IGameLogic {
 
-    private static final float MOUSE_SENSITIVITY = 0.4f;
+    private static final float MOUSE_SENSITIVITY = 0.8f;
     private static final float CAMERA_POS_STEP = 0.05f;
 
     private final Vector3f cameraPosInc;
@@ -69,7 +70,7 @@ public class UltimateKekGame implements IGameLogic {
 
         if(cameraPosInc.length()!=0) cameraPosInc.normalize();
 
-        GameItem movableItem = gameItems.get(4);
+        GameItem movableItem = gameItems.get(5);
         if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.velocity.z -= .1;
         if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.velocity.z += .1;
         if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.velocity.x -= .1;
@@ -78,8 +79,7 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void update(Window window, MouseInput mouseInput, float interval) {
-        collisionTesting();
-
+        updateItems();
         moveCamera(window, mouseInput);
     }
 
@@ -103,24 +103,24 @@ public class UltimateKekGame implements IGameLogic {
         gameItem0.setPos(0, 0, -6);
         gameItem0.setScale(.5f);
 
-        GameItem gameItem1 = new GameItem(MeshUtils.generateCube(WebColor.Blue));
+        GameItem gameItem1 = new GameItem(cube);
         gameItem1.setPos(0, 0, .5f);
         gameItem1.setScale(scale);
 
-        GameItem gameItem2 = new GameItem(MeshUtils.generateCube(WebColor.Green));
+        GameItem gameItem2 = new GameItem(cube);
         gameItem2.setPos(0f, 0, 0);
         gameItem2.setScale(scale);
 
-        GameItem gameItem3 = new GameItem(MeshUtils.generateCube(WebColor.Red));
+        GameItem gameItem3 = new GameItem(cube);
         gameItem3.setPos(0.5f, 0, 0);
         gameItem3.setScale(scale);
 
         GameItem gameItem4 = new GameItem(cube);
-        gameItem4.setPos(1f, 0, .6f);
+        gameItem4.setPos(.5f, 0, .5f);
         gameItem4.setScale(scale);
 
-        GameItem gameItem5 = new GameItem(MeshUtils.generateCube(WebColor.Purple));
-        gameItem5.setPos(.5f, 0, .5f);
+        GameItem gameItem5 = new GameItem(cube);
+        gameItem5.setPos(2f, 0, 0);
         gameItem5.setScale(scale);
 
         /*
@@ -163,29 +163,46 @@ public class UltimateKekGame implements IGameLogic {
         if (!menu && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+
             glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
         }
     }
 
-    private void collisionTesting() {
+    private void updateItems() {
         for(GameItem gameItem : gameItems){
             if(gameItem.getVelocity().length() != 0){ //game item has acceleration
-                //check for collisions wip
 
+                //calculate step
                 Vector3f step = gameItem.velocity.mul(0.1f);
 
-                Vector3f nextPos = new Vector3f(0,0,0); //move these 3lines to somewhere else in game logic movement calc (?)
-                nextPos.add(gameItem.getPos());
-                nextPos.add(step);
+                Set<BoundingBox> col = sweepPrune.checkStepCollisions(gameItem, step);
 
-                if(sweepPrune.updateItem(gameItem, step) > 0){ //nextPos
-                    //for collision
+                if(col.isEmpty()){
+                    //no collisions, perform movement
+                    gameItem.translate(step);
                     gameItem.velocity.zero();
                 } else {
-                    //perform movement
-                    gameItem.setPos(nextPos);
-                    gameItem.getBoundingBox().translate(step);
-                    gameItem.velocity.zero();
+                    //collisions
+                    Set<BoundingBox> colX = sweepPrune.checkStepCollisions(gameItem, new Vector3f(step.x, 0, 0));
+                    Set<BoundingBox> colY = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, step.y, 0));
+                    Set<BoundingBox> colZ = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, 0, step.z));
+
+                    if(colX.isEmpty() && colY.isEmpty() && colZ.isEmpty()){
+                        //collision, not performing the movement
+                        gameItem.velocity.zero();
+                        GraphUtils.drawAABB(renderer, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
+                    } else {
+                        //partial collision, perform partial step
+                        Vector3f partialStep = new Vector3f();
+                        if (colX.isEmpty()) partialStep.x = step.x;
+                        if (colY.isEmpty()) partialStep.y = step.y;
+                        if (colZ.isEmpty()) partialStep.z = step.z;
+                        gameItem.translate(partialStep);
+                        gameItem.velocity.zero();
+
+                        if(partialStep.x==0 && partialStep.y==0 && partialStep.z==0)
+                        GraphUtils.drawAABB(renderer, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
+                    }
                 }
             }
         }

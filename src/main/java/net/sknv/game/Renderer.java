@@ -153,9 +153,6 @@ public class Renderer {
                 GraphUtils.drawAABB(this, new Vector4f(255,255,0,0), gameItem.getBoundingBox());
                 System.out.println(gameItem.getBoundingBox());
             }
-            if(gameItem.nCollisions > 0){
-                GraphUtils.drawAABB(this, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
-            }
         }
 
         while (!alienVAOQueue.isEmpty()){
