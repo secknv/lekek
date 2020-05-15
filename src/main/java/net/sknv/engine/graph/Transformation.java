@@ -43,12 +43,7 @@ public class Transformation {
     }
 
     public Matrix4f getModelMatrix(GameItem item){
-        Vector3f rotation = item.getRot();
-        modelViewMatrix.identity().translate(item.getPos()).
-                rotateX(-rotation.x).
-                rotateY(-rotation.y).
-                rotateZ(-rotation.z).
-                scale(item.getScale());
+        modelViewMatrix.identity().translate(item.getPos()).rotateXYZ(item.getRot()).scale(item.getScale());
         return modelViewMatrix;
     }
 

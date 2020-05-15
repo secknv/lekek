@@ -5,6 +5,7 @@ import net.sknv.engine.IGameLogic;
 import net.sknv.engine.MouseInput;
 import net.sknv.engine.Window;
 import net.sknv.engine.collisions.BoundingBox;
+import net.sknv.engine.collisions.OBB;
 import net.sknv.engine.collisions.SPCollision;
 import net.sknv.engine.graph.*;
 import org.joml.Vector2f;
@@ -37,6 +38,7 @@ public class UltimateKekGame implements IGameLogic {
 
     //collisions stuff
     private SPCollision sweepPrune = new SPCollision();
+    private OBB testBox;
 
     public UltimateKekGame() {
         renderer = new Renderer();
@@ -75,6 +77,10 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.velocity.z += .1;
         if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.velocity.x -= .1;
         if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.velocity.x += .1;
+
+        if (window.isKeyPressed(GLFW_KEY_X)) movableItem.rotate(new Vector3f((float) (-Math.PI/100),0,0));
+        if (window.isKeyPressed(GLFW_KEY_Y)) movableItem.rotate(new Vector3f(0,(float) (-Math.PI/100),0));
+        if (window.isKeyPressed(GLFW_KEY_Z)) movableItem.rotate(new Vector3f(0,0,(float) (-Math.PI/100)));
     }
 
     @Override
@@ -119,17 +125,21 @@ public class UltimateKekGame implements IGameLogic {
         gameItem4.setPos(.5f, 0, .5f);
         gameItem4.setScale(scale);
 
-        GameItem gameItem5 = new GameItem(cube);
-        gameItem5.setPos(2f, 0, 0);
-        gameItem5.setScale(scale);
-
         /*
         Boid b = new Boid(boid);
         b.setPos(-2, 0, 0);
         b.setScale(.1f);
          */
 
-        gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, gameItem5));
+        GameItem testItem = new GameItem(cube);
+        testItem.setPos(2f, 0, 2f);
+        testItem.setScale(scale);
+        testItem.setRot(0,0,(float) Math.PI/10);
+
+        testBox = new OBB(testItem, testItem.getMesh().getMin(), testItem.getMesh().getMax());
+        testItem.setBoundingBox(testBox);
+
+        gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, testItem));
     }
 
     private void initLighting() {
@@ -144,8 +154,7 @@ public class UltimateKekGame implements IGameLogic {
     private void initCollisions() {
         for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
             GameItem gameItem = iterator.next();
-            System.out.println("converting local to world");
-            gameItem.getBoundingBox().transform(gameItem.getPos());// converts bb coords from local to world
+            gameItem.getBoundingBox().transform();// converts bb coords from local to world
             try {
                 sweepPrune.addItem(gameItem);
             } catch (Exception e){
@@ -206,6 +215,8 @@ public class UltimateKekGame implements IGameLogic {
                 }
             }
         }
+
+        GraphUtils.drawAABB(renderer, new Vector4f(200,0,200,0), testBox);
     }
 
     @Override

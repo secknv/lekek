@@ -82,8 +82,9 @@ public class GameItem {
         this.boundingBox = boundingBox;
     }
 
-    public void rotate(float x, float y, float z) {
-        setRot(rot.x + x, rot.y + y, rot.z + z);
+    public void rotate(Vector3f rot) {
+        setRot(this.rot.x + rot.x, this.rot.y + rot.y, this.rot.z + rot.z);
+        this.boundingBox.rotate(rot);
     }
 
     @Override
