@@ -1,10 +1,8 @@
 package net.sknv.engine.collisions;
 
 import net.sknv.engine.GameItem;
+import org.joml.*;
 import org.joml.Math;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 public class OBB implements BoundingBox{
 
@@ -87,7 +85,14 @@ public class OBB implements BoundingBox{
         Vector4f tz = new Vector4f(0, 0, 1,1);
 
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().rotateXYZ(gameItem.getRot());
+        modelViewMatrix.identity();
+
+        Quaternionf q = new Quaternionf();
+        q.rotateXYZ(gameItem.getRot().x, gameItem.getRot().y, gameItem.getRot().z);
+
+        //modelViewMatrix.identity().rotateXYZ(gameItem.getRot());
+        modelViewMatrix.rotate(q);
+
         modelViewMatrix.transform(tx);
         modelViewMatrix.transform(ty);
         modelViewMatrix.transform(tz);

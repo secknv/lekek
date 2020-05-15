@@ -2,6 +2,7 @@ package net.sknv.engine.graph;
 
 import net.sknv.engine.GameItem;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class Transformation {
@@ -43,7 +44,9 @@ public class Transformation {
     }
 
     public Matrix4f getModelMatrix(GameItem item){
-        modelViewMatrix.identity().translate(item.getPos()).rotateXYZ(item.getRot()).scale(item.getScale());
+        Quaternionf q = new Quaternionf();
+        q.rotateXYZ(item.getRot().x, item.getRot().y, item.getRot().z);
+        modelViewMatrix.identity().translate(item.getPos()).scale(item.getScale()).rotate(q);
         return modelViewMatrix;
     }
 
