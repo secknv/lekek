@@ -44,9 +44,12 @@ public class Transformation {
     }
 
     public Matrix4f getModelMatrix(GameItem item){
-        Quaternionf q = new Quaternionf();
-        q.rotateXYZ(item.getRot().x, item.getRot().y, item.getRot().z);
-        modelViewMatrix.identity().translate(item.getPos()).scale(item.getScale()).rotate(q);
+        Vector3f rotation = item.getRot();
+        modelViewMatrix.identity().translate(item.getPos()).
+                rotateX(-rotation.x).
+                rotateY(-rotation.y).
+                rotateZ(-rotation.z).
+                scale(item.getScale());
         return modelViewMatrix;
     }
 
