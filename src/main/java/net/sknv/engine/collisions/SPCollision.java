@@ -54,26 +54,26 @@ public class SPCollision implements ISweepPrune{
     @Override
     public void removeItem(GameItem gameItem) {
         BoundingBox bb = gameItem.getBoundingBox();
-        xAxis.remove(bb.min);
-        xAxis.remove(bb.max);
-        yAxis.remove(bb.min);
-        yAxis.remove(bb.max);
-        zAxis.remove(bb.min);
-        zAxis.remove(bb.max);
+        xAxis.remove(bb.getMin());
+        xAxis.remove(bb.getMax());
+        yAxis.remove(bb.getMin());
+        yAxis.remove(bb.getMax());
+        zAxis.remove(bb.getMin());
+        zAxis.remove(bb.getMax());
         nItems--;
     }
 
     private void insertItem(GameItem gameItem){
         BoundingBox bb = gameItem.getBoundingBox();
 
-        xAxis.add(bb.min);
-        xAxis.add(bb.max);
+        xAxis.add(bb.getMin());
+        xAxis.add(bb.getMax());
 
-        yAxis.add(bb.min);
-        yAxis.add(bb.max);
+        yAxis.add(bb.getMin());
+        yAxis.add(bb.getMax());
 
-        zAxis.add(bb.min);
-        zAxis.add(bb.max);
+        zAxis.add(bb.getMin());
+        zAxis.add(bb.getMax());
 
         nItems++;
         sortAxis();

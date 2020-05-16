@@ -1,7 +1,9 @@
 package net.sknv.engine.graph;
 
+import net.sknv.engine.collisions.AABB;
 import net.sknv.engine.collisions.BoundingBox;
 import net.sknv.engine.GameItem;
+import net.sknv.engine.collisions.OBB;
 import org.joml.Matrix4f;
 import net.sknv.game.Renderer;
 import org.joml.Vector3f;
@@ -124,6 +126,45 @@ public class GraphUtils {
         };
 
         renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_LINES));
+
+        //testing purposes
+        if(bb instanceof OBB){
+            Vector3f center = ((OBB) bb).getCenter();
+            float hx = ((OBB) bb).getHx();
+            float hy = ((OBB) bb).getHy();
+            float hz = ((OBB) bb).getHz();
+
+            Vector3f x = ((OBB) bb).getX();
+            Vector3f y = ((OBB) bb).getY();
+            Vector3f z = ((OBB) bb).getZ();
+
+            // Create Positions Array
+            posArray = new float[] {
+                    center.x, center.y, center.z,
+
+                    center.x + hx, center.y, center.z,
+                    center.x, center.y + hy, center.z,
+                    center.x, center.y, center.z + hz,
+
+                    center.x + x.x, center.y + x.y, center.z + x.z,
+                    center.x + y.x, center.y + y.y, center.z + y.z,
+                    center.x + z.x, center.y + z.y, center.z + z.z,
+            };
+
+            // Create Indices Array
+            idxArray = new int[] {
+                    0,1,
+                    0,2,
+                    0,3,
+
+                    0,4,
+                    0,5,
+                    0,6,
+            };
+
+            renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_LINES));
+        }
+
     }
 
     public static void drawAxis(Renderer renderer) {
@@ -176,5 +217,8 @@ public class GraphUtils {
         // Unbid VAO
         glBindVertexArray(0);
         return new AlienVAO(vaoId, color, getIntArray(vboIdList), idx.length, drawMode);
+    }
+
+    public static void drawOBB() {
     }
 }

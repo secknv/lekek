@@ -1,7 +1,9 @@
 package net.sknv.engine.graph;
 
 import net.sknv.engine.GameItem;
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class Transformation {
@@ -45,9 +47,9 @@ public class Transformation {
     public Matrix4f getModelMatrix(GameItem item){
         Vector3f rotation = item.getRot();
         modelViewMatrix.identity().translate(item.getPos()).
-                rotateX(-rotation.x).
-                rotateY(-rotation.y).
-                rotateZ(-rotation.z).
+                rotateX(rotation.x).
+                rotateY(rotation.y).
+                rotateZ(rotation.z).
                 scale(item.getScale());
         return modelViewMatrix;
     }

@@ -3,6 +3,8 @@ package net.sknv.engine;
 import net.sknv.engine.collisions.AABB;
 import net.sknv.engine.collisions.BoundingBox;
 import net.sknv.engine.graph.Mesh;
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class GameItem {
@@ -64,10 +66,14 @@ public class GameItem {
         this.pos.z = pos.z;
     }
 
+    public void setRot(Vector3f rot) {
+        setRot(rot.x, rot.y, rot.z);
+    }
+
     public void setRot(float x, float y, float z) {
-        this.rot.x = x;
-        this.rot.y = y;
-        this.rot.z = z;
+        this.rot.x = (float) (x % (2*Math.PI));
+        this.rot.y = (float) (y % (2*Math.PI));
+        this.rot.z = (float) (z % (2*Math.PI));
     }
 
     public void setScale(float scale) {
@@ -82,8 +88,39 @@ public class GameItem {
         this.boundingBox = boundingBox;
     }
 
-    public void rotate(float x, float y, float z) {
-        setRot(rot.x + x, rot.y + y, rot.z + z);
+    public void rotate(Vector3f rot) {
+        // Object POV axis
+        Vector3f xAxis = new Vector3f(1,0,0);
+        Vector3f yAxis = new Vector3f(0,1,0);
+        Vector3f zAxis = new Vector3f(0,0,1);
+
+        //quaternions to get to current rot
+        Quaternionf cur = new Quaternionf(new AxisAngle4f(this.getRot().x, xAxis));
+        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRot().y, yAxis));
+        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRot().z, zAxis));
+        cur.mul(curY).mul(curZ);
+
+        // generate objects axis
+        cur.transform(xAxis);
+        cur.transform(yAxis);
+        cur.transform(zAxis);
+
+        Quaternionf xq = new Quaternionf(new AxisAngle4f(rot.x, xAxis));
+        Quaternionf yq = new Quaternionf(new AxisAngle4f(rot.y, yAxis));
+        Quaternionf zq = new Quaternionf(new AxisAngle4f(rot.z, zAxis));
+
+        // get rotation on world axis for setRotation
+        xq.mul(yq).mul(zq);
+
+        this.boundingBox.rotate(xq);
+
+        //combine
+        xq.mul(cur);
+
+        Vector3f end_rot = new Vector3f();
+        xq.getEulerAnglesXYZ(end_rot);
+
+        setRot(end_rot.x, end_rot.y, end_rot.z);
     }
 
     @Override
