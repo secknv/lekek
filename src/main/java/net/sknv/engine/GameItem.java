@@ -71,9 +71,9 @@ public class GameItem {
     }
 
     public void setRot(float x, float y, float z) {
-        this.rot.x = x;
-        this.rot.y = y;
-        this.rot.z = z;
+        this.rot.x = (float) (x % (2*Math.PI));
+        this.rot.y = (float) (y % (2*Math.PI));
+        this.rot.z = (float) (z % (2*Math.PI));
     }
 
     public void setScale(float scale) {
@@ -94,32 +94,33 @@ public class GameItem {
         Vector3f yAxis = new Vector3f(0,1,0);
         Vector3f zAxis = new Vector3f(0,0,1);
 
+        //quaternions to get to current rot
+        Quaternionf cur = new Quaternionf(new AxisAngle4f(this.getRot().x, xAxis));
+        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRot().y, yAxis));
+        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRot().z, zAxis));
+        cur.mul(curY).mul(curZ);
+
         // generate objects axis
-        xAxis.rotateY(this.getRot().y).rotateZ(this.getRot().z);
-        yAxis.rotateX(this.getRot().x).rotateZ(this.getRot().z);
-        zAxis.rotateX(this.getRot().x).rotateY(this.getRot().y);
+        cur.transform(xAxis);
+        cur.transform(yAxis);
+        cur.transform(zAxis);
 
-        // rotate on obj axis
-        AxisAngle4f xAA = new AxisAngle4f(rot.x, xAxis);
-        AxisAngle4f yAA = new AxisAngle4f(rot.y, yAxis);
-        AxisAngle4f zAA = new AxisAngle4f(rot.z, zAxis);
-
-        Quaternionf xq = new Quaternionf(xAA);
-        Quaternionf yq = new Quaternionf(yAA);
-        Quaternionf zq = new Quaternionf(zAA);
+        Quaternionf xq = new Quaternionf(new AxisAngle4f(rot.x, xAxis));
+        Quaternionf yq = new Quaternionf(new AxisAngle4f(rot.y, yAxis));
+        Quaternionf zq = new Quaternionf(new AxisAngle4f(rot.z, zAxis));
 
         // get rotation on world axis for setRotation
+        xq.mul(yq).mul(zq);
 
-        Vector3f x_rot = new Vector3f();
-        Vector3f y_rot = new Vector3f();
-        Vector3f z_rot = new Vector3f();
-        //xq.mul(yq).mul(zq);
+        this.boundingBox.rotate(xq);
+
+        //combine
+        xq.mul(cur);
 
         Vector3f end_rot = new Vector3f();
         xq.getEulerAnglesXYZ(end_rot);
 
-        setRot(this.getRot().x + end_rot.x, this.getRot().y + end_rot.y, this.getRot().z + end_rot.z);
-        this.boundingBox.rotate(rot);
+        setRot(end_rot.x, end_rot.y, end_rot.z);
     }
 
     @Override

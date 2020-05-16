@@ -2,6 +2,7 @@ package net.sknv.engine.collisions;
 
 import net.sknv.engine.GameItem;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -44,7 +45,7 @@ public class AABB implements BoundingBox{
     }
 
     @Override
-    public void rotate(Vector3f rot) {
+    public void rotate(Quaternionf rot) {
 
     }
 
