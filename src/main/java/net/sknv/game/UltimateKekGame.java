@@ -131,10 +131,9 @@ public class UltimateKekGame implements IGameLogic {
         b.setScale(.1f);
          */
 
-        GameItem testItem = new GameItem(cube);
+        GameItem testItem = new GameItem(kek);
         testItem.setPos(2f, 0, 2f);
         testItem.setScale(scale);
-        testItem.setRot(0,0,(float) Math.PI/10);
 
         testBox = new OBB(testItem, testItem.getMesh().getMin(), testItem.getMesh().getMax());
         testItem.setBoundingBox(testBox);
@@ -215,8 +214,6 @@ public class UltimateKekGame implements IGameLogic {
                 }
             }
         }
-
-        GraphUtils.drawAABB(renderer, new Vector4f(200,0,200,0), testBox);
     }
 
     @Override

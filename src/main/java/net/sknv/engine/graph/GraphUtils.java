@@ -140,27 +140,32 @@ public class GraphUtils {
             Vector3f min = new Vector3f(center.x + x.x + y.x + z.x, center.y + x.y + y.y + z.y, center.z + x.z + y.z + z.z);
             Vector3f max = new Vector3f(center.x - x.x - y.x - z.x, center.y - x.y - y.y - z.y, center.z - x.z - y.z - z.z);
 
+            //outer box
+            for(int i=0; i!=10; i++){
+
+            }
+
             // Create Positions Array
             float[] posArray = new float[] {
+                //Axis
+                center.x, center.y, center.z,
 
-                    center.x, center.y, center.z,
+                center.x + x.x, center.y + x.y, center.z + x.z,
+                center.x + y.x, center.y + y.y, center.z + y.z,
+                center.x + z.x, center.y + z.y, center.z + z.z,
 
-                    center.x + x.x, center.y + x.y, center.z + x.z,
-                    center.x + y.x, center.y + y.y, center.z + y.z,
-                    center.x + z.x, center.y + z.y, center.z + z.z,
+                //exact Box
+                center.x + x.x + y.x + z.x, center.y + x.y + y.y + z.y, center.z + x.z + y.z + z.z, //max
 
-                    center.x + x.x + y.x + z.x, center.y + x.y + y.y + z.y, center.z + x.z + y.z + z.z, //max
+                center.x - x.x + y.x + z.x, center.y - x.y + y.y + z.y, center.z - x.z + y.z + z.z,
+                center.x + x.x - y.x + z.x, center.y + x.y - y.y + z.y, center.z + x.z - y.z + z.z,
+                center.x + x.x + y.x - z.x, center.y + x.y + y.y - z.y, center.z + x.z + y.z - z.z,
 
-                    center.x - x.x + y.x + z.x, center.y - x.y + y.y + z.y, center.z - x.z + y.z + z.z,
-                    center.x + x.x - y.x + z.x, center.y + x.y - y.y + z.y, center.z + x.z - y.z + z.z,
-                    center.x + x.x + y.x - z.x, center.y + x.y + y.y - z.y, center.z + x.z + y.z - z.z,
+                center.x - x.x - y.x - z.x, center.y - x.y - y.y - z.y, center.z - x.z - y.z - z.z, //min
 
-                    center.x - x.x - y.x - z.x, center.y - x.y - y.y - z.y, center.z - x.z - y.z - z.z, //min
-
-                    center.x + x.x - y.x - z.x, center.y + x.y - y.y - z.y, center.z + x.z - y.z - z.z,
-                    center.x - x.x + y.x - z.x, center.y - x.y + y.y - z.y, center.z - x.z + y.z - z.z,
-                    center.x - x.x - y.x + z.x, center.y - x.y - y.y + z.y, center.z - x.z - y.z + z.z,
-
+                center.x + x.x - y.x - z.x, center.y + x.y - y.y - z.y, center.z + x.z - y.z - z.z,
+                center.x - x.x + y.x - z.x, center.y - x.y + y.y - z.y, center.z - x.z + y.z - z.z,
+                center.x - x.x - y.x + z.x, center.y - x.y - y.y + z.y, center.z - x.z - y.z + z.z,
             };
 
             // Create Indices Array

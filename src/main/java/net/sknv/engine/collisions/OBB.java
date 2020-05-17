@@ -9,30 +9,21 @@ public class OBB implements BoundingBox{
     public GameItem gameItem;
     private Vector3f center;
     private Vector3f x, y, z;
-    private float hx, hy, hz;
 
     private EndPoint min, max;
 
     public OBB(GameItem gameItem, Vector3f min, Vector3f max) {
         this.gameItem = gameItem;
 
-        this.x = new Vector3f(1,0,0);
-        this.y = new Vector3f(0,1,0);
-        this.z = new Vector3f(0,0,1);
-
-        this.hx = Math.abs(max.x - min.x)/2;
-        this.hy = Math.abs(max.y - min.y)/2;
-        this.hz = Math.abs(max.z - min.z)/2;
-
-        this.center = new Vector3f(min.x + hx, min.y + hy, min.z + hz);
-
         this.min = new EndPoint(this, min, true);
         this.max = new EndPoint(this, max, false);
 
-        System.out.println(center);
-        System.out.println(hx);
-        System.out.println(hy);
-        System.out.println(hz);
+        this.x = new Vector3f(Math.abs(max.x - min.x)/2,0,0);
+        this.y = new Vector3f(0,Math.abs(max.y - min.y)/2,0);
+        this.z = new Vector3f(0,0,Math.abs(max.z - min.z)/2);
+
+        this.center = new Vector3f(min.x + x.x, min.y + y.y, min.z + z.z);
+        //this.center = new Vector3f(0, 0, 0);
     }
 
     public void transform() {
@@ -62,10 +53,6 @@ public class OBB implements BoundingBox{
         this.z = new Vector3f(tz.x, tz.y, tz.z);
         this.center = new Vector3f(tc.x, tc.y, tc.z);
 
-        this.hx *= gameItem.getScale();
-        this.hy *= gameItem.getScale();
-        this.hz *= gameItem.getScale();
-
         //tbr testing purposes
         this.min.setPosition(new Vector3f(min.x, min.y, min.z));
         this.max.setPosition(new Vector3f(max.x, max.y, max.z));
@@ -80,6 +67,14 @@ public class OBB implements BoundingBox{
     }
 
     public void rotate(Quaternionf rot){
+        Vector3f d = new Vector3f();
+        center.sub(gameItem.getPos(),d);
+        d.rotate(rot);
+
+        System.out.println(d);
+
+        this.center = new Vector3f(gameItem.getPos().x + d.x, gameItem.getPos().y + d.y, gameItem.getPos().z + d.z);
+
         this.x.rotate(rot);
         this.y.rotate(rot);
         this.z.rotate(rot);
@@ -115,15 +110,4 @@ public class OBB implements BoundingBox{
         return z;
     }
 
-    public float getHx() {
-        return hx;
-    }
-
-    public float getHy() {
-        return hy;
-    }
-
-    public float getHz() {
-        return hz;
-    }
 }

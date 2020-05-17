@@ -1,6 +1,7 @@
 package net.sknv.game;
 
 import net.sknv.engine.*;
+import net.sknv.engine.collisions.OBB;
 import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -151,8 +152,9 @@ public class Renderer {
             //not anymore, bb coords are updated upon movement (done in update like its supposed to)
             if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)){
                 GraphUtils.drawAABB(this, new Vector4f(255,255,0,0), gameItem.getBoundingBox());
-                System.out.println(gameItem.getBoundingBox());
             }
+
+            if(gameItem.getBoundingBox() instanceof OBB) GraphUtils.drawAABB(this, new Vector4f(200,0,200,0), gameItem.getBoundingBox());
         }
 
         while (!alienVAOQueue.isEmpty()){
