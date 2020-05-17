@@ -52,7 +52,7 @@ public class OBB implements BoundingBox{
         modelViewMatrix.transform(min);
         modelViewMatrix.transform(max);
 
-        modelViewMatrix.identity().rotateXYZ(gameItem.getRot());
+        modelViewMatrix.identity().rotateXYZ(gameItem.getRot()).scale(gameItem.getScale());
         modelViewMatrix.transform(tx);
         modelViewMatrix.transform(ty);
         modelViewMatrix.transform(tz);
@@ -80,22 +80,9 @@ public class OBB implements BoundingBox{
     }
 
     public void rotate(Quaternionf rot){
-        Vector4f tx = new Vector4f(x.x, x.y, x.z,1);
-        Vector4f ty = new Vector4f(y.x, y.y, y.z,1);
-        Vector4f tz = new Vector4f(z.x, z.y, z.z,1);
-
-        Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity();
-
-        modelViewMatrix.rotate(rot);
-
-        modelViewMatrix.transform(tx);
-        modelViewMatrix.transform(ty);
-        modelViewMatrix.transform(tz);
-
-        this.x = new Vector3f(tx.x, tx.y, tx.z);
-        this.y = new Vector3f(ty.x, ty.y, ty.z);
-        this.z = new Vector3f(tz.x, tz.y, tz.z);
+        this.x.rotate(rot);
+        this.y.rotate(rot);
+        this.z.rotate(rot);
     }
 
     @Override

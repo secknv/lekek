@@ -89,77 +89,100 @@ public class GraphUtils {
 
     public static void drawAABB(Renderer renderer, Vector4f color, BoundingBox bb) {
 
-        Vector3f min = bb.getMin().getPosition();
-        Vector3f max = bb.getMax().getPosition();
+        if(bb instanceof AABB) {
 
-        // Create Positions Array
-        float[] posArray = new float[] {
-                min.x, min.y, min.z,
-                max.x, min.y, min.z,
-                min.x, max.y, min.z,
-                min.x, min.y, max.z,
+            Vector3f min = bb.getMin().getPosition();
+            Vector3f max = bb.getMax().getPosition();
 
-                min.x, max.y, max.z,
-                max.x, min.y, max.z,
-                max.x, max.y, min.z,
-                max.x, max.y, max.z,
-        };
+            // Create Positions Array
+            float[] posArray = new float[]{
+                    min.x, min.y, min.z,
+                    max.x, min.y, min.z,
+                    min.x, max.y, min.z,
+                    min.x, min.y, max.z,
 
-        // Create Indices Array
-        int[] idxArray = new int[] {
-                0,1,
-                0,2,
-                0,3,
+                    min.x, max.y, max.z,
+                    max.x, min.y, max.z,
+                    max.x, max.y, min.z,
+                    max.x, max.y, max.z,
+            };
 
-                1,5,
-                1,6,
+            // Create Indices Array
+            int[] idxArray = new int[]{
+                    0, 1,
+                    0, 2,
+                    0, 3,
 
-                2,4,
-                2,6,
+                    1, 5,
+                    1, 6,
 
-                3,4,
-                3,5,
+                    2, 4,
+                    2, 6,
 
-                4,7,
-                5,7,
-                6,7,
-        };
+                    3, 4,
+                    3, 5,
 
-        renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_LINES));
+                    4, 7,
+                    5, 7,
+                    6, 7,
+            };
 
-        //testing purposes
-        if(bb instanceof OBB){
+            renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_LINES));
+
+            //testing purposes
+        } else if(bb instanceof OBB){
             Vector3f center = ((OBB) bb).getCenter();
-            float hx = ((OBB) bb).getHx();
-            float hy = ((OBB) bb).getHy();
-            float hz = ((OBB) bb).getHz();
 
             Vector3f x = ((OBB) bb).getX();
             Vector3f y = ((OBB) bb).getY();
             Vector3f z = ((OBB) bb).getZ();
 
-            // Create Positions Array
-            posArray = new float[] {
-                    center.x, center.y, center.z,
+            Vector3f min = new Vector3f(center.x + x.x + y.x + z.x, center.y + x.y + y.y + z.y, center.z + x.z + y.z + z.z);
+            Vector3f max = new Vector3f(center.x - x.x - y.x - z.x, center.y - x.y - y.y - z.y, center.z - x.z - y.z - z.z);
 
-                    center.x + hx, center.y, center.z,
-                    center.x, center.y + hy, center.z,
-                    center.x, center.y, center.z + hz,
+            // Create Positions Array
+            float[] posArray = new float[] {
+
+                    center.x, center.y, center.z,
 
                     center.x + x.x, center.y + x.y, center.z + x.z,
                     center.x + y.x, center.y + y.y, center.z + y.z,
                     center.x + z.x, center.y + z.y, center.z + z.z,
+
+                    center.x + x.x + y.x + z.x, center.y + x.y + y.y + z.y, center.z + x.z + y.z + z.z, //max
+
+                    center.x - x.x + y.x + z.x, center.y - x.y + y.y + z.y, center.z - x.z + y.z + z.z,
+                    center.x + x.x - y.x + z.x, center.y + x.y - y.y + z.y, center.z + x.z - y.z + z.z,
+                    center.x + x.x + y.x - z.x, center.y + x.y + y.y - z.y, center.z + x.z + y.z - z.z,
+
+                    center.x - x.x - y.x - z.x, center.y - x.y - y.y - z.y, center.z - x.z - y.z - z.z, //min
+
+                    center.x + x.x - y.x - z.x, center.y + x.y - y.y - z.y, center.z + x.z - y.z - z.z,
+                    center.x - x.x + y.x - z.x, center.y - x.y + y.y - z.y, center.z - x.z + y.z - z.z,
+                    center.x - x.x - y.x + z.x, center.y - x.y - y.y + z.y, center.z - x.z - y.z + z.z,
+
             };
 
             // Create Indices Array
-            idxArray = new int[] {
+            int[] idxArray = new int[] {
                     0,1,
                     0,2,
                     0,3,
 
-                    0,4,
-                    0,5,
-                    0,6,
+                    4,5,
+                    4,6,
+                    4,7,
+
+                    8,9,
+                    8,10,
+                    8,11,
+
+                    5,10,
+                    5,11,
+                    6,11,
+                    6,9,
+                    7,9,
+                    7,10,
             };
 
             renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_LINES));
