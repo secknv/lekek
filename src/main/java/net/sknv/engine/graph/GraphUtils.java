@@ -2,9 +2,7 @@ package net.sknv.engine.graph;
 
 import net.sknv.engine.collisions.AABB;
 import net.sknv.engine.collisions.BoundingBox;
-import net.sknv.engine.GameItem;
 import net.sknv.engine.collisions.OBB;
-import org.joml.Matrix4f;
 import net.sknv.game.Renderer;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -16,9 +14,10 @@ import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class GraphUtils {
 
@@ -130,7 +129,8 @@ public class GraphUtils {
             renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_LINES));
 
             //testing purposes
-        } else if(bb instanceof OBB){
+        }
+        if(bb instanceof OBB){
             Vector3f center = ((OBB) bb).getCenter();
 
             Vector3f x = ((OBB) bb).getX();

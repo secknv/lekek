@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Mesh {
@@ -20,6 +21,7 @@ public class Mesh {
     private Material material;
     private int drawMode;
     private Vector3f min, max;
+    private final ArrayList<Vector3f> vertices;
 
     public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx) {
         this.drawMode = GL_TRIANGLES;
@@ -41,6 +43,14 @@ public class Mesh {
             if(pos[i+1]>max.y) max.y = pos[i+1];
             if(pos[i+2]>max.z) max.z = pos[i+2];
         }
+
+        vertices = new ArrayList<Vector3f>(
+                List.of(min,
+                        new Vector3f(min.x, min.y, max.z), new Vector3f(min.x, max.y, min.z),
+                        new Vector3f(max.x, min.y, min.z), new Vector3f(min.x, max.y, max.z),
+                        new Vector3f(max.x, min.y, max.z), new Vector3f(max.x, max.y, min.z),
+                        max)
+                );
 
         try {
             vertexCount = idx.length;
@@ -316,4 +326,6 @@ public class Mesh {
     public Vector3f getMax() {
         return max;
     }
+
+    public ArrayList getVertices(){return vertices;}
 }

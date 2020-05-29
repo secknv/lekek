@@ -12,7 +12,10 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -208,7 +211,7 @@ public class UltimateKekGame implements IGameLogic {
                         gameItem.translate(partialStep);
                         gameItem.velocity.zero();
 
-                        if(partialStep.x==0 && partialStep.y==0 && partialStep.z==0)
+                        if(partialStep.x==0 && partialStep.y==0 && partialStep.z==0) //collision
                         GraphUtils.drawAABB(renderer, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
                     }
                 }

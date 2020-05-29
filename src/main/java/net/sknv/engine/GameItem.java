@@ -112,7 +112,8 @@ public class GameItem {
         // get rotation on world axis for setRotation
         xq.mul(yq).mul(zq);
 
-        this.boundingBox.rotate(xq);
+        Quaternionf obbRot = new Quaternionf();
+        xq.get(obbRot);
 
         //combine
         xq.mul(cur);
@@ -120,7 +121,8 @@ public class GameItem {
         Vector3f end_rot = new Vector3f();
         xq.getEulerAnglesXYZ(end_rot);
 
-        setRot(end_rot.x, end_rot.y, end_rot.z);
+        setRot(end_rot.x, end_rot.y, end_rot.z);//set item rot
+        this.boundingBox.rotate(obbRot);//set bb rot
     }
 
     @Override

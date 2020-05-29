@@ -1,14 +1,16 @@
 package net.sknv.game;
 
-import net.sknv.engine.*;
+import net.sknv.engine.GameItem;
+import net.sknv.engine.MouseInput;
+import net.sknv.engine.Utils;
+import net.sknv.engine.Window;
 import net.sknv.engine.collisions.OBB;
 import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import net.sknv.engine.graph.RayCast;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -154,8 +156,9 @@ public class Renderer {
                 GraphUtils.drawAABB(this, new Vector4f(255,255,0,0), gameItem.getBoundingBox());
             }
 
-            if(gameItem.getBoundingBox() instanceof OBB) GraphUtils.drawAABB(this, new Vector4f(200,0,200,0), gameItem.getBoundingBox());
+            if(gameItem.getBoundingBox() instanceof OBB) GraphUtils.drawAABB(this, new Vector4f(75f,0,130f,0f), gameItem.getBoundingBox());
         }
+        //collision, not performing the movement
 
         while (!alienVAOQueue.isEmpty()){
 

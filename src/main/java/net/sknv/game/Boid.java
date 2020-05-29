@@ -8,5 +8,4 @@ public class Boid extends GameItem {
     public Boid(Mesh mesh) {
         super(mesh);
     }
-
 }
