@@ -43,6 +43,8 @@ public class UltimateKekGame implements IGameLogic {
     private SPCollision sweepPrune = new SPCollision();
     private OBB testBox;
 
+    public GameItem movableItem;
+
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera();
@@ -75,7 +77,7 @@ public class UltimateKekGame implements IGameLogic {
 
         if(cameraPosInc.length()!=0) cameraPosInc.normalize();
 
-        GameItem movableItem = gameItems.get(5);
+        if(renderer.getClicked()!=null) movableItem = renderer.getClicked();
         if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.velocity.z -= .1;
         if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.velocity.z += .1;
         if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.velocity.x -= .1;
@@ -84,6 +86,7 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_X)) movableItem.rotate(new Vector3f((float) (-Math.PI/200),0,0));
         if (window.isKeyPressed(GLFW_KEY_Y)) movableItem.rotate(new Vector3f(0,(float) (-Math.PI/200),0));
         if (window.isKeyPressed(GLFW_KEY_Z)) movableItem.rotate(new Vector3f(0,0,(float) (-Math.PI/200)));
+
     }
 
     @Override
@@ -140,6 +143,7 @@ public class UltimateKekGame implements IGameLogic {
 
         testBox = new OBB(testItem, testItem.getMesh().getMin(), testItem.getMesh().getMax());
         testItem.setBoundingBox(testBox);
+        movableItem = testItem;
 
         gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, testItem));
     }

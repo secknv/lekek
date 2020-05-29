@@ -4,7 +4,6 @@ import net.sknv.engine.GameItem;
 import net.sknv.engine.MouseInput;
 import net.sknv.engine.Utils;
 import net.sknv.engine.Window;
-import net.sknv.engine.collisions.OBB;
 import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -133,11 +132,9 @@ public class Renderer {
         boidC.drawScaledRay(1, viewMatrix);
          */
 
-
-
         //end dbz mark ---------------------------------------------------------------------------
-
         //render each game item
+        ArrayList<GameItem> clickedItems = new ArrayList<>();
         for (GameItem gameItem : gameItems) {
 
             Mesh mesh = gameItem.getMesh();
@@ -149,16 +146,20 @@ public class Renderer {
             shaderProgram.setUniform("material", mesh.getMaterial());
             mesh.render();
 
-            //dbz proof of concept AABB
-            //gameItem.getBoundingBox().transform(gameItem);// bb coords are being transformed from local to world every frame...
-            //not anymore, bb coords are updated upon movement (done in update like its supposed to)
-            if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)){
-                GraphUtils.drawAABB(this, new Vector4f(255,255,0,0), gameItem.getBoundingBox());
+            if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem) ){
+                clickedItems.add(gameItem);
             }
-
-            if(gameItem.getBoundingBox() instanceof OBB) GraphUtils.drawAABB(this, new Vector4f(75f,0,130f,0f), gameItem.getBoundingBox());
         }
-        //collision, not performing the movement
+
+        if(!clickedItems.isEmpty()) {
+            Float d = cameraPos.distance(clickedItems.get(0).getPos());
+            for (GameItem item : clickedItems) {
+                if (cameraPos.distance(item.getPos()) <= d) clicked = item;
+            }
+            GraphUtils.drawAABB(this, new Vector4f(255, 255, 0, 0), clicked.getBoundingBox());
+        }
+
+        if(clicked != null) GraphUtils.drawAABB(this, new Vector4f(75f,0,15f,0f), clicked.getBoundingBox());
 
         while (!alienVAOQueue.isEmpty()){
 
@@ -185,7 +186,7 @@ public class Renderer {
         }
 
 
-        if(true) renderGraphUtils();
+        if(devMode) renderGraphUtils();
 
         shaderProgram.unbind();
     }
@@ -220,5 +221,11 @@ public class Renderer {
      * */
     public void addAlienVAO(AlienVAO alienVAO) {
         this.alienVAOQueue.offer(alienVAO);
+    }
+
+    //spaghet
+    private GameItem clicked;
+    public GameItem getClicked() {
+        return clicked;
     }
 }
