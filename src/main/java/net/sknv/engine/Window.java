@@ -136,4 +136,8 @@ public class Window {
     public Vector2f getCenter() {
         return new Vector2f(width/2, height/2);
     }
+
+    public void setTitle(String s) {
+        glfwSetWindowTitle(windowHandle, s);
+    }
 }

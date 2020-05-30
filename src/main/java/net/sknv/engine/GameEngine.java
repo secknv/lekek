@@ -44,21 +44,34 @@ public class GameEngine implements Runnable {
         float interval = 1f / TARGET_UPS;
 
         boolean running = true;
+
+        int count_fps = 0, count_ups = 0;
+        double tst = 0, last = 0;
+
         while (running && !window.windowShouldClose()) {
+            tst = timer.getTime();
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
-
             input();
 
             while (accumulator >= interval) {
                 update(interval);
                 accumulator -= interval;
+                count_ups++;
             }
 
             render();
 
             if (!window.isVsync()) {
                 sync();
+            }
+            count_fps++;
+
+            if (tst - last >= 1) {
+                window.setTitle("UPS: " + count_ups + " | FPS: " + count_fps);
+                count_fps = 0;
+                count_ups = 0;
+                last = tst;
             }
         }
     }

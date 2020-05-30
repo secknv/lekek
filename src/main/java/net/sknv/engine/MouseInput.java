@@ -63,8 +63,6 @@ public class MouseInput {
 
         previousPos.x = currentPos.x;
         previousPos.y = currentPos.y;
-        // why this line?
-        //glfwSetCursorPos(window.getWindowHandle(), previousPos.x, previousPos.y);
     }
 
     public boolean isLeftClicked() {
