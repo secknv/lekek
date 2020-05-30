@@ -21,7 +21,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class UltimateKekGame implements IGameLogic {
 
-    private static final float MOUSE_SENSITIVITY = 0.8f;
+    private static final float MOUSE_SENSITIVITY = 0.4f;
     private static final float CAMERA_POS_STEP = 0.05f;
 
     private final Vector3f cameraPosInc;
@@ -178,8 +178,6 @@ public class UltimateKekGame implements IGameLogic {
         if (!menu && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
-
-            glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
         }
     }
 
@@ -246,12 +244,11 @@ public class UltimateKekGame implements IGameLogic {
             if (key == GLFW_KEY_P && action == GLFW_PRESS) {
                 if(menu){
                     menu = false;
-                    glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-                    glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
                 } else {
                     menu = true;
-                    glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-                    glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    glfwSetCursorPos(windowHandle, window.getCenter().x, window.getCenter().y);
                 }
             }
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {

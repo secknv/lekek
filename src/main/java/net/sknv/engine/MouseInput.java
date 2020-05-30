@@ -46,8 +46,7 @@ public class MouseInput {
     public void input(Window window) {
         displVec.x = 0;
         displVec.y = 0;
-
-        if (previousPos.x > 0 && previousPos.y > 0 && inWindow) {
+        if (inWindow) {
             double deltaX = currentPos.x - previousPos.x;
             double deltaY = currentPos.y - previousPos.y;
             boolean rotateX = deltaX != 0;
