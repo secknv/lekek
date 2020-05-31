@@ -55,9 +55,9 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     @Override
-    public void init(Window window) throws Exception {
+    public void init(Window window, MouseInput mouseInput) throws Exception {
         renderer.init(window);
-        setKeyCallbacks(window);
+        setKeyCallbacks(window, mouseInput);
 
         initLighting();
         initGameItems();
@@ -239,14 +239,16 @@ public class UltimateKekGame implements IGameLogic {
      * For movement keys, where you just want to know if the key IS being pressed,
      * use window.isKeyPressed(key)
      * */
-    private void setKeyCallbacks(Window window) {
+    private void setKeyCallbacks(Window window, MouseInput mouseInput) {
         window.setKeyCallback((windowHandle, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_P && action == GLFW_PRESS) {
                 if(menu){
                     menu = false;
+                    mouseInput.setDisabled();
                     glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
                 } else {
                     menu = true;
+                    mouseInput.setEnabled();
                     glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
                     glfwSetCursorPos(windowHandle, window.getCenter().x, window.getCenter().y);
                 }

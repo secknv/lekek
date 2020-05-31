@@ -14,6 +14,8 @@ public class MouseInput {
     private boolean inWindow = false;
     private boolean leftClicked = false;
     private boolean rightClicked = false;
+    // Flags when mouse is in GLFW_CURSOR_DISABLED mode.
+    private boolean disabled = true;
 
     public MouseInput() {
         previousPos = new Vector2d(-1, -1);
@@ -80,10 +82,28 @@ public class MouseInput {
         return previousPos;
     }
 
-    public Vector3f getWorldRay(Matrix4f projectionMatrix, Matrix4f viewMatrix) {
+    public void setDisabled() {
+        this.disabled = true;
+    }
+    public void setEnabled() {
+        this.disabled = false;
+    }
+
+    public Vector3f getWorldRay(Window window, Matrix4f projectionMatrix, Matrix4f viewMatrix) {
         //convert from viewport to normalised device space
-        Vector4f ray_clip = new Vector4f((float)(2.0f * getPos().x) / Window.getWidth() - 1.0f,
-                (float)(1f - (2.0f * getPos().y) / Window.getHeight()), -1.0f, 1.0f);
+        double posx;
+        double posy;
+
+        if (this.disabled) {
+            posx = window.getCenter().x;
+            posy = window.getCenter().y;
+        }
+        else {
+            posx = getPos().x;
+            posy = getPos().y;
+        }
+        Vector4f ray_clip = new Vector4f((float)(2.0f * posx) / Window.getWidth() - 1.0f,
+                (float)(1f - (2.0f * posy) / Window.getHeight()), -1.0f, 1.0f);
 
         //convert from normalised device space to eye space
         Matrix4f invertedProjection = new Matrix4f();

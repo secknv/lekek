@@ -152,7 +152,7 @@ public class Renderer {
         }
 
         if(!clickedItems.isEmpty()) {
-            Float d = cameraPos.distance(clickedItems.get(0).getPos());
+            float d = cameraPos.distance(clickedItems.get(0).getPos());
             for (GameItem item : clickedItems) {
                 if (cameraPos.distance(item.getPos()) <= d) clicked = item;
             }
