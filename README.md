@@ -11,10 +11,14 @@ Inside project folder open cmd and do:
 
 wow such gradle many amaze
 
-`a w s d` to move camera in plane  
-`space shift` to control height  
-`rightclick drag` to rotate
+`a w s d` to move
+`space shift` for up/down
+`mouse` to look around
 
-`arrow keys` to control gameItem0
+`p` to unlock mouse
+`left click` to select gameItem
+
+`arrow keys` to move selected item
+`x y z` to rotate selected item
 
 press power button to paint screen black
