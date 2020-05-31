@@ -118,8 +118,7 @@ public class GameItem {
         //combine
         xq.mul(cur);
 
-        Vector3f end_rot = new Vector3f();
-        xq.getEulerAnglesXYZ(end_rot);
+        Vector3f end_rot = Utils.getEulerAngles(xq);
 
         setRot(end_rot.x, end_rot.y, end_rot.z);//set item rot
         this.boundingBox.rotate(obbRot);//set bb rot

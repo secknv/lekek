@@ -1,5 +1,9 @@
 package net.sknv.engine;
 
+import org.joml.Math;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,5 +41,15 @@ public class Utils {
             floatArr[i] = list.get(i);
         }
         return floatArr;
+    }
+
+    public static Vector3f getEulerAngles(Quaternionf q){
+        Vector3f eulerAngles = new Vector3f();
+        eulerAngles.x = (float) Math.atan2(2.0 * (q.x*q.w - q.y*q.z), 1.0 - 2.0 * (q.x*q.x + q.y*q.y));
+        float f = (float) (2.0 * (q.x*q.z + q.y*q.w));
+        f = f>1 ? 1 : (f < -1 ? -1 : f);
+        eulerAngles.y = (float) Math.asin(f);
+        eulerAngles.z = (float) Math.atan2(2.0 * (q.z*q.w - q.x*q.y), 1.0 - 2.0 * (q.y*q.y + q.z*q.z));
+        return eulerAngles;
     }
 }
