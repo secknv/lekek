@@ -21,7 +21,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class UltimateKekGame implements IGameLogic {
 
-    private static final float MOUSE_SENSITIVITY = 0.8f;
+    private static final float MOUSE_SENSITIVITY = 0.4f;
     private static final float CAMERA_POS_STEP = 0.05f;
 
     private final Vector3f cameraPosInc;
@@ -55,9 +55,9 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     @Override
-    public void init(Window window) throws Exception {
+    public void init(Window window, MouseInput mouseInput) throws Exception {
         renderer.init(window);
-        setKeyCallbacks(window);
+        setKeyCallbacks(window, mouseInput);
 
         initLighting();
         initGameItems();
@@ -178,8 +178,6 @@ public class UltimateKekGame implements IGameLogic {
         if (!menu && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
-
-            glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
         }
     }
 
@@ -241,17 +239,18 @@ public class UltimateKekGame implements IGameLogic {
      * For movement keys, where you just want to know if the key IS being pressed,
      * use window.isKeyPressed(key)
      * */
-    private void setKeyCallbacks(Window window) {
+    private void setKeyCallbacks(Window window, MouseInput mouseInput) {
         window.setKeyCallback((windowHandle, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_P && action == GLFW_PRESS) {
                 if(menu){
                     menu = false;
-                    glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-                    glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    mouseInput.setDisabled();
+                    glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
                 } else {
                     menu = true;
-                    glfwSetCursorPos(window.getWindowHandle(), window.getCenter().x, window.getCenter().y);
-                    glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    mouseInput.setEnabled();
+                    glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    glfwSetCursorPos(windowHandle, window.getCenter().x, window.getCenter().y);
                 }
             }
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
