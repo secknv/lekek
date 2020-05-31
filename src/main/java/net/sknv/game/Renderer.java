@@ -94,7 +94,7 @@ public class Renderer {
         shaderProgram.setUniform("texture_sampler", 0);
 
         //dbz mark -------------------------------------------------------------------------------
-        Vector3f worldRay = mouseInput.getWorldRay(projectionMatrix, viewMatrix);
+        Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
         Vector3f cameraPos = camera.getPosition();
 
         //ray casting
