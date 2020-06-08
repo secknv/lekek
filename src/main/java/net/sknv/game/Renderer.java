@@ -1,9 +1,6 @@
 package net.sknv.game;
 
-import net.sknv.engine.GameItem;
-import net.sknv.engine.MouseInput;
-import net.sknv.engine.Utils;
-import net.sknv.engine.Window;
+import net.sknv.engine.*;
 import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -28,7 +25,7 @@ public class Renderer {
 
     private final Transformation transformation;
 
-    private ShaderProgram shaderProgram;
+    private ShaderProgram shaderProgram, hudShaderProgram;
 
     private float specularPower;
     private boolean devMode;
@@ -45,6 +42,11 @@ public class Renderer {
     }
 
     public void init(Window window) throws Exception {
+        setupSceneShader();
+        setupHudShader();
+    }
+
+    private void setupSceneShader() throws Exception {
         //create shader
         shaderProgram = new ShaderProgram();
         shaderProgram.createVertexShader(Utils.loadResource("/shaders/vertex.glsl"));
@@ -67,11 +69,23 @@ public class Renderer {
         shaderProgram.createDirectionalLightUniform("directionalLight");
     }
 
+    private void setupHudShader() throws Exception {
+        hudShaderProgram = new ShaderProgram();
+        hudShaderProgram.createVertexShader(Utils.loadResource("/shaders/hud_vertex.glsl"));
+        hudShaderProgram.createFragmentShader(Utils.loadResource("/shaders/hud_fragment.glsl"));
+        hudShaderProgram.link();
+
+        // Create uniforms for Ortographic-model projection matrix and base colour
+        hudShaderProgram.createUniform("projModelMatrix");
+        hudShaderProgram.createUniform("colour");
+        hudShaderProgram.createUniform("hasTexture");
+    }
+
     public void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, MouseInput mouseInput, Camera camera, ArrayList<GameItem> gameItems, Vector3f ambientLight, DirectionalLight directionalLight) {
+    public void render(Window window, MouseInput mouseInput, Camera camera, ArrayList<GameItem> gameItems, Vector3f ambientLight, DirectionalLight directionalLight, IHud hud) {
         clear();
 
         if (window.isResized()) {
@@ -188,6 +202,8 @@ public class Renderer {
 
         if(devMode) renderGraphUtils();
 
+        renderHud(window, hud);
+
         shaderProgram.unbind();
     }
 
@@ -209,6 +225,25 @@ public class Renderer {
     private void renderGraphUtils() {
         //GraphUtils.drawGrid(this, new Vector3f(0,0,0),20);
         GraphUtils.drawAxis(this);
+    }
+
+    private void renderHud(Window window, IHud hud) {
+        hudShaderProgram.bind();
+
+        Matrix4f ortho = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+        for (GameItem gameItem : hud.getGameItems()) {
+            Mesh mesh = gameItem.getMesh();
+            // Set ortohtaphic and model matrix for this HUD item
+            Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(gameItem, ortho);
+            hudShaderProgram.setUniform("projModelMatrix", projModelMatrix);
+            hudShaderProgram.setUniform("colour", gameItem.getMesh().getMaterial().getAmbientColor());
+            hudShaderProgram.setUniform("hasTexture", gameItem.getMesh().getMaterial().isTextured() ? 1 : 0);
+
+            // Render the mesh for this HUD item
+            mesh.render();
+        }
+
+        hudShaderProgram.unbind();
     }
 
     public void cleanup() {
