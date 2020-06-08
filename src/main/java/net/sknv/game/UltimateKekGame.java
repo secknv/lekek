@@ -38,6 +38,7 @@ public class UltimateKekGame implements IGameLogic {
     private Vector3f ambientLight;
     private DirectionalLight directionalLight;
     private float lightAngle;
+    private Hud hud;
 
     //collisions stuff
     private SPCollision sweepPrune = new SPCollision();
@@ -93,6 +94,7 @@ public class UltimateKekGame implements IGameLogic {
     public void update(Window window, MouseInput mouseInput, float interval) {
         updateItems();
         moveCamera(window, mouseInput);
+        hud.rotateCompass(camera.getRotation().y);
     }
 
     private void initGameItems() throws Exception{
@@ -146,6 +148,8 @@ public class UltimateKekGame implements IGameLogic {
         movableItem = testItem;
 
         gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, testItem));
+
+        hud = new Hud("+");
     }
 
     private void initLighting() {
@@ -223,13 +227,15 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void render(Window window, MouseInput mouseInput) {
-        renderer.render(window, mouseInput, camera, gameItems, ambientLight, directionalLight);
+        hud.updateSize(window);
+        renderer.render(window, mouseInput, camera, gameItems, ambientLight, directionalLight, hud);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
         for(GameItem item : gameItems) item.getMesh().cleanUp();
+        hud.cleanup();
     }
 
     /**
