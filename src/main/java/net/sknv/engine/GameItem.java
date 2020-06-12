@@ -17,7 +17,7 @@ public class GameItem {
     public Vector3f velocity;
     public int nCollisions;
 
-    public GameItem() { //skill que dbz mandou has been officialized
+    public GameItem() {
         velocity = new Vector3f(0, 0, 0);
         pos = new Vector3f(0, 0, 0);
         rot = new Vector3f(0, 0, 0);
