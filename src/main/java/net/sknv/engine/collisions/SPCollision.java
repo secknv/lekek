@@ -2,7 +2,10 @@ package net.sknv.engine.collisions;
 
 import net.sknv.engine.GameItem;
 import org.joml.Vector3f;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SPCollision implements ISweepPrune{
     private ArrayList<EndPoint> xAxis = new ArrayList<>();
@@ -198,24 +201,20 @@ public class SPCollision implements ISweepPrune{
             BoundingBox nextBb;
             int i = yAxis.indexOf(bb.getMax())+1;
             while (i < yAxis.size()-1 && i > -1 && yAxis.get(i).getPosition().y < nextMax) {
-                if (bb.getMax().getPosition().y > yAxis.get(i).getPosition().y) {
-                    nextBb = yAxis.get(i).getBB();
+                nextBb = yAxis.get(i).getBB();
                     if (yAxis.get(i).isMin() && testCollisionY(nextMin, nextMax, nextBb)) {//collision
                         collisions.add(nextBb);
                     }
-                }
                 i++;
             }
         } else {
             BoundingBox prevBb;
             int i = yAxis.indexOf(bb.getMin())-1;
             while (i > -1 && i < yAxis.size()-1 && yAxis.get(i).getPosition().y >= nextMin) {
-                if (bb.getMin().getPosition().y < yAxis.get(i).getPosition().y) {
-                    prevBb = yAxis.get(i).getBB();
+                prevBb = yAxis.get(i).getBB();
                     if (!yAxis.get(i).isMin() && testCollisionY(nextMin, nextMax, prevBb)) {//collision
                         collisions.add(prevBb);
                     }
-                }
                 i--;
             }
         }

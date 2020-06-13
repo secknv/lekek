@@ -1,7 +1,7 @@
 package net.sknv.engine;
 
-import net.sknv.engine.collisions.AABB;
 import net.sknv.engine.collisions.BoundingBox;
+import net.sknv.engine.collisions.OBB;
 import net.sknv.engine.graph.Mesh;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
@@ -27,7 +27,7 @@ public class GameItem {
     public GameItem(Mesh mesh) {
         this();
         this.mesh = mesh;
-        this.boundingBox = new AABB(this, mesh.getMin(), mesh.getMax());
+        this.boundingBox = new OBB(this, mesh.getMin(), mesh.getMax());
     }
 
     public Vector3f getPos() {
