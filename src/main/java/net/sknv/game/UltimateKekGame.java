@@ -90,6 +90,8 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_Y)) movableItem.rotate(new Vector3f(0,(float) (-Math.PI/200),0));
         if (window.isKeyPressed(GLFW_KEY_Z)) movableItem.rotate(new Vector3f(0,0,(float) (-Math.PI/200)));
 
+        if (window.isKeyPressed(GLFW_KEY_K)) movableItem.setRot(0, 0, 0);
+
     }
 
     @Override
