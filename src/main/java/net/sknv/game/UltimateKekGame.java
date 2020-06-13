@@ -1,9 +1,6 @@
 package net.sknv.game;
 
-import net.sknv.engine.GameItem;
-import net.sknv.engine.IGameLogic;
-import net.sknv.engine.MouseInput;
-import net.sknv.engine.Window;
+import net.sknv.engine.*;
 import net.sknv.engine.collisions.BoundingBox;
 import net.sknv.engine.collisions.OBB;
 import net.sknv.engine.collisions.SPCollision;
@@ -12,10 +9,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -30,14 +24,14 @@ public class UltimateKekGame implements IGameLogic {
     private final Renderer renderer;
     private final Camera camera;
 
-    private ArrayList<GameItem> gameItems;
-
     private boolean menu = false;
 
     //light stuff
     private Vector3f ambientLight;
     private DirectionalLight directionalLight;
     private float lightAngle;
+
+    private Scene scene;
     private Hud hud;
 
     //collisions stuff
@@ -60,8 +54,14 @@ public class UltimateKekGame implements IGameLogic {
         renderer.init(window);
         setKeyCallbacks(window, mouseInput);
 
-        initLighting();
+        scene = new Scene();
+
         initGameItems();
+        initLighting();
+
+        camera.getPosition().x = 0.65f;
+        camera.getPosition().y = 1.15f;
+        camera.getPosition().y = 4.34f;
 
         initCollisions();
     }
@@ -83,6 +83,8 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.velocity.z += .1;
         if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.velocity.x -= .1;
         if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.velocity.x += .1;
+        if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) movableItem.velocity.y += .1;
+        if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) movableItem.velocity.y -= .1;
 
         if (window.isKeyPressed(GLFW_KEY_X)) movableItem.rotate(new Vector3f((float) (-Math.PI/200),0,0));
         if (window.isKeyPressed(GLFW_KEY_Y)) movableItem.rotate(new Vector3f(0,(float) (-Math.PI/200),0));
@@ -98,40 +100,58 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     private void initGameItems() throws Exception{
+
         float reflectance = 1f;
 
+        // Setup block mesh
         Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
-        Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
-        Mesh boid = OBJLoader.loadMesh("/models/boid.obj");
-
         Texture texture = new Texture("src/main/resources/textures/lebloq.png");
         Material material = new Material(texture, reflectance);
         cube.setMaterial(material);
+
+        // Setup kek mesh
+        Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
         kek.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
+
+        // Setup boid mesh
+        Mesh boid = OBJLoader.loadMesh("/models/boid.obj");
         boid.setMaterial(new Material(new Vector4f(0f, 1f, 1f, 1f), 0.5f));
 
-        float scale = .25f;
 
-        System.out.println("Creating items");
-        GameItem gameItem0 = new GameItem(kek);
-        gameItem0.setPos(0, 0, -6);
-        gameItem0.setScale(.5f);
+        // Background game items
+        float blockScale = 0.5f;
+        float skyBoxScale = 10.0f;
+        float extension = 2.0f;
 
-        GameItem gameItem1 = new GameItem(cube);
-        gameItem1.setPos(0, 0, .5f);
-        gameItem1.setScale(scale);
+        float startx = extension * (-skyBoxScale + blockScale);
+        float startz = extension * (skyBoxScale - blockScale);
+        float starty = -1.0f;
+        float inc = blockScale * 2;
 
-        GameItem gameItem2 = new GameItem(cube);
-        gameItem2.setPos(0f, 0, 0);
-        gameItem2.setScale(scale);
+        float posx = startx;
+        float posz = startz;
+        float incy = 0.0f;
+        int NUM_ROWS = (int)(extension * skyBoxScale * 2 / inc);
+        int NUM_COLS = (int)(extension * skyBoxScale * 2/ inc);
+        ArrayList<GameItem> gameItems  = new ArrayList<>(NUM_ROWS * NUM_COLS + 10);
+        for(int i=0; i<NUM_ROWS; i++) {
+            for(int j=0; j<NUM_COLS; j++) {
+                GameItem gameItem = new GameItem(cube);
+                gameItem.setScale(blockScale);
+                incy = Math.random() > 0.9f ? blockScale * 2 : 0f;
+                gameItem.setPos(posx, starty + incy, posz);
+                gameItems.add(gameItem);
 
-        GameItem gameItem3 = new GameItem(cube);
-        gameItem3.setPos(0.5f, 0, 0);
-        gameItem3.setScale(scale);
+                posx += inc;
+            }
+            posx = startx;
+            posz -= inc;
+        }
 
-        GameItem gameItem4 = new GameItem(cube);
-        gameItem4.setPos(.5f, 0, .5f);
-        gameItem4.setScale(scale);
+        // Special game items
+        GameItem testItem = new GameItem(kek);
+        testItem.setPos(2f, 1, 2f);
+        testItem.setScale(blockScale);
 
         /*
         Boid b = new Boid(boid);
@@ -139,29 +159,42 @@ public class UltimateKekGame implements IGameLogic {
         b.setScale(.1f);
          */
 
-        GameItem testItem = new GameItem(kek);
-        testItem.setPos(2f, 0, 2f);
-        testItem.setScale(scale);
-
         testBox = new OBB(testItem, testItem.getMesh().getMin(), testItem.getMesh().getMax());
         testItem.setBoundingBox(testBox);
         movableItem = testItem;
 
-        gameItems = new ArrayList<>(Arrays.asList(gameItem0, gameItem1, gameItem2, gameItem3, gameItem4, testItem));
+        // add special items to gameItems array
+        // this is here case more than one special items...
+        // easier to just add {testItem, myOtherItem, kekItem}
+        GameItem[] specialItems = {testItem};
+        gameItems.addAll(Arrays.asList(specialItems));
 
+        // set gameItems in scene
+        scene.setGameItems(gameItems.toArray(new GameItem[0]));
+
+        // Setup  SkyBox
+        // todo: standardize resource paths
+        SkyBox skyBox = new SkyBox("/models/skybox.obj", "src/main/resources/textures/skybox.png");
+        skyBox.setScale(skyBoxScale);
+        scene.setSkyBox(skyBox);
+
+        // Setup HUD
         hud = new Hud("+");
     }
 
     private void initLighting() {
-        ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
-
+        SceneLight sceneLight = new SceneLight();
+        sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
         float lightIntensity = 1.0f;
         Vector3f lightPos = new Vector3f(-1, 0, 0);
         Vector3f lightColor = new Vector3f(1, 1, 1);
-        directionalLight = new DirectionalLight(lightColor, lightPos, lightIntensity);
+        sceneLight.setDirectionalLight(new DirectionalLight(lightColor, lightPos, lightIntensity));
+
+        scene.setSceneLight(sceneLight);
     }
 
     private void initCollisions() {
+        List<GameItem> gameItems = Arrays.asList(scene.getGameItems());
         for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
             GameItem gameItem = iterator.next();
             gameItem.getBoundingBox().transform();// converts bb coords from local to world
@@ -186,7 +219,7 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     private void updateItems() {
-        for(GameItem gameItem : gameItems){
+        for(GameItem gameItem : scene.getGameItems()){
             if(gameItem.getVelocity().length() != 0){ //game item has acceleration
 
                 //calculate step
@@ -228,13 +261,13 @@ public class UltimateKekGame implements IGameLogic {
     @Override
     public void render(Window window, MouseInput mouseInput) {
         hud.updateSize(window);
-        renderer.render(window, mouseInput, camera, gameItems, ambientLight, directionalLight, hud);
+        renderer.render(window, mouseInput, camera, scene, hud);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
-        for(GameItem item : gameItems) item.getMesh().cleanUp();
+        for(GameItem item : scene.getGameItems()) item.getMesh().cleanUp();
         hud.cleanup();
     }
 
