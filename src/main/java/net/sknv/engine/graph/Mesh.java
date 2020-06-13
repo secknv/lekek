@@ -342,5 +342,5 @@ public class Mesh {
         return max;
     }
 
-    public ArrayList getVertices(){return vertices;}
+    public ArrayList<Vector3f> getVertices(){return vertices;}
 }
