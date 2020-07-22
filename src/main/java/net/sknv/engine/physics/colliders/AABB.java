@@ -1,4 +1,4 @@
-package net.sknv.engine.collisions;
+package net.sknv.engine.physics.colliders;
 
 import net.sknv.engine.GameItem;
 import org.joml.Matrix4f;
@@ -8,7 +8,7 @@ import org.joml.Vector4f;
 
 import java.util.ArrayList;
 
-public class AABB implements BoundingBox{
+public class AABB implements BoundingBox {
 
     public GameItem gameItem;
     public EndPoint min, max;

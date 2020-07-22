@@ -1,4 +1,4 @@
-package net.sknv.engine.collisions;
+package net.sknv.engine.physics.colliders;
 
 import org.joml.Vector3f;
 

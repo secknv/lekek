@@ -1,10 +1,10 @@
 package net.sknv.game;
 
 import net.sknv.engine.*;
-import net.sknv.engine.collisions.BoundingBox;
-import net.sknv.engine.collisions.OBB;
-import net.sknv.engine.collisions.SPCollision;
 import net.sknv.engine.graph.*;
+import net.sknv.engine.physics.colliders.BoundingBox;
+import net.sknv.engine.physics.colliders.OBB;
+import net.sknv.engine.physics.collisionDetection.SPCollision;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;

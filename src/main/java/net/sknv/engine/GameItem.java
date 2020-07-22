@@ -1,8 +1,8 @@
 package net.sknv.engine;
 
-import net.sknv.engine.collisions.BoundingBox;
-import net.sknv.engine.collisions.OBB;
 import net.sknv.engine.graph.Mesh;
+import net.sknv.engine.physics.colliders.BoundingBox;
+import net.sknv.engine.physics.colliders.OBB;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;

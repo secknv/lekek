@@ -1,8 +1,8 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.collisions.AABB;
-import net.sknv.engine.collisions.BoundingBox;
-import net.sknv.engine.collisions.OBB;
+import net.sknv.engine.physics.colliders.AABB;
+import net.sknv.engine.physics.colliders.BoundingBox;
+import net.sknv.engine.physics.colliders.OBB;
 import net.sknv.game.Renderer;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
