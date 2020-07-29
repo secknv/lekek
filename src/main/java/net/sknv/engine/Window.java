@@ -76,6 +76,10 @@ public class Window {
         glClearColor(0.0f, 0.0f,0.0f, 0.0f);
 
         glEnable(GL_DEPTH_TEST);
+
+        // cull hidden faces for optimization
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
     }
 
     public void setClearColor(float r, float g, float b, float alpha) {
