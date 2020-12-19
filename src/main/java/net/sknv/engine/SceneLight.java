@@ -3,7 +3,9 @@ package net.sknv.engine;
 import net.sknv.engine.graph.DirectionalLight;
 import org.joml.Vector3f;
 
-public class SceneLight {
+import java.io.Serializable;
+
+public class SceneLight implements Serializable {
 
     private Vector3f ambientLight;
 

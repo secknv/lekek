@@ -2,7 +2,9 @@ package net.sknv.engine.graph;
 
 import org.joml.Vector3f;
 
-public class DirectionalLight {
+import java.io.Serializable;
+
+public class DirectionalLight implements Serializable {
     private Vector3f color, direction;
 
     private float intensity;

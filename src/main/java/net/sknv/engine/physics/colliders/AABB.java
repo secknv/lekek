@@ -75,6 +75,11 @@ public class AABB implements BoundingBox {
         }
     }
 
+    @Override
+    public GameItem getGameItem() {
+        return gameItem;
+    }
+
     public String toString() {
         return "min " + min.getPosition().x + "," + min.getPosition().y + "," + min.getPosition().z +
                 "\tmax " + max.getPosition().x + "," + max.getPosition().y + "," + max.getPosition().z;

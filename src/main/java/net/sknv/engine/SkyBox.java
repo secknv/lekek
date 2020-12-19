@@ -5,7 +5,7 @@ import net.sknv.engine.graph.Mesh;
 import net.sknv.engine.graph.OBJLoader;
 import net.sknv.engine.graph.Texture;
 
-public class SkyBox extends GameItem{
+public class SkyBox extends GameItem {
 
     public SkyBox(String objModel, String textureFile) throws Exception {
         super();

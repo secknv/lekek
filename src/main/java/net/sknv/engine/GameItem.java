@@ -7,20 +7,27 @@ import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class GameItem {
+import java.io.IOException;
+import java.io.Serializable;
 
+public class GameItem implements Serializable {
+
+    protected Vector3f pos;
+    protected transient BoundingBox boundingBox;
     private Mesh mesh;
     private Vector3f rot;
     private float scale;
-    protected Vector3f pos;
-    protected BoundingBox boundingBox;
-    public Vector3f velocity;
-    public int nCollisions;
+    private boolean movable;
+    private float mass;
+    private Vector3f velocity;
+    private transient Vector3f forces;
 
     public GameItem() {
         velocity = new Vector3f(0, 0, 0);
         pos = new Vector3f(0, 0, 0);
         rot = new Vector3f(0, 0, 0);
+        movable = false;
+        mass = 1;
         scale = 1;
     }
 
@@ -61,9 +68,7 @@ public class GameItem {
     }
 
     public void setPos(Vector3f pos){
-        this.pos.x = pos.x;
-        this.pos.y = pos.y;
-        this.pos.z = pos.z;
+        setPos(pos.x, pos.y, pos.z);
     }
 
     public void setRot(Vector3f rot) {
@@ -130,7 +135,6 @@ public class GameItem {
                 "color=" + this.mesh.getMaterial() +
                 ", pos=" + pos +
                 ", boundingBox=" + boundingBox +
-                ", nCollisions=" + nCollisions +
                 '}';
     }
 
@@ -139,5 +143,22 @@ public class GameItem {
         this.pos.y += step.y;
         this.pos.z += step.z;
         this.boundingBox.translate(step);
+    }
+
+    public boolean isMovable() {
+        return movable;
+    }
+
+    public float getMass() {
+        return mass;
+    }
+
+    public void applyForce(Vector3f force) {
+    }
+
+    private void readObject(java.io.ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+        inputStream.defaultReadObject();
+        setBoundingBox(new OBB(this, mesh.getMin(), mesh.getMax()));
+        boundingBox.transform();
     }
 }
