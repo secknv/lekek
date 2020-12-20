@@ -42,9 +42,9 @@ public class Scene implements Serializable {
                 System.out.println("initializing serialized scene");
                 Scene dScene = (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/scene1.ser")).readObject());
                 this.gameItems = dScene.gameItems;
-                System.out.println(gameItems);
                 this.skyBox = dScene.skyBox;
                 this.sceneLight = dScene.sceneLight;
+                initializeScene();
                 break;
             case "SCENE1":
                 // Background game items
