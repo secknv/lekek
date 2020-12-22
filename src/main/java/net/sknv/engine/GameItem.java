@@ -27,6 +27,7 @@ public class GameItem implements Serializable {
 
     public GameItem() {
         velocity = new Vector3f(0, 0, 0);
+        forces = new Vector3f(0, 0, 0);
         pos = new Vector3f(0, 0, 0);
         rot = new Vector3f(0, 0, 0);
         movable = false;
@@ -146,6 +147,7 @@ public class GameItem implements Serializable {
     }
 
     public void applyForce(Vector3f force) {
+        forces.add(force);
     }
 
     @Override

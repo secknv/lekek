@@ -17,10 +17,6 @@ public class Scene implements Serializable {
     private Vector3f gravity;
 
     public Scene(String scene) throws Exception {
-        // Setup boid mesh
-        Mesh boid = OBJLoader.loadMesh("/models/boid.obj");
-        boid.setMaterial(new Material(new Vector4f(0f, 1f, 1f, 1f), 0.5f));
-
         switch (scene){
             case "TESTING":
 
