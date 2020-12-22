@@ -73,7 +73,7 @@ public class UltimateKekGame implements IGameLogic {
         List<GameItem> gameItems = scene.getGameItems();
         for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
             GameItem gameItem = iterator.next();
-            gameItem.getBoundingBox().transform();// converts bb coords from local to world <-- SOLVE THIS!!!
+            gameItem.getBoundingBox().transform();// converts bb coords from local to world
             try {
                 physicsEngine.addGameItem(gameItem);
             } catch (Exception e){

@@ -65,13 +65,11 @@ public class GameItem implements Serializable {
     }
 
     public void setPos(float x, float y, float z) {
-        this.pos.x = x;
-        this.pos.y = y;
-        this.pos.z = z;
+        setPos(new Vector3f(x,y,z));
     }
 
     public void setPos(Vector3f pos){
-        setPos(pos.x, pos.y, pos.z);
+        this.pos = pos;
     }
 
     public void setRot(Vector3f rot) {
@@ -132,15 +130,6 @@ public class GameItem implements Serializable {
         this.boundingBox.rotate(obbRot);//set bb rot
     }
 
-    @Override
-    public String toString() {
-        return "GameItem{" +
-                "color=" + this.mesh.getMaterial() +
-                ", pos=" + pos +
-                ", boundingBox=" + boundingBox +
-                '}';
-    }
-
     public void translate(Vector3f step) {
         this.pos.x += step.x;
         this.pos.y += step.y;
@@ -157,6 +146,15 @@ public class GameItem implements Serializable {
     }
 
     public void applyForce(Vector3f force) {
+    }
+
+    @Override
+    public String toString() {
+        return "GameItem{" +
+                "color=" + this.mesh.getMaterial() +
+                ", pos=" + pos +
+                ", boundingBox=" + boundingBox +
+                '}';
     }
 
     private void readObject(java.io.ObjectInputStream inputStream) throws Exception {
