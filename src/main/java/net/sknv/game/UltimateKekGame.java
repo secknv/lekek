@@ -55,12 +55,8 @@ public class UltimateKekGame implements IGameLogic {
         renderer.init(window);
         setKeyCallbacks(window, mouseInput);
 
-        scene = new Scene("SERIALIZED");
+        scene = new Scene("SCENE1");
 
-        /*
-        initGameItems(scene);
-        initLighting(scene);
-         */
         initPhysicsEngine(scene);
 
         // Setup HUD
@@ -69,14 +65,8 @@ public class UltimateKekGame implements IGameLogic {
         //Setup Camera
         camera.setPosition(0.65f, 1.15f, 4.34f);
 
-        //todo temp
+        //todo temp - figure this out
         movableItem = scene.getGameItems().get(0);
-    }
-
-    private void initGameItems(Scene scene) throws Exception{
-    }
-
-    private void initLighting(Scene scene) {
     }
 
     private void initPhysicsEngine(Scene scene) {
