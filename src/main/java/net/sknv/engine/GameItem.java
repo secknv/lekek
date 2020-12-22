@@ -1,6 +1,8 @@
 package net.sknv.engine;
 
+import net.sknv.engine.graph.Material;
 import net.sknv.engine.graph.Mesh;
+import net.sknv.engine.graph.OBJLoader;
 import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.AxisAngle4f;
@@ -8,13 +10,14 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class GameItem implements Serializable {
 
     protected Vector3f pos;
     protected transient BoundingBox boundingBox;
-    private Mesh mesh;
+    private transient Mesh mesh;
     private Vector3f rot;
     private float scale;
     private boolean movable;
@@ -156,9 +159,19 @@ public class GameItem implements Serializable {
     public void applyForce(Vector3f force) {
     }
 
-    private void readObject(java.io.ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+    private void readObject(java.io.ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
+        Mesh mesh = OBJLoader.loadMesh((String) inputStream.readObject());
+        mesh.setMaterial((Material) inputStream.readObject());
+
+        setMesh(mesh);
         setBoundingBox(new OBB(this, mesh.getMin(), mesh.getMax()));
-        boundingBox.transform();
+        boundingBox.transform();//todo probably not working
+    }
+
+    private void writeObject(ObjectOutputStream outputStream) throws IOException {
+        outputStream.defaultWriteObject();
+        outputStream.writeObject(mesh.getModelFile());
+        outputStream.writeObject(mesh.getMaterial());
     }
 }

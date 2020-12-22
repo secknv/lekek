@@ -94,7 +94,7 @@ public class Scene implements Serializable {
 
                 initializeScene();
 
-                saveScene();
+                //saveScene();
                 break;
             default:
                 return;
@@ -151,8 +151,10 @@ public class Scene implements Serializable {
 
     public void initializeScene(){
         //initGameItems(Scene)
+
         // Setup  SkyBox
         // todo: standardize resource paths
+
         try {
             SkyBox skyBox = null;
             skyBox = new SkyBox("/models/skybox.obj", "src/main/resources/textures/skybox.png");
@@ -163,6 +165,10 @@ public class Scene implements Serializable {
             e.printStackTrace();
         }
 
+/*
+        skyBox.setScale(10f);
+        skyBox.setPos(new Vector3f(0,0,0));
+ */
         //initLighting(Scene scene)
         SceneLight sceneLight = new SceneLight();
         sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));

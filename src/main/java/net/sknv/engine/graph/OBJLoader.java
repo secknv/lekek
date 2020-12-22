@@ -3,10 +3,8 @@ package net.sknv.engine.graph;
 import net.sknv.engine.Utils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class OBJLoader {
@@ -54,7 +52,9 @@ public class OBJLoader {
                     break;
             }
         }
-        return reorderLists(vertices, textures, normals, faces);
+        Mesh mesh = reorderLists(vertices, textures, normals, faces);
+        mesh.setModelFile(fileName);
+        return mesh;
     }
 
     private static Mesh reorderLists(List<Vector3f> posList, List<Vector2f> textCoordList,
@@ -82,8 +82,8 @@ public class OBJLoader {
         }
         int[] indicesArr = new int[indices.size()];
         indicesArr = indices.stream().mapToInt((Integer v) -> v).toArray();
-        Mesh mesh = new Mesh(posArr, textCoordArr, normArr, indicesArr);
-        return mesh;
+
+        return new Mesh(posArr, textCoordArr, normArr, indicesArr);
     }
 
     private static void processFaceVertex(IdxGroup indices, List<Vector2f> textCoordList,
