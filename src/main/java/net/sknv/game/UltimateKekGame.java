@@ -55,7 +55,7 @@ public class UltimateKekGame implements IGameLogic {
         renderer.init(window);
         setKeyCallbacks(window, mouseInput);
 
-        scene = new Scene("SCENE1");
+        scene = new Scene("SERIALIZED");
 
         initPhysicsEngine(scene);
 

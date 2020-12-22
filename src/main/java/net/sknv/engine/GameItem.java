@@ -166,7 +166,6 @@ public class GameItem implements Serializable {
 
         setMesh(mesh);
         setBoundingBox(new OBB(this, mesh.getMin(), mesh.getMax()));
-        boundingBox.transform();//todo probably not working
     }
 
     private void writeObject(ObjectOutputStream outputStream) throws IOException {
