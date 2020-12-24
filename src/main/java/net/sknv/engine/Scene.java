@@ -23,15 +23,13 @@ public class Scene implements Serializable {
                 break;
             case "SERIALIZED":
                 System.out.println("initializing serialized scene");
-                Scene dScene = (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/scene1.ser")).readObject());
+                Scene dScene = (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/empty.ser")).readObject());
                 this.gameItems = dScene.gameItems;
                 this.skyBox = dScene.skyBox;
                 this.sceneLight = dScene.sceneLight;
-                //initializeScene();
                 break;
             case "SCENE1":
                 initializeScene();
-                //saveScene();
                 break;
             default:
                 return;
@@ -70,20 +68,28 @@ public class Scene implements Serializable {
         this.sceneLight = sceneLight;
     }
 
-    private void saveScene(){
+    public void save(String sceneName){
         try {
-            FileOutputStream fileOut = new FileOutputStream("src/main/resources/scenes/scene1.ser");
+            FileOutputStream fileOut = new FileOutputStream("src/main/resources/scenes/" + sceneName + ".ser");
             ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
             outStream.writeObject(this);
             outStream.flush();
             outStream.close();
             fileOut.flush();
             fileOut.close();
+            System.out.println("Scene file saved - " + sceneName);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void load(String sceneName) throws IOException, ClassNotFoundException {
+        Scene dScene = (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/" + sceneName + ".ser")).readObject());
+        this.gameItems = dScene.gameItems;
+        this.skyBox = dScene.skyBox;
+        this.sceneLight = dScene.sceneLight;
     }
 
     public void initializeScene() throws Exception {
@@ -164,5 +170,6 @@ public class Scene implements Serializable {
         sceneLight.setDirectionalLight(new DirectionalLight(lightColor, lightPos, lightIntensity));
 
         setSceneLight(sceneLight);
+        setGravity(new Vector3f(0,-1f,0));
     }
 }

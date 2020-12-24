@@ -10,6 +10,11 @@ public class Main {
             boolean vsync = true;
             IGameLogic gameLogic = new UltimateKekGame();
             GameEngine gameEngine = new GameEngine("Ultimate Kek Game", 600, 480, vsync, gameLogic);
+
+            Terminal t = new Terminal(gameEngine);
+            t.setDaemon(true);
+            t.start();
+
             gameEngine.run();
         }
         catch (Exception e) {

@@ -104,4 +104,8 @@ public class GameEngine implements Runnable {
         gameLogic.render(window, mouseInput);
         window.update();
     }
+
+    public IGameLogic getGameLogic(){
+        return gameLogic;
+    }
 }

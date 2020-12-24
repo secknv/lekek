@@ -66,7 +66,7 @@ public class UltimateKekGame implements IGameLogic {
         camera.setPosition(0.65f, 1.15f, 4.34f);
 
         //todo temp - figure this out
-        movableItem = scene.getGameItems().get(0);
+        if(!scene.getGameItems().isEmpty()) movableItem = scene.getGameItems().get(0);
     }
 
     private void initPhysicsEngine(Scene scene) {
@@ -174,5 +174,9 @@ public class UltimateKekGame implements IGameLogic {
                 glfwSetWindowShouldClose(windowHandle, true);
             }
         });
+    }
+
+    public Scene getScene(){
+        return scene;
     }
 }
