@@ -8,7 +8,6 @@ import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import java.util.Iterator;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -55,8 +54,7 @@ public class UltimateKekGame implements IGameLogic {
         renderer.init(window);
         setKeyCallbacks(window, mouseInput);
 
-        scene = new Scene("SCENE1");
-
+        initScene("SCENE1");
         initPhysicsEngine(scene);
 
         // Setup HUD
@@ -69,15 +67,22 @@ public class UltimateKekGame implements IGameLogic {
         if(!scene.getGameItems().isEmpty()) movableItem = scene.getGameItems().get(0);
     }
 
+    private void initScene(String scene) {
+        try {
+            this.scene = new Scene(scene);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void initPhysicsEngine(Scene scene) {
         List<GameItem> gameItems = scene.getGameItems();
-        for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
-            GameItem gameItem = iterator.next();
+        for (GameItem gameItem : gameItems) {
             gameItem.getBoundingBox().transform();// converts bb coords from local to world
             try {
                 physicsEngine.addGameItem(gameItem);
-            } catch (Exception e){
-                System.out.println("object colliding");;
+            } catch (Exception e) {
+                System.out.println("object colliding");
             }
         }
     }

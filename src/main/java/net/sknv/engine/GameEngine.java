@@ -1,5 +1,9 @@
 package net.sknv.engine;
 
+import net.sknv.game.Terminal;
+
+import java.io.IOException;
+
 public class GameEngine implements Runnable {
 
     public static final int TARGET_FPS = 75;
@@ -9,12 +13,14 @@ public class GameEngine implements Runnable {
     private final Timer timer;
     private final IGameLogic gameLogic;
     private final MouseInput mouseInput;
+    private Terminal terminal;
 
-    public GameEngine(String windowTitle, int width, int height, boolean vsync, IGameLogic gameLogic) throws Exception {
-        window = new Window(windowTitle, width, height, vsync);
-        mouseInput = new MouseInput();
+    public GameEngine(String windowTitle, int width, int height, boolean vsync, IGameLogic gameLogic, Terminal terminal) {
+        this.window = new Window(windowTitle, width, height, vsync);
+        this.mouseInput = new MouseInput();
         this.gameLogic = gameLogic;
-        timer = new Timer();
+        this.timer = new Timer();
+        this.terminal = terminal;
     }
 
     @Override
@@ -43,12 +49,10 @@ public class GameEngine implements Runnable {
         float accumulator = 0f;
         float interval = 1f / TARGET_UPS;
 
-        boolean running = true;
-
         int count_fps = 0, count_ups = 0;
-        double tst = 0, last = 0;
+        double tst, last = 0;
 
-        while (running && !window.windowShouldClose()) {
+        while (!window.windowShouldClose()) {
             tst = timer.getTime();
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
@@ -87,13 +91,46 @@ public class GameEngine implements Runnable {
             try {
                 Thread.sleep(1);
             }
-            catch (InterruptedException ie) {}
+            catch (InterruptedException ignored) {}
         }
     }
 
     protected void input() {
         mouseInput.input(window);
         gameLogic.input(window, mouseInput);
+        processTerminal(terminal.getInput());
+    }
+
+    private void processTerminal(String input) {
+        if (input==null) return;
+
+        String[] in = input.split(" ");
+
+        switch (in[0]){
+            case "test":
+                System.out.println(Thread.currentThread() + " memeronis");
+                break;
+            case "savescene":
+                String sceneName;
+                if(in.length>1) sceneName = in[1]; else sceneName = "unnamed";
+                gameLogic.getScene().save(sceneName);
+                break;
+            case "loadscene":
+                if(in.length>1) sceneName = in[1]; else return;
+                try {
+                    gameLogic.getScene().load(sceneName);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "quit":
+                System.exit(0);
+                break;
+            default:
+                break;
+        }
     }
 
     protected void update(float interval) {

@@ -18,9 +18,6 @@ public class Scene implements Serializable {
 
     public Scene(String scene) throws Exception {
         switch (scene){
-            case "TESTING":
-
-                break;
             case "SERIALIZED":
                 System.out.println("initializing serialized scene");
                 Scene dScene = (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/empty.ser")).readObject());
@@ -31,8 +28,6 @@ public class Scene implements Serializable {
             case "SCENE1":
                 initializeScene();
                 break;
-            default:
-                return;
         }
     }
 
@@ -78,8 +73,6 @@ public class Scene implements Serializable {
             fileOut.flush();
             fileOut.close();
             System.out.println("Scene file saved - " + sceneName);
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }

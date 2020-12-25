@@ -25,7 +25,7 @@ public class PhysicsEngine {
     public void simulate(Scene scene){
         items = scene.getGameItems();
 
-        applyForces(scene);
+        //applyForces(scene);
         //update();
         //detectCollisions(gameItems);
         //solveCollisions();

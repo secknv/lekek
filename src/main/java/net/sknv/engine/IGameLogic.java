@@ -7,4 +7,6 @@ public interface IGameLogic {
     void update(Window window, MouseInput mouseInput, float interval);
     void render(Window window, MouseInput mouseInput);
     void cleanup();
+
+    Scene getScene(); //todo ?
 }

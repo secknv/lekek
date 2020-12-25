@@ -4,12 +4,13 @@ import net.sknv.engine.Utils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OBJLoader {
 
-    public static Mesh loadMesh(String fileName) throws Exception {
+    public static Mesh loadMesh(String fileName) throws IOException, ClassNotFoundException {
         List<String> lines = Utils.readAllLines(fileName);
 
         List<Vector3f> vertices = new ArrayList<>();
@@ -117,7 +118,6 @@ public class OBJLoader {
         private IdxGroup[] idxGroups = new IdxGroup[3];
 
         public Face(String v1, String v2, String v3) {
-            idxGroups = new IdxGroup[3];
             // Parse the lines
             idxGroups[0] = parseLine(v1);
             idxGroups[1] = parseLine(v2);
