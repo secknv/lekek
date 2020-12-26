@@ -1,8 +1,7 @@
 package net.sknv.engine;
 
 import net.sknv.game.Terminal;
-
-import java.io.IOException;
+import net.sknv.game.UltimateKekGame;
 
 public class GameEngine implements Runnable {
 
@@ -11,14 +10,14 @@ public class GameEngine implements Runnable {
 
     private final Window window;
     private final Timer timer;
-    private final IGameLogic gameLogic;
+    private final UltimateKekGame gameLogic;
     private final MouseInput mouseInput;
     private Terminal terminal;
 
     public GameEngine(String windowTitle, int width, int height, boolean vsync, IGameLogic gameLogic, Terminal terminal) {
         this.window = new Window(windowTitle, width, height, vsync);
+        this.gameLogic = (UltimateKekGame) gameLogic;
         this.mouseInput = new MouseInput();
-        this.gameLogic = gameLogic;
         this.timer = new Timer();
         this.terminal = terminal;
     }
@@ -108,7 +107,7 @@ public class GameEngine implements Runnable {
 
         switch (in[0]){
             case "test":
-                System.out.println(Thread.currentThread() + " memeronis");
+                System.out.println("its working :)");
                 break;
             case "savescene":
                 String sceneName;
@@ -117,13 +116,10 @@ public class GameEngine implements Runnable {
                 break;
             case "loadscene":
                 if(in.length>1) sceneName = in[1]; else return;
-                try {
-                    gameLogic.getScene().load(sceneName);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+                System.out.println("loading scene - " + sceneName);
+                gameLogic.initScene(sceneName);
+                gameLogic.initPhysicsEngine();
+                System.out.println("scene loaded");
                 break;
             case "quit":
                 System.exit(0);

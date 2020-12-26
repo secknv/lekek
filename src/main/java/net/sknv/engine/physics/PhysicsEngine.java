@@ -12,10 +12,11 @@ import java.util.Set;
 
 public class PhysicsEngine {
 
-    private SPCollision sweepPrune = new SPCollision();
+    private SPCollision sweepPrune;
     private ArrayList<GameItem> items;
 
     public PhysicsEngine() {
+        sweepPrune = new SPCollision();
     }
 
     public void addGameItem(GameItem gameItem) {
@@ -136,5 +137,4 @@ public class PhysicsEngine {
 
         return intersection;
     }
-
 }

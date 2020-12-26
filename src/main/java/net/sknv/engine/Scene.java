@@ -17,17 +17,14 @@ public class Scene implements Serializable {
     private Vector3f gravity;
 
     public Scene(String scene) throws Exception {
-        switch (scene){
-            case "SERIALIZED":
-                System.out.println("initializing serialized scene");
-                Scene dScene = (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/empty.ser")).readObject());
-                this.gameItems = dScene.gameItems;
-                this.skyBox = dScene.skyBox;
-                this.sceneLight = dScene.sceneLight;
-                break;
-            case "SCENE1":
-                initializeScene();
-                break;
+        if (scene.equals("default")) initializeScene();
+        else {
+            System.out.println("initializing serialized scene");
+            Scene dScene = load(scene);
+            setGameItems(dScene.getGameItems());
+            setSkyBox(dScene.getSkyBox());
+            setSceneLight(dScene.getSceneLight());
+            setGravity(dScene.getGravity());
         }
     }
 
@@ -78,11 +75,8 @@ public class Scene implements Serializable {
         }
     }
 
-    public void load(String sceneName) throws IOException, ClassNotFoundException {
-        Scene dScene = (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/" + sceneName + ".ser")).readObject());
-        this.gameItems = dScene.gameItems;
-        this.skyBox = dScene.skyBox;
-        this.sceneLight = dScene.sceneLight;
+    public static Scene load(String sceneName) throws IOException, ClassNotFoundException {
+        return (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/" + sceneName + ".ser")).readObject());
     }
 
     public void initializeScene() throws Exception {

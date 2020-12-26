@@ -2,7 +2,6 @@ package net.sknv.game;
 
 import net.sknv.engine.*;
 import net.sknv.engine.graph.Camera;
-import net.sknv.engine.graph.DirectionalLight;
 import net.sknv.engine.physics.PhysicsEngine;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector2f;
@@ -25,11 +24,6 @@ public class UltimateKekGame implements IGameLogic {
 
     private boolean menu = false;
 
-    //light stuff
-    private Vector3f ambientLight;
-    private DirectionalLight directionalLight;
-    private float lightAngle;
-
     private Scene scene;
     private Hud hud;
 
@@ -41,9 +35,7 @@ public class UltimateKekGame implements IGameLogic {
 
     public UltimateKekGame() {
         renderer = new Renderer();
-        physicsEngine = new PhysicsEngine();
         camera = new Camera();
-        lightAngle = -90;
 
         cameraPosInc = new Vector3f(0, 0, 0);
         cameraRotInc = new Vector2f(0, 0);
@@ -54,8 +46,8 @@ public class UltimateKekGame implements IGameLogic {
         renderer.init(window);
         setKeyCallbacks(window, mouseInput);
 
-        initScene("SCENE1");
-        initPhysicsEngine(scene);
+        initScene("default");
+        initPhysicsEngine();
 
         // Setup HUD
         hud = new Hud("+");
@@ -67,7 +59,7 @@ public class UltimateKekGame implements IGameLogic {
         if(!scene.getGameItems().isEmpty()) movableItem = scene.getGameItems().get(0);
     }
 
-    private void initScene(String scene) {
+    public void initScene(String scene) {
         try {
             this.scene = new Scene(scene);
         } catch (Exception e) {
@@ -75,7 +67,8 @@ public class UltimateKekGame implements IGameLogic {
         }
     }
 
-    private void initPhysicsEngine(Scene scene) {
+    public void initPhysicsEngine() {
+        physicsEngine = new PhysicsEngine();
         List<GameItem> gameItems = scene.getGameItems();
         for (GameItem gameItem : gameItems) {
             gameItem.getBoundingBox().transform();// converts bb coords from local to world
@@ -183,5 +176,9 @@ public class UltimateKekGame implements IGameLogic {
 
     public Scene getScene(){
         return scene;
+    }
+
+    private void setScene(Scene scene) {
+        this.scene = scene;
     }
 }
