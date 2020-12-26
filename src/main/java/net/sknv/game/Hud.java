@@ -11,6 +11,8 @@ import net.sknv.engine.graph.OBJLoader;
 import org.joml.Vector4f;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Hud implements IHud {
 
@@ -18,7 +20,7 @@ public class Hud implements IHud {
 
     private static final String CHARSET = "ISO-8859-1";
 
-    private final GameItem[] gameItems;
+    private final ArrayList<GameItem> gameItems;
 
     private final TextItem statusTextItem;
 
@@ -52,12 +54,27 @@ public class Hud implements IHud {
     }
 
     @Override
-    public GameItem[] getGameItems() {
+    public ArrayList<GameItem> getGameItems() {
         return gameItems;
     }
 
     public void updateSize(Window window) {
         this.statusTextItem.setPos(window.getCenter().x, window.getCenter().y, 0);
         this.compassItem.setPos(window.getWidth() - 40f, 50f, 0);
+        this.terminal.getTextItem().setPos(0f, window.getHeight()-20f, 0);
+    }
+
+    public HudTerminal getTerminal() {
+        return terminal;
+    }
+
+    public void showTerminal() {
+        terminal.open();
+        gameItems.add(terminal.getTextItem());
+    }
+
+    public void hideTerminal() {
+        terminal.close();
+        gameItems.remove(terminal.getTextItem());
     }
 }

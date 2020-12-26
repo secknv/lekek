@@ -97,36 +97,7 @@ public class GameEngine implements Runnable {
     protected void input() {
         mouseInput.input(window);
         gameLogic.input(window, mouseInput);
-        processTerminal(terminal.getInput());
-    }
-
-    private void processTerminal(String input) {
-        if (input==null) return;
-
-        String[] in = input.split(" ");
-
-        switch (in[0]){
-            case "test":
-                System.out.println("its working :)");
-                break;
-            case "savescene":
-                String sceneName;
-                if(in.length>1) sceneName = in[1]; else sceneName = "unnamed";
-                gameLogic.getScene().save(sceneName);
-                break;
-            case "loadscene":
-                if(in.length>1) sceneName = in[1]; else return;
-                System.out.println("loading scene - " + sceneName);
-                gameLogic.initScene(sceneName);
-                gameLogic.initPhysicsEngine();
-                System.out.println("scene loaded");
-                break;
-            case "quit":
-                System.exit(0);
-                break;
-            default:
-                break;
-        }
+        gameLogic.processTerminal(terminal.getInput());
     }
 
     protected void update(float interval) {
