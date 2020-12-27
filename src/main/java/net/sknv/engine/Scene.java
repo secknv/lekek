@@ -127,7 +127,7 @@ public class Scene implements Serializable {
         testItem.setPos(2f, 1, 2f);
         testItem.setScale(blockScale);
 
-        OBB testBox = new OBB(testItem, testItem.getMesh().getMin(), testItem.getMesh().getMax());
+        OBB testBox = new OBB(testItem);
         testItem.setBoundingBox(testBox);
 
         // add special items to gameItems array

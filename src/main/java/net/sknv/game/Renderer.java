@@ -193,10 +193,10 @@ public class Renderer {
             for (GameItem item : clickedItems) {
                 if (cameraPos.distance(item.getPos()) <= d) clicked = item;
             }
-            GraphUtils.drawAABB(this, new Vector4f(255, 255, 0, 0), clicked.getBoundingBox());
+            GraphUtils.drawBoundingBox(this, new Vector4f(255, 255, 0, 0), clicked.getBoundingBox());
         }
 
-        if(clicked != null) GraphUtils.drawAABB(this, new Vector4f(75f,0,15f,0f), clicked.getBoundingBox());
+        if(clicked != null) GraphUtils.drawBoundingBox(this, new Vector4f(75f,0,15f,0f), clicked.getBoundingBox());
 
         while (!alienVAOQueue.isEmpty()){
 

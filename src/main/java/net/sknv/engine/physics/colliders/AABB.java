@@ -13,10 +13,10 @@ public class AABB implements BoundingBox {
     public GameItem gameItem;
     public EndPoint min, max;
 
-    public AABB(GameItem gameItem, Vector3f min, Vector3f max) {//AABB
+    public AABB(GameItem gameItem) {//AABB
         this.gameItem = gameItem;
-        this.min = new EndPoint(this, min, true);
-        this.max = new EndPoint(this, max, false);
+        this.min = new EndPoint(this, gameItem.getMesh().getMin(), true);
+        this.max = new EndPoint(this, gameItem.getMesh().getMax(), false);
     }
     public EndPoint getMin() {
         return min;

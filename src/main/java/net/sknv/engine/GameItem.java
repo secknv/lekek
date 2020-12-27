@@ -38,7 +38,7 @@ public class GameItem implements Serializable {
     public GameItem(Mesh mesh) {
         this();
         this.mesh = mesh;
-        this.boundingBox = new OBB(this, mesh.getMin(), mesh.getMax());
+        this.boundingBox = new OBB(this);
     }
 
     public Vector3f getPos() {
@@ -165,7 +165,7 @@ public class GameItem implements Serializable {
         mesh.setMaterial((Material) inputStream.readObject());
 
         setMesh(mesh);
-        setBoundingBox(new OBB(this, mesh.getMin(), mesh.getMax()));
+        setBoundingBox(new OBB(this));
     }
 
     private void writeObject(ObjectOutputStream outputStream) throws IOException {

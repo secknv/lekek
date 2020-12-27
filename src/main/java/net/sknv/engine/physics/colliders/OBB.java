@@ -9,9 +9,10 @@ public class OBB extends AABB implements BoundingBox {
     private Vector3f center;
     private Vector3f x, y, z;
 
-    public OBB(GameItem gameItem, Vector3f min, Vector3f max) {
-        super(gameItem, min, max);
-
+    public OBB(GameItem gameItem) {
+        super(gameItem);
+        Vector3f min = gameItem.getMesh().getMin();
+        Vector3f max = gameItem.getMesh().getMax();
         this.x = new Vector3f(Math.abs(max.x - min.x)/2,0,0);
         this.y = new Vector3f(0,Math.abs(max.y - min.y)/2,0);
         this.z = new Vector3f(0,0,Math.abs(max.z - min.z)/2);
