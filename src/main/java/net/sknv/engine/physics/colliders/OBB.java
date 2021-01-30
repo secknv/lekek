@@ -18,11 +18,12 @@ public class OBB extends AABB implements BoundingBox {
         this.z = new Vector3f(0,0,Math.abs(max.z - min.z)/2);
 
         this.center = new Vector3f(min.x + x.x, min.y + y.y, min.z + z.z);
+
+        transform();
     }
 
     @Override
     public void transform() {
-        super.transform();
         Vector4f tc = new Vector4f(center.x, center.y, center.z, 1);
         Vector4f tx = new Vector4f(x.x, x.y, x.z,1);
         Vector4f ty = new Vector4f(y.x, y.y, y.z,1);

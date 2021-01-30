@@ -13,10 +13,36 @@ public class AABB implements BoundingBox {
     public GameItem gameItem;
     public EndPoint min, max;
 
-    public AABB(GameItem gameItem) {//AABB
+    public AABB(GameItem gameItem) {
         this.gameItem = gameItem;
-        this.min = new EndPoint(this, gameItem.getMesh().getMin(), true);
-        this.max = new EndPoint(this, gameItem.getMesh().getMax(), false);
+
+        //load vertices
+        ArrayList<Vector3f> vertices = gameItem.getMesh().getVertices();
+        ArrayList<Vector3f> tvertices = new ArrayList<>();
+
+        //transform vertices according to gameItem state
+        Matrix4f modelViewMatrix = new Matrix4f();
+        modelViewMatrix.identity().translate(gameItem.getPos()).scale(gameItem.getScale()).rotateXYZ(gameItem.getRot());
+
+        for (Vector3f v : vertices){
+            Vector4f tv = new Vector4f(v.x, v.y, v.z, 1);
+            modelViewMatrix.transform(tv);
+            tvertices.add(new Vector3f(tv.x, tv.y, tv.z));
+        }
+
+        this.min = new EndPoint(this, tvertices.get(0), true);
+        this.max = new EndPoint(this, tvertices.get(7), false);
+
+        //find new min and max
+        for (Vector3f v : tvertices){
+            if (v.x < min.getX()) min.setX(v.x);
+            if (v.y < min.getY()) min.setY(v.y);
+            if (v.z < min.getZ()) min.setZ(v.z);
+
+            if (v.x > max.getX()) max.setX(v.x);
+            if (v.y > max.getY()) max.setY(v.y);
+            if (v.z > max.getZ()) max.setZ(v.z);
+        }
     }
     public EndPoint getMin() {
         return min;
@@ -61,8 +87,8 @@ public class AABB implements BoundingBox {
             tvertices.add(new Vector3f(tv.x, tv.y, tv.z));
         }
 
-        min.setPosition(tvertices.get(0));
-        max.setPosition(tvertices.get(7));
+        min.setPosition(new Vector3f(tvertices.get(0)));
+        max.setPosition(new Vector3f(tvertices.get(7)));
 
         for (Vector3f v : tvertices){
             if (v.x < min.getX()) min.setX(v.x);
