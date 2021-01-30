@@ -8,6 +8,7 @@ import net.sknv.engine.graph.FontTexture;
 import net.sknv.engine.graph.Material;
 import net.sknv.engine.graph.Mesh;
 import net.sknv.engine.graph.OBJLoader;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.awt.*;
@@ -39,7 +40,7 @@ public class Hud implements IHud {
         compassItem = new GameItem(mesh);
         compassItem.setScale(40.0f);
         // Rotate to transform it to screen coordinates
-        compassItem.setRot(0f, 0f, 180f);
+        compassItem.setRotationEuclidean(new Vector3f(0f, 0f, 180f));
 
         // Create list that holds the items that compose the HUD
         gameItems = new GameItem[]{statusTextItem, compassItem};
@@ -50,7 +51,7 @@ public class Hud implements IHud {
     }
 
     public void rotateCompass(float angle) {
-        this.compassItem.setRot(0, 0, 180 + angle);
+        this.compassItem.setRotationEuclidean(new Vector3f(0, 0, 180 + angle));
     }
 
     @Override

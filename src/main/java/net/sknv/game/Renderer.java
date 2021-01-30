@@ -189,9 +189,9 @@ public class Renderer {
         }
 
         if(!clickedItems.isEmpty()) {
-            float d = cameraPos.distance(clickedItems.get(0).getPos());
+            float d = cameraPos.distance(clickedItems.get(0).getPosition());
             for (GameItem item : clickedItems) {
-                if (cameraPos.distance(item.getPos()) <= d) clicked = item;
+                if (cameraPos.distance(item.getPosition()) <= d) clicked = item;
             }
             GraphUtils.drawBoundingBox(this, new Vector4f(255, 255, 0, 0), clicked.getBoundingBox());
         }

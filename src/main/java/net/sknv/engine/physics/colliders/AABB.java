@@ -22,7 +22,7 @@ public class AABB implements BoundingBox {
 
         //transform vertices according to gameItem state
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(gameItem.getPos()).scale(gameItem.getScale()).rotateXYZ(gameItem.getRot());
+        modelViewMatrix.identity().translate(gameItem.getPosition()).scale(gameItem.getScale()).rotateXYZ(gameItem.getRotation());
 
         for (Vector3f v : vertices){
             Vector4f tv = new Vector4f(v.x, v.y, v.z, 1);
@@ -52,11 +52,12 @@ public class AABB implements BoundingBox {
         return max;
     }
 
+    /*
     public void transform() {
         Vector4f min = new Vector4f(this.min.getPosition().x, this.min.getPosition().y, this.min.getPosition().z, 1f);
         Vector4f max = new Vector4f(this.max.getPosition().x, this.max.getPosition().y, this.max.getPosition().z, 1f);
 
-        //this view matrix ignores rotation so that we always get the same AABB for rotated items (maybe change AABB limits according to rot?...)
+        //this view matrix ignores rotation so that we always get the same AABB for rotated items
         Matrix4f modelViewMatrix = new Matrix4f();
         modelViewMatrix.identity().translate(gameItem.getPos()).scale(gameItem.getScale());
 
@@ -66,6 +67,7 @@ public class AABB implements BoundingBox {
         this.min.setPosition(new Vector3f(min.x, min.y, min.z));
         this.max.setPosition(new Vector3f(max.x, max.y, max.z));
     }
+     */
 
     public void translate(Vector3f step){
         this.min.getPosition().add(step);
@@ -79,7 +81,7 @@ public class AABB implements BoundingBox {
         ArrayList<Vector3f> tvertices = new ArrayList<>();
 
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(gameItem.getPos()).scale(gameItem.getScale()).rotateXYZ(gameItem.getRot());
+        modelViewMatrix.identity().translate(gameItem.getPosition()).scale(gameItem.getScale()).rotateXYZ(gameItem.getRotation());
 
         for (Vector3f v : vertices){
             Vector4f tv = new Vector4f(v.x, v.y, v.z, 1);

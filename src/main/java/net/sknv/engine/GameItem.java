@@ -15,10 +15,10 @@ import java.io.Serializable;
 
 public class GameItem implements Serializable {
 
-    protected Vector3f pos;
+    protected Vector3f position;
     protected transient BoundingBox boundingBox;
     private transient Mesh mesh;
-    private Vector3f rot;
+    private Vector3f rotation;
     private float scale;
     private boolean movable;
     private float mass;
@@ -28,8 +28,8 @@ public class GameItem implements Serializable {
     public GameItem() {
         velocity = new Vector3f(0, 0, 0);
         forces = new Vector3f(0, 0, 0);
-        pos = new Vector3f(0, 0, 0);
-        rot = new Vector3f(0, 0, 0);
+        position = new Vector3f(0, 0, 0);
+        rotation = new Vector3f(0, 0, 0);
         movable = false;
         mass = 1;
         scale = 1;
@@ -41,12 +41,12 @@ public class GameItem implements Serializable {
         this.boundingBox = new OBB(this);
     }
 
-    public Vector3f getPos() {
-        return pos;
+    public Vector3f getPosition() {
+        return position;
     }
 
-    public Vector3f getRot() {
-        return rot;
+    public Vector3f getRotation() {
+        return rotation;
     }
 
     public float getScale() {
@@ -66,21 +66,16 @@ public class GameItem implements Serializable {
     }
 
     public void setPos(float x, float y, float z) {
-        setPos(new Vector3f(x,y,z));
+        setPosition(new Vector3f(x,y,z));
     }
 
-    public void setPos(Vector3f pos){
-        this.pos = pos;
+    public void setPosition(Vector3f position){
+        this.position = position;
     }
 
-    public void setRot(Vector3f rot) {
-        setRot(rot.x, rot.y, rot.z);
-    }
-
-    public void setRot(float x, float y, float z) {
-        this.rot.x = (float) (x % (2*Math.PI));
-        this.rot.y = (float) (y % (2*Math.PI));
-        this.rot.z = (float) (z % (2*Math.PI));
+    public void setRotationEuclidean(Vector3f euclideanRot) {
+        euclideanRot.sub(rotation);
+        rotateEuclidean(euclideanRot);
     }
 
     public void setScale(float scale) {
@@ -95,22 +90,22 @@ public class GameItem implements Serializable {
         this.boundingBox = boundingBox;
     }
 
-    public void rotate(Vector3f rot) {
+    public void rotateEuclidean(Vector3f rot) {
         // Object POV axis
         Vector3f xAxis = new Vector3f(1,0,0);
         Vector3f yAxis = new Vector3f(0,1,0);
         Vector3f zAxis = new Vector3f(0,0,1);
 
         //quaternions to get to current rot
-        Quaternionf cur = new Quaternionf(new AxisAngle4f(this.getRot().x, xAxis));
-        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRot().y, yAxis));
-        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRot().z, zAxis));
-        cur.mul(curY).mul(curZ);
+        Quaternionf current = new Quaternionf(new AxisAngle4f(this.getRotation().x, xAxis));
+        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRotation().y, yAxis));
+        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRotation().z, zAxis));
+        current.mul(curY).mul(curZ);
 
-        // generate objects axis
-        cur.transform(xAxis);
-        cur.transform(yAxis);
-        cur.transform(zAxis);
+        // generate rotated object axis'
+        current.transform(xAxis);
+        current.transform(yAxis);
+        current.transform(zAxis);
 
         Quaternionf xq = new Quaternionf(new AxisAngle4f(rot.x, xAxis));
         Quaternionf yq = new Quaternionf(new AxisAngle4f(rot.y, yAxis));
@@ -119,22 +114,20 @@ public class GameItem implements Serializable {
         // get rotation on world axis for setRotation
         xq.mul(yq).mul(zq);
 
-        Quaternionf obbRot = new Quaternionf();
-        xq.get(obbRot);
+        Quaternionf rotQuaternion = new Quaternionf();
+        xq.get(rotQuaternion);
 
         //combine
-        xq.mul(cur);
+        xq.mul(current);
 
-        Vector3f end_rot = Utils.getEulerAngles(xq);
-
-        setRot(end_rot.x, end_rot.y, end_rot.z);//set item rot
-        this.boundingBox.rotate(obbRot);//set bb rot
+        rotation = Utils.getEulerAngles(xq);//set item rot
+        this.boundingBox.rotate(rotQuaternion);//set bb rot
     }
 
     public void translate(Vector3f step) {
-        this.pos.x += step.x;
-        this.pos.y += step.y;
-        this.pos.z += step.z;
+        this.position.x += step.x;
+        this.position.y += step.y;
+        this.position.z += step.z;
         this.boundingBox.translate(step);
     }
 
@@ -154,7 +147,7 @@ public class GameItem implements Serializable {
     public String toString() {
         return "GameItem{" +
                 "color=" + this.mesh.getMaterial() +
-                ", pos=" + pos +
+                ", pos=" + position +
                 ", boundingBox=" + boundingBox +
                 '}';
     }

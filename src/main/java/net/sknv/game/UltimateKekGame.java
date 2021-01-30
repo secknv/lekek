@@ -3,7 +3,6 @@ package net.sknv.game;
 import net.sknv.engine.*;
 import net.sknv.engine.graph.Camera;
 import net.sknv.engine.physics.PhysicsEngine;
-import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -30,8 +29,6 @@ public class UltimateKekGame implements IGameLogic {
 
     //collisions stuff
     private PhysicsEngine physicsEngine;
-    private OBB testBox;
-
     public GameItem movableItem;
 
     public UltimateKekGame() {
@@ -110,11 +107,11 @@ public class UltimateKekGame implements IGameLogic {
             else movableItem.getVelocity().x = .1f;
         } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) movableItem.getVelocity().y = -.1f;
 
-        if (window.isKeyPressed(GLFW_KEY_X)) movableItem.rotate(new Vector3f((float) (-Math.PI / 200), 0, 0));
-        if (window.isKeyPressed(GLFW_KEY_Y)) movableItem.rotate(new Vector3f(0, (float) (-Math.PI / 200), 0));
-        if (window.isKeyPressed(GLFW_KEY_Z)) movableItem.rotate(new Vector3f(0, 0, (float) (-Math.PI / 200)));
+        if (window.isKeyPressed(GLFW_KEY_X)) movableItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
+        if (window.isKeyPressed(GLFW_KEY_Y)) movableItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
+        if (window.isKeyPressed(GLFW_KEY_Z)) movableItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
 
-        if (window.isKeyPressed(GLFW_KEY_K)) movableItem.setRot(0, 0, 0);
+        if (window.isKeyPressed(GLFW_KEY_K)) movableItem.setRotationEuclidean(new Vector3f());
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {
