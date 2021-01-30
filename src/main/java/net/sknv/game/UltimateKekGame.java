@@ -98,17 +98,17 @@ public class UltimateKekGame implements IGameLogic {
         if (renderer.getClicked() != null) movableItem = renderer.getClicked();
         if (window.isKeyPressed(GLFW_KEY_UP)) {
             if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.getVelocity().z = 0f;
-            else movableItem.getVelocity().z = .1f;
-        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.getVelocity().z = -.1f;
+            else movableItem.getVelocity().z = -.1f;
+        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.getVelocity().z = .1f;
 
         if (window.isKeyPressed(GLFW_KEY_LEFT)) {
             if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.getVelocity().x = 0f;
-            else movableItem.getVelocity().x = .1f;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.getVelocity().x = -.1f;
+            else movableItem.getVelocity().x = -.1f;
+        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.getVelocity().x = .1f;
 
         if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) {
             if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) movableItem.getVelocity().y = 0f;
-            else movableItem.getVelocity().x = .1f;
+            else movableItem.getVelocity().y = .1f;
         } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) movableItem.getVelocity().y = -.1f;
 
         if (window.isKeyPressed(GLFW_KEY_X)) movableItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
