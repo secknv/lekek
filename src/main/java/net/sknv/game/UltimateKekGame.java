@@ -3,6 +3,7 @@ package net.sknv.game;
 import net.sknv.engine.*;
 import net.sknv.engine.graph.Camera;
 import net.sknv.engine.physics.PhysicsEngine;
+import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -69,7 +70,10 @@ public class UltimateKekGame implements IGameLogic {
         physicsEngine = new PhysicsEngine();
         List<GameItem> gameItems = scene.getGameItems();
         for (GameItem gameItem : gameItems) {
-            //gameItem.getBoundingBox().transform();// converts bb coords from local to world
+            //todo: temporary, GameItem empty constructor should deprecate and bb should be initialized on a constructor with all params,
+            // unless it is decided to not deprecate the empty constructor to support other types of gameItems (Huds, lines, stuff)
+            // in that case class inheritance should be pondered
+            gameItem.setBoundingBox(new OBB(gameItem));
             try {
                 physicsEngine.addGameItem(gameItem);
             } catch (Exception e) {
