@@ -30,7 +30,7 @@ public class OBB extends AABB implements BoundingBox {
         Vector4f tz = new Vector4f(z.x, z.y, z.z,1);
 
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(gameItem.getPos()).scale(gameItem.getScale());
+        modelViewMatrix.identity().translate(gameItem.getPos()).scale(gameItem.getScale()).rotateXYZ(gameItem.getRot());
         modelViewMatrix.transform(tc);
 
         modelViewMatrix.identity().rotateXYZ(gameItem.getRot()).scale(gameItem.getScale());
@@ -42,6 +42,18 @@ public class OBB extends AABB implements BoundingBox {
         this.y = new Vector3f(ty.x, ty.y, ty.z);
         this.z = new Vector3f(tz.x, tz.y, tz.z);
         this.center = new Vector3f(tc.x, tc.y, tc.z);
+
+        /*
+        Vector3f d = new Vector3f();
+        center.sub(gameItem.getPos(),d);
+        d.rotate(rot);
+
+        this.center = new Vector3f(gameItem.getPos().x + d.x, gameItem.getPos().y + d.y, gameItem.getPos().z + d.z);
+
+        this.x.rotate(rot);
+        this.y.rotate(rot);
+        this.z.rotate(rot);
+         */
     }
 
     @Override
