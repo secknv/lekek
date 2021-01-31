@@ -1,12 +1,13 @@
 package net.sknv.game;
 
 import net.sknv.engine.*;
-import net.sknv.engine.graph.Camera;
+import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.PhysicsEngine;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -230,6 +231,26 @@ public class UltimateKekGame implements IGameLogic {
                 break;
             case "removeitems":
                 scene.getGameItems().clear();
+                break;
+            case "removeitem":
+                scene.getGameItems().remove(movableItem);
+                break;
+            case "additem":
+                try {
+                    String model = in[1];
+                    Mesh mesh = OBJLoader.loadMesh("/models/" + model + ".obj");
+                    Texture texture = new Texture("src/main/resources/textures/lebloq.png");
+                    Material material = new Material(texture, 1f);
+                    mesh.setMaterial(material);
+                    GameItem newItem = new GameItem(mesh);
+                    scene.getGameItems().add(newItem);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case "quit":
                 System.exit(0);
