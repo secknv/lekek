@@ -145,7 +145,6 @@ public class Renderer {
         }
 
         //Boid boid = (Boid) gameItems.get(6);
-
         //tracking line
         /*
         Vector3f t = new Vector3f(boid.getPos().x, boid.getPos().y, boid.getPos().z);
@@ -168,8 +167,8 @@ public class Renderer {
 
         boidC.drawScaledRay(1, viewMatrix);
          */
-
         //end dbz mark ---------------------------------------------------------------------------
+
         //render each game item
         ArrayList<GameItem> clickedItems = new ArrayList<>();
         for (GameItem gameItem : scene.getGameItems()) {
