@@ -5,8 +5,8 @@ import net.sknv.game.UltimateKekGame;
 
 public class GameEngine implements Runnable {
 
-    public static final int TARGET_FPS = 60;//75;
-    public static final int TARGET_UPS = 144;//60;
+    public static final int TARGET_FPS = 144;
+    public static final int TARGET_UPS = 200;
 
     private final Window window;
     private final Timer timer;

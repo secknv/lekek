@@ -45,9 +45,7 @@ public class Camera {
         rotation.z = z;
     }
 
-    public void moveRotation(float offsetX, float offsetY, float offsetZ) {
-        rotation.x += offsetX;
-        rotation.y += offsetY;
-        rotation.z += offsetZ;
+    public void moveRotation(Vector3f cameraRotationIncrement) {
+        rotation.add(cameraRotationIncrement);
     }
 }
