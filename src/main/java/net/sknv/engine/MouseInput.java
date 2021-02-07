@@ -1,7 +1,6 @@
 package net.sknv.engine;
 
 import org.joml.*;
-
 import static org.lwjgl.glfw.GLFW.*;
 
 public class MouseInput {
@@ -18,12 +17,19 @@ public class MouseInput {
     private boolean disabled = true;
 
     public MouseInput() {
-        previousPos = new Vector2d(-1, -1);
-        currentPos = new Vector2d(0, 0);
+        previousPos = new Vector2d();
+        currentPos = new Vector2d();
         displVec = new Vector2f();
     }
 
     public void init(Window window) {
+        double[] x = new double[1];
+        double[] y = new double[1];
+        glfwGetCursorPos(window.getWindowHandle(),x, y);
+        Vector2d current = new Vector2d(x[0], y[0]);
+        previousPos.set(current);
+        currentPos.set(current);
+
         glfwSetCursorPosCallback(window.getWindowHandle(), (windowHandle, xpos, ypos) -> {
             currentPos.x = xpos;
             currentPos.y = ypos;
@@ -51,13 +57,11 @@ public class MouseInput {
         if (inWindow) {
             double deltaX = currentPos.x - previousPos.x;
             double deltaY = currentPos.y - previousPos.y;
-            boolean rotateX = deltaX != 0;
-            boolean rotateY = deltaY != 0;
 
-            if (rotateX) {
+            if (deltaX != 0) {
                 displVec.y = (float) deltaX;
             }
-            if (rotateY) {
+            if (deltaY != 0) {
                 displVec.x = (float) deltaY;
             }
         }
