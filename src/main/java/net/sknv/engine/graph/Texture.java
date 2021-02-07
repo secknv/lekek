@@ -17,6 +17,8 @@ public class Texture {
 
     private final int height;
 
+    private String fileName;
+
     public Texture(String fileName) throws Exception {
         ByteBuffer buf;
         // Load Texture file
@@ -34,6 +36,7 @@ public class Texture {
             height = h.get();
         }
 
+        this.fileName = fileName;
         this.id = createTexture(buf);
 
         stbi_image_free(buf);
@@ -89,6 +92,7 @@ public class Texture {
     public int getHeight() {
         return this.height;
     }
+
     public void bind() {
         glBindTexture(GL_TEXTURE_2D, id);
     }
@@ -99,5 +103,9 @@ public class Texture {
 
     public void cleanup() {
         glDeleteTextures(id);
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 }

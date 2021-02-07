@@ -145,7 +145,6 @@ public class Renderer {
         }
 
         //Boid boid = (Boid) gameItems.get(6);
-
         //tracking line
         /*
         Vector3f t = new Vector3f(boid.getPos().x, boid.getPos().y, boid.getPos().z);
@@ -168,8 +167,8 @@ public class Renderer {
 
         boidC.drawScaledRay(1, viewMatrix);
          */
-
         //end dbz mark ---------------------------------------------------------------------------
+
         //render each game item
         ArrayList<GameItem> clickedItems = new ArrayList<>();
         for (GameItem gameItem : scene.getGameItems()) {
@@ -189,14 +188,14 @@ public class Renderer {
         }
 
         if(!clickedItems.isEmpty()) {
-            float d = cameraPos.distance(clickedItems.get(0).getPos());
+            float d = cameraPos.distance(clickedItems.get(0).getPosition());
             for (GameItem item : clickedItems) {
-                if (cameraPos.distance(item.getPos()) <= d) clicked = item;
+                if (cameraPos.distance(item.getPosition()) <= d) clicked = item;
             }
-            GraphUtils.drawAABB(this, new Vector4f(255, 255, 0, 0), clicked.getBoundingBox());
+            GraphUtils.drawBoundingBox(this, new Vector4f(255, 255, 0, 0), clicked.getBoundingBox());
         }
 
-        if(clicked != null) GraphUtils.drawAABB(this, new Vector4f(75f,0,15f,0f), clicked.getBoundingBox());
+        if(clicked != null) GraphUtils.drawBoundingBox(this, new Vector4f(75f,0,15f,0f), clicked.getBoundingBox());
 
         while (!alienVAOQueue.isEmpty()){
 
@@ -256,6 +255,7 @@ public class Renderer {
             Mesh mesh = gameItem.getMesh();
             // Set ortohtaphic and model matrix for this HUD item
             Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(gameItem, ortho);
+
             hudShaderProgram.setUniform("projModelMatrix", projModelMatrix);
             hudShaderProgram.setUniform("colour", gameItem.getMesh().getMaterial().getAmbientColor());
             hudShaderProgram.setUniform("hasTexture", gameItem.getMesh().getMaterial().isTextured() ? 1 : 0);

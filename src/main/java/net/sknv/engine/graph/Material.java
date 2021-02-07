@@ -2,15 +2,16 @@ package net.sknv.engine.graph;
 
 import org.joml.Vector4f;
 
-import java.util.Optional;
+import java.io.IOException;
+import java.io.Serializable;
 
-public class Material {
+public class Material implements Serializable{
 
     private static final Vector4f DEFAULT_COLOR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     private Vector4f ambientColor, diffuseColor, specularColor;
 
-    private Texture texture;
+    private transient Texture texture;
 
     private float reflectance;
 
@@ -95,5 +96,18 @@ public class Material {
         return "Material{" +
                 "color=" + (webColor==null?"Unknown":webColor.toString()) +
                 '}';
+    }
+
+    private void readObject(java.io.ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+        inputStream.defaultReadObject();
+        try {
+            String fileName = (String) inputStream.readObject();
+            setTexture(new Texture(fileName));
+        } catch (Exception e) { }
+    }
+
+    private void writeObject(java.io.ObjectOutputStream outputStream) throws IOException {
+        outputStream.defaultWriteObject();
+        if(texture!=null) outputStream.writeObject(texture.getFileName());
     }
 }

@@ -5,9 +5,9 @@ import net.sknv.engine.graph.Mesh;
 import net.sknv.engine.graph.OBJLoader;
 import net.sknv.engine.graph.Texture;
 
-public class SkyBox extends GameItem{
+public class SkyBox extends GameItem {
 
-    public SkyBox(String objModel, String textureFile) throws Exception {
+    public SkyBox(String objModel, String textureFile) throws Exception {//todo problem: SKYBOX NOT WORKING WHEN SERIALIZED
         super();
         Mesh skyBoxMesh = OBJLoader.loadMesh(objModel);
         Texture skyBoxTexture = new Texture(textureFile);

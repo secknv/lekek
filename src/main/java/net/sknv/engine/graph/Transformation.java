@@ -6,43 +6,39 @@ import org.joml.Vector3f;
 
 public class Transformation {
 
-    private final Matrix4f projectionMatrix, viewMatrix, modelViewMatrix, orthoMatrix;
+    private static final Matrix4f projectionMatrix = new Matrix4f();
+    private static final Matrix4f viewMatrix = new Matrix4f();
+    private static final Matrix4f modelViewMatrix = new Matrix4f();
+    private static final Matrix4f orthogonalMatrix = new Matrix4f();
 
-    public Transformation() {
-        projectionMatrix = new Matrix4f();
-        viewMatrix = new Matrix4f();
-        modelViewMatrix = new Matrix4f();
-        orthoMatrix = new Matrix4f();
-    }
-
-    public final Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
+    public static Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
         float aspectRatio = width / height;
         projectionMatrix.identity();
         projectionMatrix.perspective(fov, aspectRatio, zNear, zFar);
         return projectionMatrix;
     }
 
-    public Matrix4f getViewMatrix(Camera camera) {
+    public static Matrix4f getViewMatrix(Camera camera) {
         Vector3f cameraPos = camera.getPosition();
         Vector3f rot = camera.getRotation();
 
         viewMatrix.identity();
         //must rotate first so camera rotates over it's position
-        viewMatrix.rotate((float)Math.toRadians(rot.x), new Vector3f(1, 0, 0))
-                .rotate((float)Math.toRadians(rot.y), new Vector3f(0, 1, 0));
+        viewMatrix.rotate(rot.x, new Vector3f(1, 0, 0))
+                .rotate(rot.y, new Vector3f(0, 1, 0));
         //then do translation
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         return viewMatrix;
     }
 
-    public final Matrix4f getOrthoProjectionMatrix(float left, float right, float bottom, float top) {
-        orthoMatrix.identity();
-        orthoMatrix.setOrtho2D(left, right, bottom, top);
-        return orthoMatrix;
+    public static Matrix4f getOrthoProjectionMatrix(float left, float right, float bottom, float top) {
+        orthogonalMatrix.identity();
+        orthogonalMatrix.setOrtho2D(left, right, bottom, top);
+        return orthogonalMatrix;
     }
 
 
-    public Matrix4f getModelViewMatrix(GameItem item, Matrix4f viewMatrix) {// modelViewMatrix = modelMatrix * viewMatrix
+    public static Matrix4f getModelViewMatrix(GameItem item, Matrix4f viewMatrix) {// modelViewMatrix = modelMatrix * viewMatrix
         //must create copy
         Matrix4f viewCurr = new Matrix4f(viewMatrix);
         //because this changes the values of viewCurr and since there is only one viewMatrix for all the items,
@@ -50,26 +46,20 @@ public class Transformation {
         return viewCurr.mul(getModelMatrix(item));
     }
 
-    public Matrix4f getOrtoProjModelMatrix(GameItem gameItem, Matrix4f orthoMatrix) {
-        Vector3f rotation = gameItem.getRot();
-        Matrix4f modelMatrix = new Matrix4f();
-        modelMatrix.identity().translate(gameItem.getPos()).
-                rotateX((float)Math.toRadians(-rotation.x)).
-                rotateY((float)Math.toRadians(-rotation.y)).
-                rotateZ((float)Math.toRadians(-rotation.z)).
-                scale(gameItem.getScale());
+    public static Matrix4f getOrtoProjModelMatrix(GameItem gameItem, Matrix4f orthoMatrix) {
+        Matrix4f modelMatrix = getModelMatrix(gameItem);
         Matrix4f orthoMatrixCurr = new Matrix4f(orthoMatrix);
         orthoMatrixCurr.mul(modelMatrix);
         return orthoMatrixCurr;
     }
 
-    public Matrix4f getModelMatrix(GameItem item){
-        Vector3f rotation = item.getRot();
-        modelViewMatrix.identity().translate(item.getPos()).
+    public static Matrix4f getModelMatrix(GameItem gameItem){
+        Vector3f rotation = gameItem.getRotation();
+        modelViewMatrix.identity().translate(gameItem.getPosition()).
                 rotateX(rotation.x).
                 rotateY(rotation.y).
                 rotateZ(rotation.z).
-                scale(item.getScale());
+                scale(gameItem.getScale());
         return modelViewMatrix;
     }
 

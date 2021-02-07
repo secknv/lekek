@@ -1,41 +1,52 @@
 package net.sknv.engine;
 
-import net.sknv.engine.collisions.BoundingBox;
-import net.sknv.engine.collisions.OBB;
+import net.sknv.engine.graph.Material;
 import net.sknv.engine.graph.Mesh;
+import net.sknv.engine.graph.OBJLoader;
+import net.sknv.engine.physics.colliders.BoundingBox;
+import net.sknv.engine.physics.colliders.OBB;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class GameItem {
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-    private Mesh mesh;
-    private Vector3f rot;
+public class GameItem implements Serializable {
+
+    protected Vector3f position;
+    protected transient BoundingBox boundingBox;
+    private transient Mesh mesh;
+    private Vector3f rotation;
     private float scale;
-    protected Vector3f pos;
-    protected BoundingBox boundingBox;
-    public Vector3f velocity;
-    public int nCollisions;
+    private boolean movable;
+    private float mass;
+    private Vector3f velocity;
+    private transient Vector3f forces;
 
     public GameItem() {
         velocity = new Vector3f(0, 0, 0);
-        pos = new Vector3f(0, 0, 0);
-        rot = new Vector3f(0, 0, 0);
+        forces = new Vector3f(0, 0, 0);
+        position = new Vector3f(0, 0, 0);
+        rotation = new Vector3f(0, 0, 0);
+        movable = false;
+        mass = 1;
         scale = 1;
     }
 
     public GameItem(Mesh mesh) {
         this();
         this.mesh = mesh;
-        this.boundingBox = new OBB(this, mesh.getMin(), mesh.getMax());
+        this.boundingBox = new OBB(this);
     }
 
-    public Vector3f getPos() {
-        return pos;
+    public Vector3f getPosition() {
+        return position;
     }
 
-    public Vector3f getRot() {
-        return rot;
+    public Vector3f getRotation() {
+        return rotation;
     }
 
     public float getScale() {
@@ -55,25 +66,16 @@ public class GameItem {
     }
 
     public void setPos(float x, float y, float z) {
-        this.pos.x = x;
-        this.pos.y = y;
-        this.pos.z = z;
+        setPosition(new Vector3f(x,y,z));
     }
 
-    public void setPos(Vector3f pos){
-        this.pos.x = pos.x;
-        this.pos.y = pos.y;
-        this.pos.z = pos.z;
+    public void setPosition(Vector3f position){
+        this.position = position;
     }
 
-    public void setRot(Vector3f rot) {
-        setRot(rot.x, rot.y, rot.z);
-    }
-
-    public void setRot(float x, float y, float z) {
-        this.rot.x = (float) (x % (2*Math.PI));
-        this.rot.y = (float) (y % (2*Math.PI));
-        this.rot.z = (float) (z % (2*Math.PI));
+    public void setRotationEuclidean(Vector3f euclideanRot) {
+        euclideanRot.sub(rotation);
+        rotateEuclidean(euclideanRot);
     }
 
     public void setScale(float scale) {
@@ -88,22 +90,22 @@ public class GameItem {
         this.boundingBox = boundingBox;
     }
 
-    public void rotate(Vector3f rot) {
+    public void rotateEuclidean(Vector3f rot) {
         // Object POV axis
         Vector3f xAxis = new Vector3f(1,0,0);
         Vector3f yAxis = new Vector3f(0,1,0);
         Vector3f zAxis = new Vector3f(0,0,1);
 
         //quaternions to get to current rot
-        Quaternionf cur = new Quaternionf(new AxisAngle4f(this.getRot().x, xAxis));
-        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRot().y, yAxis));
-        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRot().z, zAxis));
-        cur.mul(curY).mul(curZ);
+        Quaternionf current = new Quaternionf(new AxisAngle4f(this.getRotation().x, xAxis));
+        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRotation().y, yAxis));
+        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRotation().z, zAxis));
+        current.mul(curY).mul(curZ);
 
-        // generate objects axis
-        cur.transform(xAxis);
-        cur.transform(yAxis);
-        cur.transform(zAxis);
+        // generate rotated object axis'
+        current.transform(xAxis);
+        current.transform(yAxis);
+        current.transform(zAxis);
 
         Quaternionf xq = new Quaternionf(new AxisAngle4f(rot.x, xAxis));
         Quaternionf yq = new Quaternionf(new AxisAngle4f(rot.y, yAxis));
@@ -112,32 +114,56 @@ public class GameItem {
         // get rotation on world axis for setRotation
         xq.mul(yq).mul(zq);
 
-        Quaternionf obbRot = new Quaternionf();
-        xq.get(obbRot);
+        Quaternionf rotQuaternion = new Quaternionf();
+        xq.get(rotQuaternion);
 
         //combine
-        xq.mul(cur);
+        xq.mul(current);
 
-        Vector3f end_rot = Utils.getEulerAngles(xq);
+        rotation = Utils.getEulerAngles(xq);//set item rot
+        this.boundingBox.rotate(rotQuaternion);//set bb rot
+    }
 
-        setRot(end_rot.x, end_rot.y, end_rot.z);//set item rot
-        this.boundingBox.rotate(obbRot);//set bb rot
+    public void translate(Vector3f step) {
+        this.position.x += step.x;
+        this.position.y += step.y;
+        this.position.z += step.z;
+        this.boundingBox.translate(step);
+    }
+
+    public boolean isMovable() {
+        return movable;
+    }
+
+    public float getMass() {
+        return mass;
+    }
+
+    public void applyForce(Vector3f force) {
+        forces.add(force);
     }
 
     @Override
     public String toString() {
         return "GameItem{" +
                 "color=" + this.mesh.getMaterial() +
-                ", pos=" + pos +
+                ", pos=" + position +
                 ", boundingBox=" + boundingBox +
-                ", nCollisions=" + nCollisions +
                 '}';
     }
 
-    public void translate(Vector3f step) {
-        this.pos.x += step.x;
-        this.pos.y += step.y;
-        this.pos.z += step.z;
-        this.boundingBox.translate(step);
+    private void readObject(java.io.ObjectInputStream inputStream) throws Exception {
+        inputStream.defaultReadObject();
+        Mesh mesh = OBJLoader.loadMesh((String) inputStream.readObject());
+        mesh.setMaterial((Material) inputStream.readObject());
+
+        setMesh(mesh);
+        setBoundingBox(new OBB(this));
+    }
+
+    private void writeObject(ObjectOutputStream outputStream) throws IOException {
+        outputStream.defaultWriteObject();
+        outputStream.writeObject(mesh.getModelFile());
+        outputStream.writeObject(mesh.getMaterial());
     }
 }

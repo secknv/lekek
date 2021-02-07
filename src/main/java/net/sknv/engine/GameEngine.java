@@ -1,20 +1,25 @@
 package net.sknv.engine;
 
+import net.sknv.game.Terminal;
+import net.sknv.game.UltimateKekGame;
+
 public class GameEngine implements Runnable {
 
-    public static final int TARGET_FPS = 75;
-    public static final int TARGET_UPS = 60;
+    public static final int TARGET_FPS = 144;
+    public static final int TARGET_UPS = 200;
 
     private final Window window;
     private final Timer timer;
-    private final IGameLogic gameLogic;
+    private final UltimateKekGame gameLogic;
     private final MouseInput mouseInput;
+    private Terminal terminal;
 
-    public GameEngine(String windowTitle, int width, int height, boolean vsync, IGameLogic gameLogic) throws Exception {
-        window = new Window(windowTitle, width, height, vsync);
-        mouseInput = new MouseInput();
-        this.gameLogic = gameLogic;
-        timer = new Timer();
+    public GameEngine(String windowTitle, int width, int height, boolean vsync, IGameLogic gameLogic, Terminal terminal) {
+        this.window = new Window(windowTitle, width, height, vsync);
+        this.gameLogic = (UltimateKekGame) gameLogic;
+        this.mouseInput = new MouseInput();
+        this.timer = new Timer();
+        this.terminal = terminal;
     }
 
     @Override
@@ -43,12 +48,10 @@ public class GameEngine implements Runnable {
         float accumulator = 0f;
         float interval = 1f / TARGET_UPS;
 
-        boolean running = true;
-
         int count_fps = 0, count_ups = 0;
-        double tst = 0, last = 0;
+        double tst, last = 0;
 
-        while (running && !window.windowShouldClose()) {
+        while (!window.windowShouldClose()) {
             tst = timer.getTime();
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
@@ -87,13 +90,14 @@ public class GameEngine implements Runnable {
             try {
                 Thread.sleep(1);
             }
-            catch (InterruptedException ie) {}
+            catch (InterruptedException ignored) {}
         }
     }
 
     protected void input() {
         mouseInput.input(window);
         gameLogic.input(window, mouseInput);
+        gameLogic.processTerminal(terminal.getInput());
     }
 
     protected void update(float interval) {
@@ -103,5 +107,9 @@ public class GameEngine implements Runnable {
     protected void render() {
         gameLogic.render(window, mouseInput);
         window.update();
+    }
+
+    public IGameLogic getGameLogic(){
+        return gameLogic;
     }
 }

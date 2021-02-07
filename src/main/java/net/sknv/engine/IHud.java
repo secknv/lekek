@@ -1,11 +1,13 @@
 package net.sknv.engine;
 
+import java.util.ArrayList;
+
 public interface IHud {
 
-    GameItem[] getGameItems();
+    ArrayList<GameItem> getGameItems();
 
     default void cleanup() {
-        GameItem[] gameItems = getGameItems();
+        ArrayList<GameItem> gameItems = getGameItems();
         for (GameItem gameItem : gameItems) {
             gameItem.getMesh().cleanUp();
         }

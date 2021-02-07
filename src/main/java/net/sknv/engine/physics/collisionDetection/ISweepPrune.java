@@ -1,6 +1,7 @@
-package net.sknv.engine.collisions;
+package net.sknv.engine.physics.collisionDetection;
 
 import net.sknv.engine.GameItem;
+import net.sknv.engine.physics.colliders.BoundingBox;
 import org.joml.Vector3f;
 
 import java.util.Set;

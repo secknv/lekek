@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Mesh {
 
+    private String modelFile;
     public final int vaoId;
     public final List<Integer> vboIdList;
     public final int vertexCount;
@@ -275,6 +276,14 @@ public class Mesh {
 
     public int getVertexCount() {
         return vertexCount;
+    }
+
+    public String getModelFile() {
+        return modelFile;
+    }
+
+    public void setModelFile(String fileName) {
+        this.modelFile = fileName;
     }
 
     public void render() {

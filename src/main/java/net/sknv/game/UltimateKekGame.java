@@ -1,52 +1,43 @@
 package net.sknv.game;
 
 import net.sknv.engine.*;
-import net.sknv.engine.collisions.BoundingBox;
-import net.sknv.engine.collisions.OBB;
-import net.sknv.engine.collisions.SPCollision;
 import net.sknv.engine.graph.*;
+import net.sknv.engine.physics.PhysicsEngine;
+import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class UltimateKekGame implements IGameLogic {
 
-    private static final float MOUSE_SENSITIVITY = 0.4f;
-    private static final float CAMERA_POS_STEP = 0.05f;
+    private static final float MOUSE_SENSITIVITY = 0.003f;
+    private static final float CAMERA_POS_STEP = 0.03f;
 
     private final Vector3f cameraPosInc;
-    private final Vector2f cameraRotInc;
+    private final Vector3f cameraRotInc;
 
     private final Renderer renderer;
     private final Camera camera;
 
     private boolean menu = false;
-
-    //light stuff
-    private Vector3f ambientLight;
-    private DirectionalLight directionalLight;
-    private float lightAngle;
+    private boolean usingTerminal = false;
 
     private Scene scene;
     private Hud hud;
 
     //collisions stuff
-    private SPCollision sweepPrune = new SPCollision();
-    private OBB testBox;
-
+    private PhysicsEngine physicsEngine;
     public GameItem movableItem;
 
     public UltimateKekGame() {
         renderer = new Renderer();
-        camera = new Camera();
-        lightAngle = -90;
-
-        cameraPosInc = new Vector3f(0, 0, 0);
-        cameraRotInc = new Vector2f(0, 0);
+        camera = new Camera(new Vector3f(), new Vector3f());
+        cameraPosInc = new Vector3f();
+        cameraRotInc = new Vector3f();
     }
 
     @Override
@@ -54,21 +45,47 @@ public class UltimateKekGame implements IGameLogic {
         renderer.init(window);
         setKeyCallbacks(window, mouseInput);
 
-        scene = new Scene();
+        initScene("default");
+        initPhysicsEngine();
 
-        initGameItems();
-        initLighting();
+        // Setup HUD
+        hud = new Hud("+");
 
-        camera.getPosition().x = 0.65f;
-        camera.getPosition().y = 1.15f;
-        camera.getPosition().y = 4.34f;
+        //Setup Camera
+        camera.setPosition(0.65f, 1.15f, 4.34f);
 
-        initCollisions();
+        //todo temp - figure this out
+        if(!scene.getGameItems().isEmpty()) movableItem = scene.getGameItems().get(0);
+    }
+
+    public void initScene(String scene) {
+        try {
+            this.scene = new Scene(scene);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void initPhysicsEngine() {
+        physicsEngine = new PhysicsEngine();
+        List<GameItem> gameItems = scene.getGameItems();
+        for (GameItem gameItem : gameItems) {
+            //todo: temporary, GameItem empty constructor should deprecate and bb should be initialized on a constructor with all params,
+            // unless it is decided to not deprecate the empty constructor to support other types of gameItems (Huds, lines, stuff)
+            // in that case class inheritance should be pondered
+            gameItem.setBoundingBox(new OBB(gameItem));
+            try {
+                physicsEngine.addGameItem(gameItem);
+            } catch (Exception e) {
+                System.out.println("object colliding");
+            }
+        }
     }
 
     @Override
     public void input(Window window, MouseInput mouseInput) {
         cameraPosInc.zero();
+
         if (window.isKeyPressed(GLFW_KEY_W)) cameraPosInc.z = -1;
         if (window.isKeyPressed(GLFW_KEY_S)) cameraPosInc.z = (cameraPosInc.z < 0 ? 0 : 1);
         if (window.isKeyPressed(GLFW_KEY_A)) cameraPosInc.x = -1;
@@ -76,188 +93,48 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraPosInc.y = -1;
         if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraPosInc.y = (cameraPosInc.y < 0 ? 0 : 1);
 
-        if(cameraPosInc.length()!=0) cameraPosInc.normalize();
+        if (cameraPosInc.length() != 0) cameraPosInc.normalize();
 
-        if(renderer.getClicked()!=null) movableItem = renderer.getClicked();
-        if (window.isKeyPressed(GLFW_KEY_UP)) movableItem.velocity.z -= .1;
-        if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.velocity.z += .1;
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) movableItem.velocity.x -= .1;
-        if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.velocity.x += .1;
-        if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) movableItem.velocity.y += .1;
-        if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) movableItem.velocity.y -= .1;
+        if (renderer.getClicked() != null) movableItem = renderer.getClicked();
+        if (window.isKeyPressed(GLFW_KEY_UP)) {
+            if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.getVelocity().z = 0f;
+            else movableItem.getVelocity().z = -.1f;
+        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.getVelocity().z = .1f;
 
-        if (window.isKeyPressed(GLFW_KEY_X)) movableItem.rotate(new Vector3f((float) (-Math.PI/200),0,0));
-        if (window.isKeyPressed(GLFW_KEY_Y)) movableItem.rotate(new Vector3f(0,(float) (-Math.PI/200),0));
-        if (window.isKeyPressed(GLFW_KEY_Z)) movableItem.rotate(new Vector3f(0,0,(float) (-Math.PI/200)));
+        if (window.isKeyPressed(GLFW_KEY_LEFT)) {
+            if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.getVelocity().x = 0f;
+            else movableItem.getVelocity().x = -.1f;
+        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.getVelocity().x = .1f;
 
-        if (window.isKeyPressed(GLFW_KEY_K)) movableItem.setRot(0, 0, 0);
+        if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) {
+            if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) movableItem.getVelocity().y = 0f;
+            else movableItem.getVelocity().y = .1f;
+        } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) movableItem.getVelocity().y = -.1f;
 
-    }
+        if (window.isKeyPressed(GLFW_KEY_X)) movableItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
+        if (window.isKeyPressed(GLFW_KEY_Y)) movableItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
+        if (window.isKeyPressed(GLFW_KEY_Z)) movableItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
 
-    @Override
-    public void update(Window window, MouseInput mouseInput, float interval) {
-        updateItems();
-        moveCamera(window, mouseInput);
-        hud.rotateCompass(camera.getRotation().y);
-    }
-
-    private void initGameItems() throws Exception{
-
-        float reflectance = 1f;
-
-        // Setup block mesh
-        Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
-        Texture texture = new Texture("src/main/resources/textures/lebloq.png");
-        Material material = new Material(texture, reflectance);
-        cube.setMaterial(material);
-
-        // Setup kek mesh
-        Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
-        kek.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
-
-        // Setup boid mesh
-        Mesh boid = OBJLoader.loadMesh("/models/boid.obj");
-        boid.setMaterial(new Material(new Vector4f(0f, 1f, 1f, 1f), 0.5f));
-
-
-        // Background game items
-        float blockScale = 0.5f;
-        float skyBoxScale = 10.0f;
-        float extension = 2.0f;
-
-        float startx = extension * (-skyBoxScale + blockScale);
-        float startz = extension * (skyBoxScale - blockScale);
-        float starty = -1.0f;
-        float inc = blockScale * 2;
-
-        float posx = startx;
-        float posz = startz;
-        float incy = 0.0f;
-        int NUM_ROWS = (int)(extension * skyBoxScale * 2 / inc);
-        int NUM_COLS = (int)(extension * skyBoxScale * 2/ inc);
-        ArrayList<GameItem> gameItems  = new ArrayList<>(NUM_ROWS * NUM_COLS + 10);
-        for(int i=0; i<NUM_ROWS; i++) {
-            for(int j=0; j<NUM_COLS; j++) {
-                GameItem gameItem = new GameItem(cube);
-                gameItem.setScale(blockScale);
-                incy = Math.random() > 0.9f ? blockScale * 2 : 0f;
-                gameItem.setPos(posx, starty + incy, posz);
-                gameItems.add(gameItem);
-
-                posx += inc;
-            }
-            posx = startx;
-            posz -= inc;
-        }
-
-        // Special game items
-        GameItem testItem = new GameItem(kek);
-        testItem.setPos(2f, 1, 2f);
-        testItem.setScale(blockScale);
-
-        /*
-        Boid b = new Boid(boid);
-        b.setPos(-2, 0, 0);
-        b.setScale(.1f);
-         */
-
-        testBox = new OBB(testItem, testItem.getMesh().getMin(), testItem.getMesh().getMax());
-        testItem.setBoundingBox(testBox);
-        movableItem = testItem;
-
-        // add special items to gameItems array
-        // this is here case more than one special items...
-        // easier to just add {testItem, myOtherItem, kekItem}
-        GameItem[] specialItems = {testItem};
-        gameItems.addAll(Arrays.asList(specialItems));
-
-        // set gameItems in scene
-        scene.setGameItems(gameItems.toArray(new GameItem[0]));
-
-        // Setup  SkyBox
-        // todo: standardize resource paths
-        SkyBox skyBox = new SkyBox("/models/skybox.obj", "src/main/resources/textures/skybox.png");
-        skyBox.setScale(skyBoxScale);
-        scene.setSkyBox(skyBox);
-
-        // Setup HUD
-        hud = new Hud("+");
-    }
-
-    private void initLighting() {
-        SceneLight sceneLight = new SceneLight();
-        sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
-        float lightIntensity = 1.0f;
-        Vector3f lightPos = new Vector3f(-1, 0, 0);
-        Vector3f lightColor = new Vector3f(1, 1, 1);
-        sceneLight.setDirectionalLight(new DirectionalLight(lightColor, lightPos, lightIntensity));
-
-        scene.setSceneLight(sceneLight);
-    }
-
-    private void initCollisions() {
-        List<GameItem> gameItems = Arrays.asList(scene.getGameItems());
-        for (Iterator<GameItem> iterator = gameItems.iterator(); iterator.hasNext();) {
-            GameItem gameItem = iterator.next();
-            gameItem.getBoundingBox().transform();// converts bb coords from local to world
-            try {
-                sweepPrune.addItem(gameItem);
-            } catch (Exception e){
-                System.out.println("object colliding");;
-                //iterator.remove();
-            }
-        }
+        if (window.isKeyPressed(GLFW_KEY_K)) movableItem.setRotationEuclidean(new Vector3f());
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {
         // moves camera pos
-        camera.movePosition(cameraPosInc.x * CAMERA_POS_STEP, cameraPosInc.y * CAMERA_POS_STEP, cameraPosInc.z * CAMERA_POS_STEP);
+        if(!(menu || usingTerminal)) camera.movePosition(cameraPosInc.x * CAMERA_POS_STEP, cameraPosInc.y * CAMERA_POS_STEP, cameraPosInc.z * CAMERA_POS_STEP);
 
         // rotates camera
-        if (!menu && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
+        if (!(menu || usingTerminal) && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
             Vector2f rotVec = mouseInput.getDisplVec();
-            camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+            cameraRotInc.set(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+            camera.moveRotation(cameraRotInc);
         }
     }
 
-    private void updateItems() {
-        for(GameItem gameItem : scene.getGameItems()){
-            if(gameItem.getVelocity().length() != 0){ //game item has acceleration
-
-                //calculate step
-                Vector3f step = gameItem.velocity.mul(0.1f);
-
-                Set<BoundingBox> col = sweepPrune.checkStepCollisions(gameItem, step);
-
-                if(col.isEmpty()){
-                    //no collisions, perform movement
-                    gameItem.translate(step);
-                    gameItem.velocity.zero();
-                } else {
-                    //collisions
-                    Set<BoundingBox> colX = sweepPrune.checkStepCollisions(gameItem, new Vector3f(step.x, 0, 0));
-                    Set<BoundingBox> colY = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, step.y, 0));
-                    Set<BoundingBox> colZ = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, 0, step.z));
-
-                    if(colX.isEmpty() && colY.isEmpty() && colZ.isEmpty()){
-                        //collision, not performing the movement
-                        gameItem.velocity.zero();
-                        GraphUtils.drawAABB(renderer, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
-                    } else {
-                        //partial collision, perform partial step
-                        Vector3f partialStep = new Vector3f();
-                        if (colX.isEmpty()) partialStep.x = step.x;
-                        if (colY.isEmpty()) partialStep.y = step.y;
-                        if (colZ.isEmpty()) partialStep.z = step.z;
-                        gameItem.translate(partialStep);
-                        gameItem.velocity.zero();
-
-                        if(partialStep.x==0 && partialStep.y==0 && partialStep.z==0) //collision
-                        GraphUtils.drawAABB(renderer, new Vector4f(255,0,0,0), gameItem.getBoundingBox());
-                    }
-                }
-            }
-        }
+    @Override
+    public void update(Window window, MouseInput mouseInput, float interval) {
+        physicsEngine.simulate(scene);
+        moveCamera(window, mouseInput);
+        hud.rotateCompass(camera.getRotation().y);
     }
 
     @Override
@@ -282,7 +159,18 @@ public class UltimateKekGame implements IGameLogic {
      * */
     private void setKeyCallbacks(Window window, MouseInput mouseInput) {
         window.setKeyCallback((windowHandle, key, scancode, action, mods) -> {
-            if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+            if (usingTerminal && (action == GLFW_PRESS || action == GLFW_REPEAT)){ //using hud terminal
+                if(key>48 && key<91){
+                    hud.getTerminal().addText(String.valueOf((char)Character.toLowerCase(key)));
+                } else if (key == 32) hud.getTerminal().addText(" ");
+                else if (key == 257) {
+                    processTerminal(hud.getTerminal().enter());
+                    closeHudTerminal(mouseInput, windowHandle);
+                }
+                else if (key == 259) hud.getTerminal().backspace();
+            }
+
+            if (key == GLFW_KEY_P && action == GLFW_PRESS && !usingTerminal) {
                 if(menu){
                     menu = false;
                     mouseInput.setDisabled();
@@ -295,9 +183,92 @@ public class UltimateKekGame implements IGameLogic {
                 }
             }
             if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-                glfwSetWindowShouldClose(windowHandle, true);
+                if(usingTerminal){ //closing hud terminal
+                    closeHudTerminal(mouseInput, windowHandle);
+                } else glfwSetWindowShouldClose(windowHandle, true); //closing game
             }
-
+            if (!usingTerminal && key == GLFW_KEY_T && action == GLFW_PRESS){ //opening hud terminal
+                openHudTerminal(window, mouseInput, windowHandle);
+            }
         });
+    }
+
+    private void openHudTerminal(Window window, MouseInput mouseInput, long windowHandle) {
+        usingTerminal = true;
+        mouseInput.setEnabled();
+        glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetCursorPos(windowHandle, window.getCenter().x, window.getCenter().y);
+        hud.showTerminal();
+    }
+
+    private void closeHudTerminal(MouseInput mouseInput, long windowHandle) {
+        usingTerminal = false;
+        mouseInput.setDisabled();
+        glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        hud.hideTerminal();
+    }
+
+    public void processTerminal(String input) {
+        if (input==null) return;
+
+        String[] in = input.split(" ");
+
+        switch (in[0]){
+            case "test":
+                System.out.println("its working :)");
+                break;
+            case "savescene":
+                String sceneName;
+                if(in.length>1) sceneName = in[1]; else sceneName = "unnamed";
+                getScene().save(sceneName);
+                break;
+            case "loadscene":
+                if(in.length>1) sceneName = in[1]; else return;
+                System.out.println("loading scene - " + sceneName);
+                initScene(sceneName);
+                initPhysicsEngine();
+                System.out.println("scene loaded");
+                break;
+            case "removeitems":
+                scene.getGameItems().clear();
+                break;
+            case "removeitem":
+                scene.getGameItems().remove(movableItem);
+                break;
+            case "additem":
+                try {
+                    String model = in[1];
+                    Mesh mesh = OBJLoader.loadMesh("/models/" + model + ".obj");
+                    Texture texture = new Texture("src/main/resources/textures/lebloq.png");
+                    Material material = new Material(texture, 1f);
+                    mesh.setMaterial(material);
+                    GameItem newItem = new GameItem(mesh);
+                    scene.getGameItems().add(newItem);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "quit":
+                System.exit(0);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public Scene getScene(){
+        return scene;
+    }
+
+    public Hud getHud(){
+        return hud;
+    }
+
+    private void setScene(Scene scene) {
+        this.scene = scene;
     }
 }

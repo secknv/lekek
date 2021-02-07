@@ -1,8 +1,8 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.collisions.AABB;
-import net.sknv.engine.collisions.BoundingBox;
-import net.sknv.engine.collisions.OBB;
+import net.sknv.engine.physics.colliders.AABB;
+import net.sknv.engine.physics.colliders.BoundingBox;
+import net.sknv.engine.physics.colliders.OBB;
 import net.sknv.game.Renderer;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -86,10 +86,9 @@ public class GraphUtils {
         renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_TRIANGLES));
     }
 
-    public static void drawAABB(Renderer renderer, Vector4f color, BoundingBox bb) {
+    public static void drawBoundingBox(Renderer renderer, Vector4f color, BoundingBox bb) {
 
         if(bb instanceof AABB) {
-
             Vector3f min = bb.getMin().getPosition();
             Vector3f max = bb.getMax().getPosition();
 
@@ -136,14 +135,6 @@ public class GraphUtils {
             Vector3f x = ((OBB) bb).getX();
             Vector3f y = ((OBB) bb).getY();
             Vector3f z = ((OBB) bb).getZ();
-
-            Vector3f min = new Vector3f(center.x + x.x + y.x + z.x, center.y + x.y + y.y + z.y, center.z + x.z + y.z + z.z);
-            Vector3f max = new Vector3f(center.x - x.x - y.x - z.x, center.y - x.y - y.y - z.y, center.z - x.z - y.z - z.z);
-
-            //outer box
-            for(int i=0; i!=10; i++){
-
-            }
 
             // Create Positions Array
             float[] posArray = new float[] {
@@ -245,8 +236,5 @@ public class GraphUtils {
         // Unbid VAO
         glBindVertexArray(0);
         return new AlienVAO(vaoId, color, getIntArray(vboIdList), idx.length, drawMode);
-    }
-
-    public static void drawOBB() {
     }
 }

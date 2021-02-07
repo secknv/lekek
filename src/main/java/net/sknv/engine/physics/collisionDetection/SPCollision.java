@@ -1,13 +1,15 @@
-package net.sknv.engine.collisions;
+package net.sknv.engine.physics.collisionDetection;
 
 import net.sknv.engine.GameItem;
+import net.sknv.engine.physics.colliders.BoundingBox;
+import net.sknv.engine.physics.colliders.EndPoint;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SPCollision implements ISweepPrune{
+public class SPCollision implements ISweepPrune {
     private ArrayList<EndPoint> xAxis = new ArrayList<>();
     private ArrayList<EndPoint> yAxis = new ArrayList<>();
     private ArrayList<EndPoint> zAxis = new ArrayList<>();
