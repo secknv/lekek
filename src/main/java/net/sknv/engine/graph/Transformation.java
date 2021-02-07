@@ -24,8 +24,8 @@ public class Transformation {
 
         viewMatrix.identity();
         //must rotate first so camera rotates over it's position
-        viewMatrix.rotate((float)Math.toRadians(rot.x), new Vector3f(1, 0, 0))
-                .rotate((float)Math.toRadians(rot.y), new Vector3f(0, 1, 0));
+        viewMatrix.rotate(rot.x, new Vector3f(1, 0, 0))
+                .rotate(rot.y, new Vector3f(0, 1, 0));
         //then do translation
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         return viewMatrix;
@@ -47,11 +47,9 @@ public class Transformation {
     }
 
     public static Matrix4f getOrtoProjModelMatrix(GameItem gameItem, Matrix4f orthoMatrix) {
-
         Matrix4f modelMatrix = getModelMatrix(gameItem);
         Matrix4f orthoMatrixCurr = new Matrix4f(orthoMatrix);
         orthoMatrixCurr.mul(modelMatrix);
-
         return orthoMatrixCurr;
     }
 

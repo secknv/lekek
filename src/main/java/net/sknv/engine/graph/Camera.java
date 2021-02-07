@@ -25,12 +25,12 @@ public class Camera {
 
     public void movePosition(float offsetX, float offsetY, float offsetZ) {
         if ( offsetZ != 0 ) {
-            position.x += (float)Math.sin(Math.toRadians(rotation.y)) * -1.0f * offsetZ;
-            position.z += (float)Math.cos(Math.toRadians(rotation.y)) * offsetZ;
+            position.x += (float)Math.sin(rotation.y) * -1.0f * offsetZ;
+            position.z += (float)Math.cos(rotation.y) * offsetZ;
         }
         if ( offsetX != 0) {
-            position.x += (float)Math.sin(Math.toRadians(rotation.y - 90)) * -1.0f * offsetX;
-            position.z += (float)Math.cos(Math.toRadians(rotation.y - 90)) * offsetX;
+            position.x += (float)Math.sin(rotation.y - (Math.PI/2)) * -1.0f * offsetX;
+            position.z += (float)Math.cos(rotation.y - (Math.PI/2)) * offsetX;
         }
         position.y += offsetY;
     }

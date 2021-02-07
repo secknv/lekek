@@ -55,7 +55,7 @@ public class Hud implements IHud {
     }
 
     public void rotateCompass(float angle) {
-        this.compassItem.setRotationEuclidean(new Vector3f(0, 0, (float) Math.toRadians(180 + angle)));
+        this.compassItem.setRotationEuclidean(new Vector3f(0, 0, (float) Math.PI + angle));
     }
 
     @Override

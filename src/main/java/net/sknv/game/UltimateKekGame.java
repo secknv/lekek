@@ -14,7 +14,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class UltimateKekGame implements IGameLogic {
 
-    private static final float MOUSE_SENSITIVITY = 0.4f;
+    private static final float MOUSE_SENSITIVITY = 0.01f;
     private static final float CAMERA_POS_STEP = 0.05f;
 
     private final Vector3f cameraPosInc;
@@ -36,9 +36,8 @@ public class UltimateKekGame implements IGameLogic {
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera(new Vector3f(), new Vector3f());
-
-        cameraPosInc = new Vector3f(0, 0, 0);
-        cameraRotInc = new Vector2f(0, 0);
+        cameraPosInc = new Vector3f();
+        cameraRotInc = new Vector2f();
     }
 
     @Override
