@@ -27,10 +27,14 @@ public class Hud implements IHud {
 
     private final GameItem compassItem;
 
+    private final HudTerminal terminal;
+
     public Hud(String statusText) throws Exception {
         FontTexture fontTexture = new FontTexture(FONT, CHARSET);
         this.statusTextItem = new TextItem(statusText, fontTexture);
         this.statusTextItem.getMesh().getMaterial().setAmbientColor(new Vector4f(1, 1, 1, 1));
+
+        this.terminal = new HudTerminal(new TextItem("/", fontTexture));
 
         // Create compass
         Mesh mesh = OBJLoader.loadMesh("/models/compass.obj");
@@ -43,7 +47,7 @@ public class Hud implements IHud {
         compassItem.setRotationEuclidean(new Vector3f(0f, 0f, 180f));
 
         // Create list that holds the items that compose the HUD
-        gameItems = new GameItem[]{statusTextItem, compassItem};
+        gameItems = new ArrayList<>(List.of(statusTextItem, compassItem));
     }
 
     public void setStatusText(String statusText) {
