@@ -35,7 +35,7 @@ public class UltimateKekGame implements IGameLogic {
 
     public UltimateKekGame() {
         renderer = new Renderer();
-        camera = new Camera();
+        camera = new Camera(new Vector3f(), new Vector3f());
 
         cameraPosInc = new Vector3f(0, 0, 0);
         cameraRotInc = new Vector2f(0, 0);
