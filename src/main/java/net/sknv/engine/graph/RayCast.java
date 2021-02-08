@@ -2,30 +2,27 @@ package net.sknv.engine.graph;
 
 import net.sknv.engine.GameItem;
 import net.sknv.game.Renderer;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class RayCast {
     public Vector3f origin;
     public Vector3f direction;
-    private final Renderer renderer;
 
     public RayCast(Renderer renderer, Vector3f origin, Vector3f direction) {
         this.origin = origin;
         this.direction = direction.normalize();
-        this.renderer = renderer;
     }
 
-    public void drawNormalisedRay(){
+    public void drawNormalisedRay(Renderer renderer){
         Vector3f ray = new Vector3f();
         origin.add(direction, ray);
         GraphUtils.drawLine(origin, ray, renderer, new Vector4f(255,255,0,0));
     }
 
-    public void drawScaledRay(int k) {
+    public void drawScaledRay(Renderer renderer, int scale) {
         Vector3f end = new Vector3f();
-        direction.mul(k, end);
+        direction.mul(scale, end);
         origin.add(end, end);
         GraphUtils.drawLine(origin, end, renderer, new Vector4f(255,255,0,0));
     }
