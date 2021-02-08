@@ -16,18 +16,12 @@ import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 
 public class Renderer {
 
-    private static final float FOV = (float) Math.toRadians(60.0f);
-    private static final float Z_NEAR = 0.01f;
-    private static final float Z_FAR = 1000.f;
+    private ShaderProgram shaderProgram, hudShaderProgram, skyBoxShaderProgram;
 
     private static final int MAX_POINT_LIGHTS = 5;
     private static final int MAX_SPOT_LIGHTS = 5;
-
-    private final Transformation transformation;
-
-    private ShaderProgram shaderProgram, hudShaderProgram, skyBoxShaderProgram;
-
     private float specularPower;
+
     private boolean devMode;
 
     private final LinkedBlockingQueue<AlienVAO> alienVAOQueue = new LinkedBlockingQueue<>();
@@ -36,7 +30,6 @@ public class Renderer {
     private ArrayList<RayCast> rayCasts = new ArrayList<RayCast>();
 
     public Renderer() {
-        transformation = new Transformation();
         specularPower = 10f;
         devMode = true;
     }
@@ -98,39 +91,27 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, MouseInput mouseInput, Camera camera, Scene scene, IHud hud) {
+    public void render(Matrix4f projectionMatrix, Matrix4f viewMatrix, Matrix4f ortho, Scene scene, IHud hud) {
         clear();
-
-        if (window.isResized()) {
-            glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(false);
-        }
-
-        renderScene(window, mouseInput, camera, scene);
-        renderSkyBox(window, camera, scene);
-        renderHud(window, hud);
+        renderScene(projectionMatrix, viewMatrix, scene);
+        renderSkyBox(projectionMatrix, viewMatrix, scene);
+        renderHud(ortho, hud);
     }
 
-    private void renderScene(Window window, MouseInput mouseInput, Camera camera, Scene scene) {
+    private void renderScene(Matrix4f projectionMatrix, Matrix4f viewMatrix, Scene scene) {
 
         Vector3f ambientLight = scene.getSceneLight().getAmbientLight();
         DirectionalLight directionalLight = scene.getSceneLight().getDirectionalLight();
 
         shaderProgram.bind();
-
-        //update projection matrix
-        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
-
-        //update view matrix
-        Matrix4f viewMatrix = transformation.getViewMatrix(camera);
+        shaderProgram.setUniform("texture_sampler", 0);
 
         //update light uniforms
         renderLights(viewMatrix, ambientLight, directionalLight);
 
-        shaderProgram.setUniform("texture_sampler", 0);
 
-        //dbz mark -------------------------------------------------------------------------------
+        /*dbz mark -------------------------------------------------------------------------------
         Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
         Vector3f cameraPos = camera.getPosition();
 
@@ -175,18 +156,17 @@ public class Renderer {
 
             Mesh mesh = gameItem.getMesh();
             //set model view
-            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
+            Matrix4f modelViewMatrix = Transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
 
             //if color
             shaderProgram.setUniform("material", mesh.getMaterial());
             mesh.render();
 
-            if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem) ){
-                clickedItems.add(gameItem);
-            }
+            //if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)) clickedItems.add(gameItem);
         }
 
+        /*
         if(mouseInput.isRightClicked()) rayCasts.add(ray);
         for (RayCast rayCast : rayCasts){
             rayCast.drawScaledRay(this,10);
@@ -202,6 +182,7 @@ public class Renderer {
         }
 
         if(clicked != null) GraphUtils.drawBoundingBox(this, new Vector4f(75f,0,15f,0f), clicked.getBoundingBox());
+         */
 
         while (!alienVAOQueue.isEmpty()){
 
@@ -253,14 +234,13 @@ public class Renderer {
         GraphUtils.drawAxis(this);
     }
 
-    private void renderHud(Window window, IHud hud) {
+    private void renderHud(Matrix4f ortho, IHud hud) {
         hudShaderProgram.bind();
 
-        Matrix4f ortho = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
         for (GameItem gameItem : hud.getGameItems()) {
             Mesh mesh = gameItem.getMesh();
             // Set ortohtaphic and model matrix for this HUD item
-            Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(gameItem, ortho);
+            Matrix4f projModelMatrix = Transformation.getOrtoProjModelMatrix(gameItem, ortho);
 
             hudShaderProgram.setUniform("projModelMatrix", projModelMatrix);
             hudShaderProgram.setUniform("colour", gameItem.getMesh().getMaterial().getAmbientColor());
@@ -273,20 +253,18 @@ public class Renderer {
         hudShaderProgram.unbind();
     }
 
-    private void renderSkyBox(Window window, Camera camera, Scene scene) {
+    private void renderSkyBox(Matrix4f projectionMatrix, Matrix4f viewMatrix, Scene scene) {
         skyBoxShaderProgram.bind();
 
         skyBoxShaderProgram.setUniform("texture_sampler", 0);
-
-        // Update projection Matrix
-        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
         skyBoxShaderProgram.setUniform("projectionMatrix", projectionMatrix);
+
         SkyBox skyBox = scene.getSkyBox();
-        Matrix4f viewMatrix = transformation.getViewMatrix(camera);
-        viewMatrix.m30(0);
-        viewMatrix.m31(0);
-        viewMatrix.m32(0);
-        Matrix4f modelViewMatrix = transformation.getModelViewMatrix(skyBox, viewMatrix);
+        Matrix4f vMatrix = new Matrix4f(viewMatrix);
+        vMatrix.m30(0);
+        vMatrix.m31(0);
+        vMatrix.m32(0);
+        Matrix4f modelViewMatrix = Transformation.getModelViewMatrix(skyBox, vMatrix);
         skyBoxShaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
         skyBoxShaderProgram.setUniform("ambientLight", scene.getSceneLight().getAmbientLight());
 

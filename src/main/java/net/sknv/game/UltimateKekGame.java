@@ -4,6 +4,7 @@ import net.sknv.engine.*;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.PhysicsEngine;
 import net.sknv.engine.physics.colliders.OBB;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -11,8 +12,13 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 public class UltimateKekGame implements IGameLogic {
+
+    private static final float FOV = (float) Math.toRadians(60.0f);
+    private static final float Z_NEAR = 0.01f;
+    private static final float Z_FAR = 1000.f;
 
     private static final float MOUSE_SENSITIVITY = 0.003f;
     private static final float CAMERA_POS_STEP = 0.03f;
@@ -149,8 +155,18 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void render(Window window, MouseInput mouseInput) {
+        if (window.isResized()) {
+            glViewport(0, 0, window.getWidth(), window.getHeight());
+            window.setResized(false);
+        }
+
+        //update matrices
+        Matrix4f projectionMatrix = Transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
+        Matrix4f viewMatrix = Transformation.getViewMatrix(camera);
+        Matrix4f ortho = Transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+
         hud.updateSize(window);
-        renderer.render(window, mouseInput, camera, scene, hud);
+        renderer.render(projectionMatrix, viewMatrix, ortho, scene, hud);
     }
 
     @Override
