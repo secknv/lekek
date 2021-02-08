@@ -65,7 +65,7 @@ public class GraphUtils {
             else idxArray[i*2+1]=5*size-i;
         }
 
-        renderer.addAlienVAO(generateAVAO(posArray, idxArray, new Vector4f(1, 0, 0, 1), GL_LINES));
+        renderer.addAlienVAO(generateAVAO(posArray, idxArray, new Vector4f(0, 0, 0, 1), GL_LINES));
     }
 
     public static void drawQuad(Renderer renderer, Vector4f color,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){

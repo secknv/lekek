@@ -21,13 +21,10 @@ public class Renderer {
     private static final int MAX_SPOT_LIGHTS = 5;
     private float specularPower;
 
-    private boolean devMode;
-
     private final LinkedBlockingQueue<AlienVAO> alienVAOQueue = new LinkedBlockingQueue<>();
 
     public Renderer() {
         specularPower = 10f;
-        devMode = true;
     }
 
     public void init(Window window) throws Exception {
@@ -143,7 +140,7 @@ public class Renderer {
             glDeleteVertexArrays(vao.getVaoId());
         }
 
-        if(devMode) renderGraphUtils();
+        renderGraphUtils();
 
         shaderProgram.unbind();
     }
