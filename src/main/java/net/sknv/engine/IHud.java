@@ -1,15 +1,17 @@
 package net.sknv.engine;
 
+import net.sknv.engine.entities.HudElement;
+
 import java.util.ArrayList;
 
 public interface IHud {
 
-    ArrayList<GameItem> getGameItems();
+    ArrayList<HudElement> getHudElements();
 
     default void cleanup() {
-        ArrayList<GameItem> gameItems = getGameItems();
-        for (GameItem gameItem : gameItems) {
-            gameItem.getMesh().cleanUp();
+        ArrayList<HudElement> HudElements = getHudElements();
+        for (HudElement elem : HudElements) {
+            elem.getMesh().cleanUp();
         }
     }
 }

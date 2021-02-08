@@ -1,7 +1,6 @@
 package net.sknv.game;
 
-import net.sknv.engine.GameItem;
-import net.sknv.engine.TextItem;
+import net.sknv.engine.entities.TextItem;
 
 public class HudTerminal {
     private TextItem terminalText;
@@ -11,7 +10,7 @@ public class HudTerminal {
         this.terminalText = terminalText;
     }
 
-    public GameItem getTextItem() {
+    public TextItem getTextItem() {
         return terminalText;
     }
 
