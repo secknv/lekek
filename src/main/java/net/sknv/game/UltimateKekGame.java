@@ -116,6 +116,16 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_Z)) movableItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
 
         if (window.isKeyPressed(GLFW_KEY_K)) movableItem.setRotationEuclidean(new Vector3f());
+
+        if(mouseInput.isLeftClicked()){
+            /*
+            Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
+            Vector3f cameraPos = camera.getPosition();
+
+            //ray casting
+            RayCast ray = new RayCast(renderer, new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+             */
+        }
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {
