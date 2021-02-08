@@ -6,7 +6,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -107,35 +106,7 @@ public class Renderer {
         //update light uniforms
         renderLights(viewMatrix, ambientLight, directionalLight);
 
-
-        /*dbz mark -------------------------------------------------------------------------------
-        //Boid boid = (Boid) gameItems.get(6);
-        //tracking line
-        /*
-        Vector3f t = new Vector3f(boid.getPos().x, boid.getPos().y, boid.getPos().z);
-        if(track.size()<2){
-            track.add(t);
-        }
-        else {
-            if(t.distance(track.get(track.size()-1))>0.05f) track.add(t);
-            if(track.size()>200){ track.remove(0);};
-            for(int i=0; i!=track.size()-1; i++){
-                GraphUtils.drawLine(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), track.get(i), track.get(i+1));
-            }
-        }
-         */
-        /*
-        //boid rays
-        RayCast boidL = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-        RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.velocity);
-        RayCast boidR = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-
-        boidC.drawScaledRay(1, viewMatrix);
-         */
-        //end dbz mark ---------------------------------------------------------------------------
-
         //render each game item
-        ArrayList<GameItem> clickedItems = new ArrayList<>();
         for (GameItem gameItem : scene.getGameItems()) {
 
             Mesh mesh = gameItem.getMesh();
@@ -146,21 +117,7 @@ public class Renderer {
             //if color
             shaderProgram.setUniform("material", mesh.getMaterial());
             mesh.render();
-
-            //if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)) clickedItems.add(gameItem);
         }
-
-        /*
-        if(!clickedItems.isEmpty()) {
-            float d = cameraPos.distance(clickedItems.get(0).getPosition());
-            for (GameItem item : clickedItems) {
-                if (cameraPos.distance(item.getPosition()) <= d) clicked = item;
-            }
-            GraphUtils.drawBoundingBox(this, new Vector4f(255, 255, 0, 0), clicked.getBoundingBox());
-        }
-
-        if(clicked != null) GraphUtils.drawBoundingBox(this, new Vector4f(75f,0,15f,0f), clicked.getBoundingBox());
-         */
 
         while (!alienVAOQueue.isEmpty()){
 
@@ -185,7 +142,6 @@ public class Renderer {
             glBindVertexArray(0);
             glDeleteVertexArrays(vao.getVaoId());
         }
-
 
         if(devMode) renderGraphUtils();
 
@@ -261,11 +217,5 @@ public class Renderer {
      * */
     public void addAlienVAO(AlienVAO alienVAO) {
         this.alienVAOQueue.offer(alienVAO);
-    }
-
-    //spaghet
-    private GameItem clicked;
-    public GameItem getClicked() {
-        return clicked;
     }
 }
