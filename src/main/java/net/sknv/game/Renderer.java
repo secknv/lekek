@@ -26,9 +26,6 @@ public class Renderer {
 
     private final LinkedBlockingQueue<AlienVAO> alienVAOQueue = new LinkedBlockingQueue<>();
 
-    //spaghet
-    private ArrayList<RayCast> rayCasts = new ArrayList<RayCast>();
-
     public Renderer() {
         specularPower = 10f;
         devMode = true;
@@ -112,13 +109,6 @@ public class Renderer {
 
 
         /*dbz mark -------------------------------------------------------------------------------
-        //ray casting triangle intersection test
-        if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
-            GraphUtils.drawQuad(this, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        } else{
-            GraphUtils.drawQuad(this, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        }
-
         //Boid boid = (Boid) gameItems.get(6);
         //tracking line
         /*
@@ -161,12 +151,6 @@ public class Renderer {
         }
 
         /*
-        if(mouseInput.isRightClicked()) rayCasts.add(ray);
-        for (RayCast rayCast : rayCasts){
-            rayCast.drawScaledRay(this,10);
-        }
-        System.out.println(rayCasts.size());
-
         if(!clickedItems.isEmpty()) {
             float d = cameraPos.distance(clickedItems.get(0).getPosition());
             for (GameItem item : clickedItems) {

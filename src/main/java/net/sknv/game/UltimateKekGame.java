@@ -10,6 +10,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -21,7 +22,8 @@ public class UltimateKekGame implements IGameLogic {
     private static final float Z_NEAR = 0.01f;
     private static final float Z_FAR = 1000.f;
 
-    Matrix4f projectionMatrix, viewMatrix, ortho;
+    private static Matrix4f projectionMatrix, viewMatrix, ortho;
+    private ArrayList<RayCast> rayCasts = new ArrayList<>();
 
     private static final float MOUSE_SENSITIVITY = 0.003f;
     private static final float CAMERA_POS_STEP = 0.03f;
@@ -93,7 +95,19 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void input(Window window, MouseInput mouseInput) {
+
+        if (window.isResized()) {
+            glViewport(0, 0, window.getWidth(), window.getHeight());
+            window.setResized(false);
+        }
+
+        //update matrices
+        projectionMatrix = Transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
+        viewMatrix = Transformation.getViewMatrix(camera);
+        ortho = Transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+
         cameraPosInc.zero();
+        hud.updateSize(window);
 
         if (window.isKeyPressed(GLFW_KEY_W)) cameraPosInc.z = -1;
         if (window.isKeyPressed(GLFW_KEY_S)) cameraPosInc.z = (cameraPosInc.z < 0 ? 0 : 1);
@@ -126,30 +140,21 @@ public class UltimateKekGame implements IGameLogic {
 
         if (window.isKeyPressed(GLFW_KEY_K)) movableItem.setRotationEuclidean(new Vector3f());
 
-
-
-        if (window.isResized()) {
-            glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(false);
-        }
-        hud.updateSize(window);
-
-        //update matrices
-        projectionMatrix = Transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
-        viewMatrix = Transformation.getViewMatrix(camera);
-        ortho = Transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
-
-
         //ray casting
         Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
         Vector3f cameraPos = camera.getPosition();
         RayCast ray = new RayCast(renderer, new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
 
-        //ray casting triangle intersection test
+        //ray casting quad intersection test
         if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
             GraphUtils.drawQuad(renderer, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
         } else{
             GraphUtils.drawQuad(renderer, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
+        }
+
+        if(mouseInput.isRightClicked()) rayCasts.add(ray);
+        for (RayCast rayCast : rayCasts){
+            rayCast.drawScaledRay(renderer,10);
         }
     }
 
