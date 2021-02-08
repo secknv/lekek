@@ -53,7 +53,7 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void init(Window window, MouseInput mouseInput) throws Exception {
-        renderer.init(window);
+        renderer.init();
         setKeyCallbacks(window, mouseInput);
 
         initScene("default");
@@ -141,7 +141,7 @@ public class UltimateKekGame implements IGameLogic {
         //ray casting
         Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
         Vector3f cameraPos = camera.getPosition();
-        RayCast ray = new RayCast(renderer, new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+        RayCast ray = new RayCast(new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
 
         //ray casting quad intersection test
         if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
@@ -152,7 +152,7 @@ public class UltimateKekGame implements IGameLogic {
 
         if(mouseInput.isRightClicked()) rayCasts.add(ray);
         for (RayCast rayCast : rayCasts){
-            rayCast.drawScaledRay(renderer,10);
+            GraphUtils.drawRay(renderer, rayCast, 10);
         }
 
         ArrayList<GameItem> clickedItems = new ArrayList<>();

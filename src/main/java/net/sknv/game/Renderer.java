@@ -27,7 +27,7 @@ public class Renderer {
         specularPower = 10f;
     }
 
-    public void init(Window window) throws Exception {
+    public void init() throws Exception {
         setupSceneShader();
         setupHudShader();
         setupSkyBoxShader();
@@ -89,6 +89,7 @@ public class Renderer {
         renderScene(projectionMatrix, viewMatrix, scene);
         renderSkyBox(projectionMatrix, viewMatrix, scene);
         renderHud(ortho, hud);
+        renderGraphUtils();
     }
 
     private void renderScene(Matrix4f projectionMatrix, Matrix4f viewMatrix, Scene scene) {
@@ -139,8 +140,6 @@ public class Renderer {
             glBindVertexArray(0);
             glDeleteVertexArrays(vao.getVaoId());
         }
-
-        renderGraphUtils();
 
         shaderProgram.unbind();
     }
