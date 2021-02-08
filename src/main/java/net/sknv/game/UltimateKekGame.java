@@ -172,7 +172,10 @@ public class UltimateKekGame implements IGameLogic {
     @Override
     public void cleanup() {
         renderer.cleanup();
-        for(GameItem item : scene.getGameItems()) item.getMesh().cleanUp();
+        for(AbstractGameItem item : scene.getGameItems()) {
+            // todo: temp fix for retro-compat. Update AbsGameItem to include cleanup methods or find other good solution.
+            if (item instanceof GameItemMesh) ((GameItemMesh)item).getMesh().cleanUp();
+        }
         hud.cleanup();
     }
 
