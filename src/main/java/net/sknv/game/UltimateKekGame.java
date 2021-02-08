@@ -7,6 +7,7 @@ import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +20,8 @@ public class UltimateKekGame implements IGameLogic {
     private static final float FOV = (float) Math.toRadians(60.0f);
     private static final float Z_NEAR = 0.01f;
     private static final float Z_FAR = 1000.f;
+
+    Matrix4f projectionMatrix, viewMatrix, ortho;
 
     private static final float MOUSE_SENSITIVITY = 0.003f;
     private static final float CAMERA_POS_STEP = 0.03f;
@@ -123,14 +126,30 @@ public class UltimateKekGame implements IGameLogic {
 
         if (window.isKeyPressed(GLFW_KEY_K)) movableItem.setRotationEuclidean(new Vector3f());
 
-        if(mouseInput.isLeftClicked()){
-            /*
-            Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
-            Vector3f cameraPos = camera.getPosition();
 
-            //ray casting
-            RayCast ray = new RayCast(renderer, new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-             */
+
+        if (window.isResized()) {
+            glViewport(0, 0, window.getWidth(), window.getHeight());
+            window.setResized(false);
+        }
+        hud.updateSize(window);
+
+        //update matrices
+        projectionMatrix = Transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
+        viewMatrix = Transformation.getViewMatrix(camera);
+        ortho = Transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+
+
+        //ray casting
+        Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
+        Vector3f cameraPos = camera.getPosition();
+        RayCast ray = new RayCast(renderer, new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
+
+        //ray casting triangle intersection test
+        if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
+            GraphUtils.drawQuad(renderer, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
+        } else{
+            GraphUtils.drawQuad(renderer, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
         }
     }
 
@@ -154,18 +173,7 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     @Override
-    public void render(Window window, MouseInput mouseInput) {
-        if (window.isResized()) {
-            glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(false);
-        }
-
-        //update matrices
-        Matrix4f projectionMatrix = Transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
-        Matrix4f viewMatrix = Transformation.getViewMatrix(camera);
-        Matrix4f ortho = Transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
-
-        hud.updateSize(window);
+    public void render() {
         renderer.render(projectionMatrix, viewMatrix, ortho, scene, hud);
     }
 

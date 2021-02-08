@@ -112,12 +112,6 @@ public class Renderer {
 
 
         /*dbz mark -------------------------------------------------------------------------------
-        Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
-        Vector3f cameraPos = camera.getPosition();
-
-        //ray casting
-        RayCast ray = new RayCast(this, new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-
         //ray casting triangle intersection test
         if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
             GraphUtils.drawQuad(this, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
