@@ -1,4 +1,4 @@
-package net.sknv.engine.physics;
+package net.sknv.engine.entities;
 
 import net.sknv.engine.Utils;
 import net.sknv.engine.graph.*;
@@ -19,14 +19,16 @@ import java.io.Serializable;
 public abstract class AbstractGameItem implements IRenderable, Serializable {
 
     protected Vector3f position;
+    protected Vector3f rotation;
+    protected float scale;
+    protected transient Mesh mesh;
+
+    // todo: move this to Collider type?
     protected transient BoundingBox boundingBox;
-    private transient Mesh mesh;
-    private Vector3f rotation;
-    private float scale;
-    private boolean movable;
-    private float mass;
-    private Vector3f velocity;
-    private transient Vector3f forces;
+    protected boolean movable;
+    protected float mass;
+    protected Vector3f velocity;
+    protected transient Vector3f forces;
 
     public AbstractGameItem() {
         velocity = new Vector3f(0, 0, 0);

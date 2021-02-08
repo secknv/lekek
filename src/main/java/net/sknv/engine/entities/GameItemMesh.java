@@ -1,10 +1,9 @@
-package net.sknv.engine;
+package net.sknv.engine.entities;
 
 import net.sknv.engine.graph.Mesh;
 import net.sknv.engine.graph.ShaderProgram;
 import net.sknv.engine.graph.Texture;
 import net.sknv.engine.graph.Transformation;
-import net.sknv.engine.physics.AbstractGameItem;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Matrix4f;
 

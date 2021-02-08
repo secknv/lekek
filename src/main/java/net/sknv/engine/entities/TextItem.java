@@ -1,5 +1,7 @@
-package net.sknv.engine;
+package net.sknv.engine.entities;
 
+import net.sknv.engine.Utils;
+import net.sknv.engine.entities.GameItemMesh;
 import net.sknv.engine.graph.FontTexture;
 import net.sknv.engine.graph.Material;
 import net.sknv.engine.graph.Mesh;
@@ -7,7 +9,7 @@ import net.sknv.engine.graph.Mesh;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextItem extends GameItem {
+public class TextItem extends GameItemMesh {
 
     private static final float ZPOS = 0.0f;
 
