@@ -171,16 +171,9 @@ public class Renderer {
 
         //render each game item
         ArrayList<GameItem> clickedItems = new ArrayList<>();
-        for (GameItem gameItem : scene.getGameItems()) {
+        for (AbstractGameItem gameItem : scene.getGameItems()) {
 
-            Mesh mesh = gameItem.getMesh();
-            //set model view
-            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
-            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-
-            //if color
-            shaderProgram.setUniform("material", mesh.getMaterial());
-            mesh.render();
+            gameItem.render(shaderProgram, viewMatrix);
 
             if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem) ){
                 clickedItems.add(gameItem);
@@ -250,18 +243,9 @@ public class Renderer {
     private void renderHud(Window window, IHud hud) {
         hudShaderProgram.bind();
 
-        Matrix4f ortho = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
-        for (GameItem gameItem : hud.getGameItems()) {
-            Mesh mesh = gameItem.getMesh();
-            // Set ortohtaphic and model matrix for this HUD item
-            Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(gameItem, ortho);
-
-            hudShaderProgram.setUniform("projModelMatrix", projModelMatrix);
-            hudShaderProgram.setUniform("colour", gameItem.getMesh().getMaterial().getAmbientColor());
-            hudShaderProgram.setUniform("hasTexture", gameItem.getMesh().getMaterial().isTextured() ? 1 : 0);
-
-            // Render the mesh for this HUD item
-            mesh.render();
+        Matrix4f ortho = Transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+        for (HudElement elem : hud.getHudElements()) {
+            elem.render(hudShaderProgram, ortho);
         }
 
         hudShaderProgram.unbind();

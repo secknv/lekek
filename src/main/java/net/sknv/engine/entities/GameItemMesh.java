@@ -1,11 +1,11 @@
 package net.sknv.engine.entities;
 
-import net.sknv.engine.graph.Mesh;
-import net.sknv.engine.graph.ShaderProgram;
-import net.sknv.engine.graph.Texture;
-import net.sknv.engine.graph.Transformation;
+import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Matrix4f;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -13,6 +13,8 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class GameItemMesh extends AbstractGameItem {
+
+    protected transient Mesh mesh;
 
     public GameItemMesh() {
         super();
@@ -52,5 +54,37 @@ public class GameItemMesh extends AbstractGameItem {
         //restore state
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    public Mesh getMesh() {
+        return mesh;
+    }
+
+    public void setMesh(Mesh mesh) {
+        this.mesh = mesh;
+    }
+
+    @Override
+    public String toString() {
+        return "GameItem{" +
+                "color=" + this.mesh.getMaterial() +
+                ", pos=" + position +
+                ", boundingBox=" + boundingBox +
+                '}';
+    }
+
+    private void readObject(java.io.ObjectInputStream inputStream) throws Exception {
+        inputStream.defaultReadObject();
+        Mesh mesh = OBJLoader.loadMesh((String) inputStream.readObject());
+        mesh.setMaterial((Material) inputStream.readObject());
+
+        setMesh(mesh);
+        setBoundingBox(new OBB(this));
+    }
+
+    private void writeObject(ObjectOutputStream outputStream) throws IOException {
+        outputStream.defaultWriteObject();
+        outputStream.writeObject(mesh.getModelFile());
+        outputStream.writeObject(mesh.getMaterial());
     }
 }

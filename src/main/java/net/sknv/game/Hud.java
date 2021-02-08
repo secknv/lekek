@@ -1,8 +1,10 @@
 package net.sknv.game;
 
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.AbstractGameItem;
+import net.sknv.engine.entities.GameItemMesh;
 import net.sknv.engine.IHud;
-import net.sknv.engine.TextItem;
+import net.sknv.engine.entities.HudElement;
+import net.sknv.engine.entities.TextItem;
 import net.sknv.engine.Window;
 import net.sknv.engine.graph.FontTexture;
 import net.sknv.engine.graph.Material;
@@ -21,11 +23,11 @@ public class Hud implements IHud {
 
     private static final String CHARSET = "ISO-8859-1";
 
-    private final ArrayList<GameItem> gameItems;
+    private final ArrayList<HudElement> hudElements;
 
     private final TextItem statusTextItem;
 
-    private final GameItem compassItem;
+    private final HudElement compassItem;
 
     private final HudTerminal terminal;
 
@@ -41,13 +43,13 @@ public class Hud implements IHud {
         Material material = new Material();
         material.setAmbientColor(new Vector4f(1, 0, 0, 1));
         mesh.setMaterial(material);
-        compassItem = new GameItem(mesh);
+        compassItem = new HudElement(mesh);
         compassItem.setScale(40.0f);
         // Rotate to transform it to screen coordinates
         compassItem.setRotationEuclidean(new Vector3f(0f, 0f, 180f));
 
         // Create list that holds the items that compose the HUD
-        gameItems = new ArrayList<>(List.of(statusTextItem, compassItem));
+        hudElements = new ArrayList<HudElement>(List.of(statusTextItem, compassItem));
     }
 
     public void setStatusText(String statusText) {
@@ -59,14 +61,14 @@ public class Hud implements IHud {
     }
 
     @Override
-    public ArrayList<GameItem> getGameItems() {
-        return gameItems;
+    public ArrayList<HudElement> getHudElements() {
+        return hudElements;
     }
 
     public void updateSize(Window window) {
-        this.statusTextItem.setPos(window.getCenter().x, window.getCenter().y, 0);
-        this.compassItem.setPos(window.getWidth() - 40f, 50f, 0);
-        this.terminal.getTextItem().setPos(0f, window.getHeight()-20f, 0);
+        this.statusTextItem.setPosition(window.getCenter().x, window.getCenter().y, 0);
+        this.compassItem.setPosition(window.getWidth() - 40f, 50f, 0);
+        this.terminal.getTextItem().setPosition(0f, window.getHeight()-20f, 0);
     }
 
     public HudTerminal getTerminal() {
@@ -75,11 +77,11 @@ public class Hud implements IHud {
 
     public void showTerminal() {
         terminal.open();
-        gameItems.add(terminal.getTextItem());
+        hudElements.add(terminal.getTextItem());
     }
 
     public void hideTerminal() {
         terminal.close();
-        gameItems.remove(terminal.getTextItem());
+        hudElements.remove(terminal.getTextItem());
     }
 }

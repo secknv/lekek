@@ -15,9 +15,9 @@ public interface IRenderable {
      *   <li>A transformation matrix. This can be the ViewMatrix, ModelViewMatrix or OrthoProjModelMatrix, for example.</li>
      * </ol>
      * In our case, the required transformations are applied inside this method's implementations and so we pass it the
-     * first matrix in the sequence: the View Matrix.
+     * first matrix in the sequence: the View Matrix (or the OrthoProjMatrix for the HUD case).
      * @param shaderProgram {@link ShaderProgram} for this object.
-     * @param viewMatrix Represents where the player is and where he is looking at.
+     * @param matrix First matrix in the transformation sequence.
      */
-    void render(ShaderProgram shaderProgram, Matrix4f viewMatrix);
+    void render(ShaderProgram shaderProgram, Matrix4f matrix);
 }

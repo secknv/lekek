@@ -1,16 +1,14 @@
 package net.sknv.engine.entities;
 
 import net.sknv.engine.Utils;
-import net.sknv.engine.graph.*;
+import net.sknv.engine.graph.IRenderable;
+import net.sknv.engine.graph.ShaderProgram;
 import net.sknv.engine.physics.colliders.BoundingBox;
-import net.sknv.engine.physics.colliders.OBB;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -21,7 +19,6 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     protected Vector3f position;
     protected Vector3f rotation;
     protected float scale;
-    protected transient Mesh mesh;
 
     // todo: move this to Collider type?
     protected transient BoundingBox boundingBox;
@@ -75,10 +72,6 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
 
     public void setScale(float scale) {
         this.scale = scale;
-    }
-
-    public void setMesh(Mesh mesh) {
-        this.mesh = mesh;
     }
 
     public void setBoundingBox(BoundingBox boundingBox) {
@@ -136,29 +129,5 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
 
     public void applyForce(Vector3f force) {
         forces.add(force);
-    }
-
-    @Override
-    public String toString() {
-        return "GameItem{" +
-                "color=" + this.mesh.getMaterial() +
-                ", pos=" + position +
-                ", boundingBox=" + boundingBox +
-                '}';
-    }
-
-    private void readObject(java.io.ObjectInputStream inputStream) throws Exception {
-        inputStream.defaultReadObject();
-        Mesh mesh = OBJLoader.loadMesh((String) inputStream.readObject());
-        mesh.setMaterial((Material) inputStream.readObject());
-
-        setMesh(mesh);
-        setBoundingBox(new OBB(this));
-    }
-
-    private void writeObject(ObjectOutputStream outputStream) throws IOException {
-        outputStream.defaultWriteObject();
-        outputStream.writeObject(mesh.getModelFile());
-        outputStream.writeObject(mesh.getMaterial());
     }
 }
