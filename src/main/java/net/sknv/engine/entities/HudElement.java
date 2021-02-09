@@ -10,15 +10,12 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class HudElement extends GameItemMesh {
 
-    protected transient Mesh mesh;
-
     public HudElement() {
         super();
     }
 
     public HudElement(Mesh mesh) {
-        this();
-        this.mesh = mesh;
+        super(mesh);
     }
 
     @Override
