@@ -33,6 +33,19 @@ public class GraphUtils {
         renderer.addAlienVAO(generateAVAO(posArray, idxArray, color, GL_LINES));
     }
 
+    public static void drawRay(Renderer renderer, RayCast ray){
+        Vector3f end = new Vector3f();
+        ray.origin.add(ray.direction, end);
+        GraphUtils.drawLine(ray.origin, end, renderer, new Vector4f(255,255,0,0));
+    }
+
+    public static void drawRay(Renderer renderer, RayCast ray, float scale) {
+        Vector3f end = new Vector3f();
+        ray.direction.mul(scale, end);
+        ray.origin.add(end, end);
+        GraphUtils.drawLine(ray.origin, end, renderer, new Vector4f(255,255,0,0));
+    }
+
     public static void drawGrid(Renderer renderer, Vector3f origin, int size){
         Vector3f start = new Vector3f();
         origin.add(-size/2f, 0f, -size/2f, start);
@@ -65,7 +78,7 @@ public class GraphUtils {
             else idxArray[i*2+1]=5*size-i;
         }
 
-        renderer.addAlienVAO(generateAVAO(posArray, idxArray, new Vector4f(1, 0, 0, 1), GL_LINES));
+        renderer.addAlienVAO(generateAVAO(posArray, idxArray, new Vector4f(0, 0, 0, 1), GL_LINES));
     }
 
     public static void drawQuad(Renderer renderer, Vector4f color,Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4){

@@ -6,7 +6,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -16,32 +15,19 @@ import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 
 public class Renderer {
 
-    private static final float FOV = (float) Math.toRadians(60.0f);
-    private static final float Z_NEAR = 0.01f;
-    private static final float Z_FAR = 1000.f;
+    private ShaderProgram shaderProgram, hudShaderProgram, skyBoxShaderProgram;
 
     private static final int MAX_POINT_LIGHTS = 5;
     private static final int MAX_SPOT_LIGHTS = 5;
-
-    private final Transformation transformation;
-
-    private ShaderProgram shaderProgram, hudShaderProgram, skyBoxShaderProgram;
-
     private float specularPower;
-    private boolean devMode;
 
     private final LinkedBlockingQueue<AlienVAO> alienVAOQueue = new LinkedBlockingQueue<>();
 
-    //spaghet
-    private ArrayList<Vector3f> track = new ArrayList<>();
-
     public Renderer() {
-        transformation = new Transformation();
         specularPower = 10f;
-        devMode = true;
     }
 
-    public void init(Window window) throws Exception {
+    public void init() throws Exception {
         setupSceneShader();
         setupHudShader();
         setupSkyBoxShader();
@@ -98,104 +84,38 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, MouseInput mouseInput, Camera camera, Scene scene, IHud hud) {
+    public void render(Matrix4f projectionMatrix, Matrix4f viewMatrix, Matrix4f ortho, Scene scene, IHud hud) {
         clear();
-
-        if (window.isResized()) {
-            glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(false);
-        }
-
-        renderScene(window, mouseInput, camera, scene);
-        renderSkyBox(window, camera, scene);
-        renderHud(window, hud);
+        renderScene(projectionMatrix, viewMatrix, scene);
+        renderSkyBox(projectionMatrix, viewMatrix, scene);
+        renderHud(ortho, hud);
+        renderGraphUtils();
     }
 
-    private void renderScene(Window window, MouseInput mouseInput, Camera camera, Scene scene) {
+    private void renderScene(Matrix4f projectionMatrix, Matrix4f viewMatrix, Scene scene) {
 
         Vector3f ambientLight = scene.getSceneLight().getAmbientLight();
         DirectionalLight directionalLight = scene.getSceneLight().getDirectionalLight();
 
         shaderProgram.bind();
-
-        //update projection matrix
-        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
-
-        //update view matrix
-        Matrix4f viewMatrix = transformation.getViewMatrix(camera);
+        shaderProgram.setUniform("texture_sampler", 0);
 
         //update light uniforms
         renderLights(viewMatrix, ambientLight, directionalLight);
 
-        shaderProgram.setUniform("texture_sampler", 0);
-
-        //dbz mark -------------------------------------------------------------------------------
-        Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
-        Vector3f cameraPos = camera.getPosition();
-
-        //ray casting
-        RayCast ray = new RayCast(this, cameraPos, new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-
-        //ray casting triangle intersection test
-        if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
-            GraphUtils.drawQuad(this, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        } else{
-            GraphUtils.drawQuad(this, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        }
-
-        //Boid boid = (Boid) gameItems.get(6);
-        //tracking line
-        /*
-        Vector3f t = new Vector3f(boid.getPos().x, boid.getPos().y, boid.getPos().z);
-        if(track.size()<2){
-            track.add(t);
-        }
-        else {
-            if(t.distance(track.get(track.size()-1))>0.05f) track.add(t);
-            if(track.size()>200){ track.remove(0);};
-            for(int i=0; i!=track.size()-1; i++){
-                GraphUtils.drawLine(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), track.get(i), track.get(i+1));
-            }
-        }
-         */
-        /*
-        //boid rays
-        RayCast boidL = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-        RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.velocity);
-        RayCast boidR = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-
-        boidC.drawScaledRay(1, viewMatrix);
-         */
-        //end dbz mark ---------------------------------------------------------------------------
-
         //render each game item
-        ArrayList<GameItem> clickedItems = new ArrayList<>();
         for (GameItem gameItem : scene.getGameItems()) {
 
             Mesh mesh = gameItem.getMesh();
             //set model view
-            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
+            Matrix4f modelViewMatrix = Transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
 
             //if color
             shaderProgram.setUniform("material", mesh.getMaterial());
             mesh.render();
-
-            if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem) ){
-                clickedItems.add(gameItem);
-            }
         }
-
-        if(!clickedItems.isEmpty()) {
-            float d = cameraPos.distance(clickedItems.get(0).getPosition());
-            for (GameItem item : clickedItems) {
-                if (cameraPos.distance(item.getPosition()) <= d) clicked = item;
-            }
-            GraphUtils.drawBoundingBox(this, new Vector4f(255, 255, 0, 0), clicked.getBoundingBox());
-        }
-
-        if(clicked != null) GraphUtils.drawBoundingBox(this, new Vector4f(75f,0,15f,0f), clicked.getBoundingBox());
 
         while (!alienVAOQueue.isEmpty()){
 
@@ -221,9 +141,6 @@ public class Renderer {
             glDeleteVertexArrays(vao.getVaoId());
         }
 
-
-        if(devMode) renderGraphUtils();
-
         shaderProgram.unbind();
     }
 
@@ -247,14 +164,13 @@ public class Renderer {
         GraphUtils.drawAxis(this);
     }
 
-    private void renderHud(Window window, IHud hud) {
+    private void renderHud(Matrix4f ortho, IHud hud) {
         hudShaderProgram.bind();
 
-        Matrix4f ortho = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
         for (GameItem gameItem : hud.getGameItems()) {
             Mesh mesh = gameItem.getMesh();
             // Set ortohtaphic and model matrix for this HUD item
-            Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(gameItem, ortho);
+            Matrix4f projModelMatrix = Transformation.getOrtoProjModelMatrix(gameItem, ortho);
 
             hudShaderProgram.setUniform("projModelMatrix", projModelMatrix);
             hudShaderProgram.setUniform("colour", gameItem.getMesh().getMaterial().getAmbientColor());
@@ -267,20 +183,18 @@ public class Renderer {
         hudShaderProgram.unbind();
     }
 
-    private void renderSkyBox(Window window, Camera camera, Scene scene) {
+    private void renderSkyBox(Matrix4f projectionMatrix, Matrix4f viewMatrix, Scene scene) {
         skyBoxShaderProgram.bind();
 
         skyBoxShaderProgram.setUniform("texture_sampler", 0);
-
-        // Update projection Matrix
-        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
         skyBoxShaderProgram.setUniform("projectionMatrix", projectionMatrix);
+
         SkyBox skyBox = scene.getSkyBox();
-        Matrix4f viewMatrix = transformation.getViewMatrix(camera);
-        viewMatrix.m30(0);
-        viewMatrix.m31(0);
-        viewMatrix.m32(0);
-        Matrix4f modelViewMatrix = transformation.getModelViewMatrix(skyBox, viewMatrix);
+        Matrix4f vMatrix = new Matrix4f(viewMatrix);
+        vMatrix.m30(0);
+        vMatrix.m31(0);
+        vMatrix.m32(0);
+        Matrix4f modelViewMatrix = Transformation.getModelViewMatrix(skyBox, vMatrix);
         skyBoxShaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
         skyBoxShaderProgram.setUniform("ambientLight", scene.getSceneLight().getAmbientLight());
 
@@ -299,11 +213,5 @@ public class Renderer {
      * */
     public void addAlienVAO(AlienVAO alienVAO) {
         this.alienVAOQueue.offer(alienVAO);
-    }
-
-    //spaghet
-    private GameItem clicked;
-    public GameItem getClicked() {
-        return clicked;
     }
 }

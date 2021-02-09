@@ -94,19 +94,18 @@ public class Scene implements Serializable {
         //init gameItems
         //background game items
         float blockScale = 0.5f;
-        float skyBoxScale = 10.0f;
-        float extension = 2.0f;
+        float skyBoxScale = 20.0f;
 
-        float startx = extension * (-skyBoxScale + blockScale);
-        float startz = extension * (skyBoxScale - blockScale);
+        float startx = 0;
+        float startz = 0;
         float starty = -1.0f;
         float inc = blockScale * 2;
 
         float posx = startx;
         float posz = startz;
         float incy = 0.0f;
-        int NUM_ROWS = (int)(extension * skyBoxScale * 2 / inc);
-        int NUM_COLS = (int)(extension * skyBoxScale * 2/ inc);
+        int NUM_ROWS = 10;
+        int NUM_COLS = 10;
         ArrayList<GameItem> gameItems  = new ArrayList<>(NUM_ROWS * NUM_COLS + 10);
         for(int i=0; i<NUM_ROWS; i++) {
             for(int j=0; j<NUM_COLS; j++) {
