@@ -1,7 +1,7 @@
 package net.sknv.engine;
 
 import net.sknv.engine.entities.AbstractGameItem;
-import net.sknv.engine.entities.GameItemMesh;
+import net.sknv.engine.entities.Collider;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector3f;
@@ -108,14 +108,14 @@ public class Scene implements Serializable {
         float incy = 0.0f;
         int NUM_ROWS = 10;
         int NUM_COLS = 10;
-        ArrayList<AbstractGameItem> gameItems  = new ArrayList<>(NUM_ROWS * NUM_COLS + 10);
+        ArrayList<AbstractGameItem> blocks  = new ArrayList<>(NUM_ROWS * NUM_COLS + 10);
         for(int i=0; i<NUM_ROWS; i++) {
             for(int j=0; j<NUM_COLS; j++) {
-                AbstractGameItem gameItem = new GameItemMesh(cube);
-                gameItem.setScale(blockScale);
+                Collider grass = new Collider(cube);
+                grass.setScale(blockScale);
                 incy = Math.random() > 0.9f ? blockScale * 2 : 0f;
-                gameItem.setPosition(posx, starty + incy, posz);
-                gameItems.add(gameItem);
+                grass.setPosition(posx, starty + incy, posz);
+                blocks.add(grass);
 
                 posx += inc;
             }
@@ -124,7 +124,7 @@ public class Scene implements Serializable {
         }
 
         // Special game items
-        GameItemMesh testItem = new GameItemMesh(kek);
+        Collider testItem = new Collider(kek);
         testItem.setPosition(2f, 1, 2f);
         testItem.setScale(blockScale);
 
@@ -134,9 +134,9 @@ public class Scene implements Serializable {
         // add special items to gameItems array
         // this is here case more than one special items...
         // easier to just add {testItem, myOtherItem, kekItem}
-        AbstractGameItem[] specialItems = {testItem};
-        gameItems.addAll(Arrays.asList(specialItems));
-        setGameItems(gameItems);
+        Collider[] specialItems = {testItem};
+        blocks.addAll(Arrays.asList(specialItems));
+        setGameItems(blocks);
 
         // Setup SkyBox
         // todo: standardize resource paths

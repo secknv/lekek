@@ -2,8 +2,6 @@ package net.sknv.engine.entities;
 
 import net.sknv.engine.Utils;
 import net.sknv.engine.graph.*;
-import net.sknv.engine.physics.colliders.BoundingBox;
-import net.sknv.engine.physics.colliders.OBB;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -28,7 +26,6 @@ public class GameItemMesh extends AbstractGameItem {
     public GameItemMesh(Mesh mesh) {
         this();
         this.mesh = mesh;
-        this.boundingBox = new OBB(this);
     }
 
     @Override
@@ -76,11 +73,11 @@ public class GameItemMesh extends AbstractGameItem {
 
     @Override
     public String toString() {
-        return "GameItem{" +
-                "hud?=" + (this instanceof HudElement) +
-                "color=" + (mesh!=null ? this.mesh.getMaterial() : "no mesh") +
-                ", pos=" + position +
-                ", boundingBox=" + boundingBox +
+        return "GameItemMesh{" +
+                "position=" + position +
+                ", rotation=" + rotation +
+                ", scale=" + scale +
+                ", mesh=" + mesh +
                 '}';
     }
 
@@ -90,7 +87,6 @@ public class GameItemMesh extends AbstractGameItem {
         mesh.setMaterial((Material) inputStream.readObject());
 
         setMesh(mesh);
-        setBoundingBox(new OBB(this));
     }
 
     private void writeObject(ObjectOutputStream outputStream) throws IOException {
@@ -99,12 +95,13 @@ public class GameItemMesh extends AbstractGameItem {
         outputStream.writeObject(mesh.getMaterial());
     }
 
-    public void setBoundingBox(BoundingBox boundingBox) {
-        this.boundingBox = boundingBox;
-    }
-
-
-    public void rotateEuclidean(Vector3f rot) {
+    /*
+    * // todo: this is probably spaghet but ok
+    * The idea here is to have Collider override this method, call super and add the BB rotation line.
+    * BUT `this.boundingBox.rotate(rotQuaternion);` <- requires rotQuaternion
+    * SO we make this method return that
+    * */
+    public Quaternionf rotateEuclidean(Vector3f rot) {
         // Object POV axis
         Vector3f xAxis = new Vector3f(1,0,0);
         Vector3f yAxis = new Vector3f(0,1,0);
@@ -135,8 +132,7 @@ public class GameItemMesh extends AbstractGameItem {
         xq.mul(current);
 
         rotation = Utils.getEulerAngles(xq);//set item rot
-        if (this instanceof HudElement) return;
-        this.boundingBox.rotate(rotQuaternion);//set bb rot
+        return rotQuaternion;
     }
 
     public void setRotationEuclidean(Vector3f euclideanRot) {
