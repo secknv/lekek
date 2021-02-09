@@ -36,8 +36,6 @@ public class SkyBox extends GameItemMesh {
         assert ambientLight != null: "You MUST set the Ambient Light with this::setAmbientLight!";
         assert projectionMatrix != null: "You MUST set the Projection Matrix with this::setProjectionMatrix!";
 
-        shaderProgram.bind();
-
         shaderProgram.setUniform("texture_sampler", 0);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
@@ -48,9 +46,6 @@ public class SkyBox extends GameItemMesh {
         Matrix4f modelViewMatrix = Transformation.getModelViewMatrix(this, vMatrix);
         shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
         shaderProgram.setUniform("ambientLight", ambientLight);
-
-
-        shaderProgram.unbind();
     }
 
     public void setAmbientLight(Vector3f ambientLight) {

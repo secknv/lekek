@@ -30,7 +30,6 @@ public class GameItemMesh extends AbstractGameItem {
 
     @Override
     public void render(ShaderProgram shaderProgram, Matrix4f viewMatrix) {
-        shaderProgram.bind();
 
         int drawMode = GL_TRIANGLES;
 
@@ -58,9 +57,6 @@ public class GameItemMesh extends AbstractGameItem {
         //restore state
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
-
-        // reset to default
-        shaderProgram.unbind();
     }
 
     public Mesh getMesh() {
