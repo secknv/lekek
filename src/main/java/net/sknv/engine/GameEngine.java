@@ -105,7 +105,7 @@ public class GameEngine implements Runnable {
     }
 
     protected void render() {
-        gameLogic.render(window, mouseInput);
+        gameLogic.render();
         window.update();
     }
 

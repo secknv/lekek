@@ -8,7 +8,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -24,19 +23,13 @@ public class Renderer {
     private static final int MAX_SPOT_LIGHTS = 5;
     private float specularPower;
 
-    private boolean devMode;
-
     private final LinkedBlockingQueue<AlienVAO> alienVAOQueue = new LinkedBlockingQueue<>();
-
-    //spaghet
-    private ArrayList<RayCast> rayCasts = new ArrayList<RayCast>();
 
     public Renderer() {
         specularPower = 10f;
-        devMode = true;
     }
 
-    public void init(Window window) throws Exception {
+    public void init() throws Exception {
         setupSceneShader();
         setupHudShader();
         setupSkyBoxShader();
@@ -98,6 +91,7 @@ public class Renderer {
         renderScene(projectionMatrix, viewMatrix, scene);
         renderSkyBox(projectionMatrix, viewMatrix, scene);
         renderHud(ortho, hud);
+        renderGraphUtils();
     }
 
     private void renderScene(Matrix4f projectionMatrix, Matrix4f viewMatrix, Scene scene) {
@@ -112,71 +106,10 @@ public class Renderer {
         //update light uniforms
         renderLights(viewMatrix, ambientLight, directionalLight);
 
-
-        /*dbz mark -------------------------------------------------------------------------------
-        Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
-        Vector3f cameraPos = camera.getPosition();
-
-        //ray casting
-        RayCast ray = new RayCast(this, new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-
-        //ray casting triangle intersection test
-        if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
-            GraphUtils.drawQuad(this, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        } else{
-            GraphUtils.drawQuad(this, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        }
-
-        //Boid boid = (Boid) gameItems.get(6);
-        //tracking line
-        /*
-        Vector3f t = new Vector3f(boid.getPos().x, boid.getPos().y, boid.getPos().z);
-        if(track.size()<2){
-            track.add(t);
-        }
-        else {
-            if(t.distance(track.get(track.size()-1))>0.05f) track.add(t);
-            if(track.size()>200){ track.remove(0);};
-            for(int i=0; i!=track.size()-1; i++){
-                GraphUtils.drawLine(shaderProgram, viewMatrix, new Vector4f(255,0,0,0), track.get(i), track.get(i+1));
-            }
-        }
-         */
-        /*
-        //boid rays
-        RayCast boidL = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-        RayCast boidC = new RayCast(shaderProgram, boid.getPos(), boid.velocity);
-        RayCast boidR = new RayCast(shaderProgram, boid.getPos(), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-
-        boidC.drawScaledRay(1, viewMatrix);
-         */
-        //end dbz mark ---------------------------------------------------------------------------
-
         //render each game item
-        ArrayList<AbstractGameItem> clickedItems = new ArrayList<>();
         for (AbstractGameItem gameItem : scene.getGameItems()) {
             gameItem.render(shaderProgram, viewMatrix);
-
-            //if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItem)) clickedItems.add(gameItem);
         }
-
-        /*
-        if(mouseInput.isRightClicked()) rayCasts.add(ray);
-        for (RayCast rayCast : rayCasts){
-            rayCast.drawScaledRay(this,10);
-        }
-        System.out.println(rayCasts.size());
-
-        if(!clickedItems.isEmpty()) {
-            float d = cameraPos.distance(clickedItems.get(0).getPosition());
-            for (GameItem item : clickedItems) {
-                if (cameraPos.distance(item.getPosition()) <= d) clicked = item;
-            }
-            GraphUtils.drawBoundingBox(this, new Vector4f(255, 255, 0, 0), clicked.getBoundingBox());
-        }
-
-        if(clicked != null) GraphUtils.drawBoundingBox(this, new Vector4f(75f,0,15f,0f), clicked.getBoundingBox());
-         */
 
         while (!alienVAOQueue.isEmpty()){
 
@@ -201,9 +134,6 @@ public class Renderer {
             glBindVertexArray(0);
             glDeleteVertexArrays(vao.getVaoId());
         }
-
-
-        if(devMode) renderGraphUtils();
 
         shaderProgram.unbind();
     }
@@ -260,11 +190,5 @@ public class Renderer {
      * */
     public void addAlienVAO(AlienVAO alienVAO) {
         this.alienVAOQueue.offer(alienVAO);
-    }
-
-    //spaghet
-    private AbstractGameItem clicked;
-    public AbstractGameItem getClicked() {
-        return clicked;
     }
 }

@@ -13,8 +13,10 @@ import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -25,6 +27,9 @@ public class UltimateKekGame implements IGameLogic {
     private static final float FOV = (float) Math.toRadians(60.0f);
     private static final float Z_NEAR = 0.01f;
     private static final float Z_FAR = 1000.f;
+
+    private static Matrix4f projectionMatrix, viewMatrix, ortho;
+    private ArrayList<RayCast> rayCasts = new ArrayList<>();
 
     private static final float MOUSE_SENSITIVITY = 0.003f;
     private static final float CAMERA_POS_STEP = 0.03f;
@@ -43,7 +48,7 @@ public class UltimateKekGame implements IGameLogic {
 
     //collisions stuff
     private PhysicsEngine physicsEngine;
-    public GameItemMesh movableItem;
+    public GameItemMesh selectedItem;
 
     public UltimateKekGame() {
         renderer = new Renderer();
@@ -54,7 +59,7 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void init(Window window, MouseInput mouseInput) throws Exception {
-        renderer.init(window);
+        renderer.init();
         setKeyCallbacks(window, mouseInput);
 
         initScene("default");
@@ -67,7 +72,7 @@ public class UltimateKekGame implements IGameLogic {
         camera.setPosition(0.65f, 1.15f, 4.34f);
 
         //todo temp - figure this out
-        if(!scene.getGameItems().isEmpty()) movableItem = (GameItemMesh) scene.getGameItems().get(0);
+        if(!scene.getGameItems().isEmpty()) selectedItem = (GameItemMesh)scene.getGameItems().get(0);
     }
 
     public void initScene(String scene) {
@@ -101,7 +106,19 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void input(Window window, MouseInput mouseInput) {
+
+        if (window.isResized()) {
+            glViewport(0, 0, window.getWidth(), window.getHeight());
+            window.setResized(false);
+        }
+
+        //update matrices
+        projectionMatrix = Transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
+        viewMatrix = Transformation.getViewMatrix(camera);
+        ortho = Transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+
         cameraPosInc.zero();
+        hud.updateSize(window);
 
         if (window.isKeyPressed(GLFW_KEY_W)) cameraPosInc.z = -1;
         if (window.isKeyPressed(GLFW_KEY_S)) cameraPosInc.z = (cameraPosInc.z < 0 ? 0 : 1);
@@ -112,37 +129,65 @@ public class UltimateKekGame implements IGameLogic {
 
         if (cameraPosInc.length() != 0) cameraPosInc.normalize();
 
-        if (renderer.getClicked() != null) movableItem = (GameItemMesh) renderer.getClicked();
         if (window.isKeyPressed(GLFW_KEY_UP)) {
-            if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.getVelocity().z = 0f;
-            else movableItem.getVelocity().z = -.1f;
-        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.getVelocity().z = .1f;
+            if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = 0f;
+            else selectedItem.getVelocity().z = -.1f;
+        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = .1f;
 
         if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-            if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.getVelocity().x = 0f;
-            else movableItem.getVelocity().x = -.1f;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) movableItem.getVelocity().x = .1f;
+            if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = 0f;
+            else selectedItem.getVelocity().x = -.1f;
+        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = .1f;
 
         if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) {
-            if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) movableItem.getVelocity().y = 0f;
-            else movableItem.getVelocity().y = .1f;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) movableItem.getVelocity().y = -.1f;
+            if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = 0f;
+            else selectedItem.getVelocity().y = .1f;
+        } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = -.1f;
 
-        if (window.isKeyPressed(GLFW_KEY_X)) movableItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
-        if (window.isKeyPressed(GLFW_KEY_Y)) movableItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
-        if (window.isKeyPressed(GLFW_KEY_Z)) movableItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
+        if (window.isKeyPressed(GLFW_KEY_X)) selectedItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
+        if (window.isKeyPressed(GLFW_KEY_Y)) selectedItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
+        if (window.isKeyPressed(GLFW_KEY_Z)) selectedItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
+        if (window.isKeyPressed(GLFW_KEY_K)) selectedItem.setRotationEuclidean(new Vector3f());
 
-        if (window.isKeyPressed(GLFW_KEY_K)) movableItem.setRotationEuclidean(new Vector3f());
+        //ray casting
+        Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
+        Vector3f cameraPos = camera.getPosition();
+        RayCast ray = new RayCast(new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
 
-        if(mouseInput.isLeftClicked()){
-            /*
-            Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
-            Vector3f cameraPos = camera.getPosition();
-
-            //ray casting
-            RayCast ray = new RayCast(renderer, new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
-             */
+        //ray casting quad intersection test
+        if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
+            GraphUtils.drawQuad(renderer, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
+        } else{
+            GraphUtils.drawQuad(renderer, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
         }
+
+        if(mouseInput.isRightClicked()) rayCasts.add(ray);
+        for (RayCast rayCast : rayCasts){
+            GraphUtils.drawRay(renderer, rayCast, 10);
+        }
+
+        ArrayList<GameItemMesh> clickedItems = new ArrayList<>();
+        for (AbstractGameItem gameItem : scene.getGameItems()) {
+            if (gameItem instanceof GameItemMesh) {
+                // todo: spaghet
+                GameItemMesh gameItemMesh = (GameItemMesh) gameItem;
+                if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItemMesh)) clickedItems.add(gameItemMesh);
+            }
+        }
+
+        if(!clickedItems.isEmpty()) {
+            float d = cameraPos.distance(clickedItems.get(0).getPosition());
+            for (GameItemMesh item : clickedItems) {
+                if (cameraPos.distance(item.getPosition()) <= d){
+                    d = cameraPos.distance(item.getPosition());
+                    selectedItem = item;
+                }
+                GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), item.getBoundingBox());
+            }
+            GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), selectedItem.getBoundingBox());
+        }
+
+        if(selectedItem != null) GraphUtils.drawBoundingBox(renderer, new Vector4f(75f,0,15f,0f), selectedItem.getBoundingBox());
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {
@@ -165,18 +210,7 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     @Override
-    public void render(Window window, MouseInput mouseInput) {
-        if (window.isResized()) {
-            glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(false);
-        }
-
-        //update matrices
-        Matrix4f projectionMatrix = Transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
-        Matrix4f viewMatrix = Transformation.getViewMatrix(camera);
-        Matrix4f ortho = Transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
-
-        hud.updateSize(window);
+    public void render() {
         renderer.render(projectionMatrix, viewMatrix, ortho, scene, hud);
     }
 
@@ -273,7 +307,7 @@ public class UltimateKekGame implements IGameLogic {
                 scene.getGameItems().clear();
                 break;
             case "removeitem":
-                scene.getGameItems().remove(movableItem);
+                scene.getGameItems().remove(selectedItem);
                 break;
             case "additem":
                 try {

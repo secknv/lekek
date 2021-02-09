@@ -1,6 +1,7 @@
 package net.sknv.engine;
 
 import org.joml.*;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class MouseInput {
@@ -119,7 +120,7 @@ public class MouseInput {
         Matrix4f invertedViewMatrix = new Matrix4f();
         viewMatrix.invert(invertedViewMatrix);
         invertedViewMatrix.transform(ray_eye);
-        Vector3f ray_world = new Vector3f(ray_eye.x,ray_eye.y, ray_eye.z); //y inverted idk why
+        Vector3f ray_world = new Vector3f(ray_eye.x,ray_eye.y,ray_eye.z);
         ray_world.normalize();
 
         return ray_world;
