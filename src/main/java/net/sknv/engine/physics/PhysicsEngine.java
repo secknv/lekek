@@ -2,8 +2,7 @@ package net.sknv.engine.physics;
 
 import net.sknv.engine.Scene;
 import net.sknv.engine.entities.AbstractGameItem;
-import net.sknv.engine.entities.GameItemMesh;
-import net.sknv.engine.entities.HudElement;
+import net.sknv.engine.entities.Collider;
 import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.collisionDetection.SPCollision;
 import org.joml.Vector3f;
@@ -15,21 +14,21 @@ import java.util.Set;
 public class PhysicsEngine {
 
     private SPCollision sweepPrune;
-    private ArrayList<GameItemMesh> items = new ArrayList<>();
+    private ArrayList<Collider> items = new ArrayList<>();
 
     public PhysicsEngine() {
         sweepPrune = new SPCollision();
     }
 
-    public void addGameItem(GameItemMesh gameItem) {
-        sweepPrune.addItem(gameItem);
+    public void addGameItem(Collider collider) {
+        sweepPrune.addItem(collider);
     }
 
     public void simulate(Scene scene){
         // todo: tem GameItemMesh fix
         ArrayList<AbstractGameItem> absGIList = scene.getGameItems();
         for (AbstractGameItem item : absGIList) {
-            if (item instanceof GameItemMesh && !(item instanceof HudElement)) items.add((GameItemMesh) item);
+            if (item instanceof Collider) items.add((Collider) item);
         }
 
         //applyForces(scene);
@@ -37,53 +36,53 @@ public class PhysicsEngine {
         //detectCollisions(gameItems);
         //solveCollisions();
 
-        for (GameItemMesh gameItem: items) {
-            if(gameItem.getVelocity().length() != 0){ //game item has vel
-                detectCollisions(gameItem);
+        for (Collider collider : items) {
+            if(collider.getVelocity().length() != 0){ //game item has vel
+                detectCollisions(collider);
             }
         }
 
     }
 
     private void applyForces(Scene scene) {
-        for (GameItemMesh gameItem : items){
-            gameItem.applyForce(scene.getGravity());
+        for (Collider collider : items){
+            collider.applyForce(scene.getGravity());
         }
     }
 
-    private void detectCollisions(GameItemMesh gameItem) {
+    private void detectCollisions(Collider collider) {
         //calculate step
-        Vector3f step = gameItem.getVelocity().mul(0.1f);
+        Vector3f step = collider.getVelocity().mul(0.1f);
 
-        Set<BoundingBox> col = sweepPrune.checkStepCollisions(gameItem, step);
+        Set<BoundingBox> col = sweepPrune.checkStepCollisions(collider, step);
 
         if (col.isEmpty()) {
             //no collisions, perform movement
-            gameItem.translate(step);
-            gameItem.getVelocity().zero();
+            collider.translate(step);
+            collider.getVelocity().zero();
         } else {
-            handleCollisions(gameItem, col);
+            handleCollisions(collider, col);
         }
     }
 
-    private void handleCollisions(GameItemMesh gameItem, Set<BoundingBox> colliders){
-        Vector3f step = gameItem.getVelocity().mul(0.1f); // CHANGE THIS! step should be calculated from gameitem properties thus gameitem.getStep
-        Vector3f possibleStep = calculatePossibleStep(gameItem, colliders.iterator().next(), step); //could calculate for every item but cba as for now
+    private void handleCollisions(Collider collider, Set<BoundingBox> bbx){
+        Vector3f step = collider.getVelocity().mul(0.1f); // CHANGE THIS! step should be calculated from gameitem properties thus gameitem.getStep
+        Vector3f possibleStep = calculatePossibleStep(collider, bbx.iterator().next(), step); //could calculate for every item but cba as for now
         Vector3f intersection = new Vector3f();
         Vector3f nIntersection = new Vector3f();
 
         step.sub(possibleStep, intersection);
 
         Set<BoundingBox> staticItems = new HashSet<>();
-        for(BoundingBox bb : colliders) { //define possible step and remove components from intersect
-            if (!bb.getGameItem().isMovable()) {
+        for(BoundingBox bb : bbx) { //define possible step and remove components from intersect
+            if (!bb.getCollider().isMovable()) {
                 //static collider
                 staticItems.add(bb);
                 Set<BoundingBox> colX = null, colY = null, colZ = null;
 
-                colX = sweepPrune.checkStepCollisions(gameItem, new Vector3f(step.x, 0, 0));
-                colY = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, step.y, 0));
-                colZ = sweepPrune.checkStepCollisions(gameItem, new Vector3f(0, 0, step.z));
+                colX = sweepPrune.checkStepCollisions(collider, new Vector3f(step.x, 0, 0));
+                colY = sweepPrune.checkStepCollisions(collider, new Vector3f(0, step.y, 0));
+                colZ = sweepPrune.checkStepCollisions(collider, new Vector3f(0, 0, step.z));
 
                 if (colX.isEmpty() && colY.isEmpty() && colZ.isEmpty()) {
                     //collision onto static no movement
@@ -97,46 +96,46 @@ public class PhysicsEngine {
         }
 
         //we should have possible step and intersection calculated
-        colliders.removeAll(staticItems);
-        intersection.div(colliders.size(), nIntersection);
+        bbx.removeAll(staticItems);
+        intersection.div(bbx.size(), nIntersection);
 
         //if all collider were static
-        if(colliders.isEmpty()){
+        if(bbx.isEmpty()){
             //perform movement
-            gameItem.translate(possibleStep);
-            gameItem.getVelocity().zero();
+            collider.translate(possibleStep);
+            collider.getVelocity().zero();
             return;
         }
 
         //apply nInt to all movable colliders
-        for(BoundingBox bbCol : colliders) {
+        for(BoundingBox bbCol : bbx) {
             //calculate resulting effect based on velocity , item materials and nIntersect
-            collisionResponse(gameItem, bbCol.getGameItem(), step, nIntersection);
+            collisionResponse(collider, bbCol.getCollider(), step, nIntersection);
         }
 
     }
 
-    private void collisionResponse(GameItemMesh agent, GameItemMesh subject, Vector3f step, Vector3f intersect){
+    private void collisionResponse(Collider agent, Collider subject, Vector3f step, Vector3f intersect){
         float agentP = intersect.length() * agent.getMass();
         float subjectP = intersect.length() * subject.getMass();
 
         if(agentP >= subjectP) ;
     }
 
-    private Vector3f calculatePossibleStep(GameItemMesh gameItem, BoundingBox bb, Vector3f step) {
+    private Vector3f calculatePossibleStep(Collider collider, BoundingBox bb, Vector3f step) {
         float x = 0;
         float y = 0;
         float z = 0;
 
-        if(step.x>0) x = bb.getMin().getX() - gameItem.getBoundingBox().getMax().getX();
-        if(step.x<0) x = bb.getMax().getX() - gameItem.getBoundingBox().getMin().getX();
+        if(step.x>0) x = bb.getMin().getX() - collider.getBoundingBox().getMax().getX();
+        if(step.x<0) x = bb.getMax().getX() - collider.getBoundingBox().getMin().getX();
 
-        if(step.y>0) y = bb.getMin().getY() - gameItem.getBoundingBox().getMax().getY();
-        if(step.y<0) y = bb.getMax().getY() - gameItem.getBoundingBox().getMin().getY();
+        if(step.y>0) y = bb.getMin().getY() - collider.getBoundingBox().getMax().getY();
+        if(step.y<0) y = bb.getMax().getY() - collider.getBoundingBox().getMin().getY();
 
 
-        if(step.z>0) z = bb.getMin().getZ() - gameItem.getBoundingBox().getMax().getZ();
-        if(step.z<0) z = bb.getMax().getZ() - gameItem.getBoundingBox().getMin().getZ();
+        if(step.z>0) z = bb.getMin().getZ() - collider.getBoundingBox().getMax().getZ();
+        if(step.z<0) z = bb.getMax().getZ() - collider.getBoundingBox().getMin().getZ();
 
         Vector3f intersection = new Vector3f(x,y,z);
         step.sub(intersection, intersection);

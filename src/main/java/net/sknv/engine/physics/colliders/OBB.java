@@ -1,6 +1,6 @@
 package net.sknv.engine.physics.colliders;
 
-import net.sknv.engine.entities.GameItemMesh;
+import net.sknv.engine.entities.Collider;
 import org.joml.Math;
 import org.joml.*;
 
@@ -9,11 +9,11 @@ public class OBB extends AABB implements BoundingBox {
     private Vector3f center;
     private Vector3f x, y, z;
 
-    public OBB(GameItemMesh gameItem) {
-        super(gameItem);
+    public OBB(Collider collider) {
+        super(collider);
 
-        Vector3f min = gameItem.getMesh().getMin();
-        Vector3f max = gameItem.getMesh().getMax();
+        Vector3f min = collider.getMesh().getMin();
+        Vector3f max = collider.getMesh().getMax();
         this.x = new Vector3f(Math.abs(max.x - min.x)/2,0,0);
         this.y = new Vector3f(0,Math.abs(max.y - min.y)/2,0);
         this.z = new Vector3f(0,0,Math.abs(max.z - min.z)/2);
@@ -25,10 +25,10 @@ public class OBB extends AABB implements BoundingBox {
         Vector4f tz = new Vector4f(z.x, z.y, z.z,1);
 
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(gameItem.getPosition()).scale(gameItem.getScale()).rotateXYZ(gameItem.getRotation());
+        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotateXYZ(collider.getRotation());
         modelViewMatrix.transform(tc);
 
-        modelViewMatrix.identity().rotateXYZ(gameItem.getRotation()).scale(gameItem.getScale());
+        modelViewMatrix.identity().rotateXYZ(collider.getRotation()).scale(collider.getScale());
         modelViewMatrix.transform(tx);
         modelViewMatrix.transform(ty);
         modelViewMatrix.transform(tz);
@@ -49,10 +49,10 @@ public class OBB extends AABB implements BoundingBox {
     public void rotate(Quaternionf rot){
         super.rotate(rot);
         Vector3f d = new Vector3f();
-        center.sub(gameItem.getPosition(),d);
+        center.sub(collider.getPosition(),d);
         d.rotate(rot);
 
-        this.center = new Vector3f(gameItem.getPosition().x + d.x, gameItem.getPosition().y + d.y, gameItem.getPosition().z + d.z);
+        this.center = new Vector3f(collider.getPosition().x + d.x, collider.getPosition().y + d.y, collider.getPosition().z + d.z);
 
         this.x.rotate(rot);
         this.y.rotate(rot);

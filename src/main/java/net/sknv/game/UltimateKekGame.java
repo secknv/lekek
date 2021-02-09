@@ -5,8 +5,8 @@ import net.sknv.engine.MouseInput;
 import net.sknv.engine.Scene;
 import net.sknv.engine.Window;
 import net.sknv.engine.entities.AbstractGameItem;
+import net.sknv.engine.entities.Collider;
 import net.sknv.engine.entities.GameItemMesh;
-import net.sknv.engine.entities.HudElement;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.PhysicsEngine;
 import net.sknv.engine.physics.colliders.OBB;
@@ -48,7 +48,7 @@ public class UltimateKekGame implements IGameLogic {
 
     //collisions stuff
     private PhysicsEngine physicsEngine;
-    public GameItemMesh selectedItem;
+    public Collider selectedItem;
 
     public UltimateKekGame() {
         renderer = new Renderer();
@@ -72,7 +72,7 @@ public class UltimateKekGame implements IGameLogic {
         camera.setPosition(0.65f, 1.15f, 4.34f);
 
         //todo temp - figure this out
-        if(!scene.getGameItems().isEmpty()) selectedItem = (GameItemMesh)scene.getGameItems().get(0);
+        if(!scene.getGameItems().isEmpty()) selectedItem = (Collider) scene.getGameItems().get(0);
     }
 
     public void initScene(String scene) {
@@ -92,11 +92,11 @@ public class UltimateKekGame implements IGameLogic {
             // in that case class inheritance should be pondered
 
             // todo: temp if to prevent HudElements from getting called in the Physics Engine
-            if (gameItem instanceof GameItemMesh && !(gameItem instanceof HudElement)) {
-                GameItemMesh gameItemMesh = (GameItemMesh) gameItem;
-                gameItemMesh.setBoundingBox(new OBB(gameItemMesh));
+            if (gameItem instanceof Collider) {
+                Collider collider = (Collider) gameItem;
+                collider.setBoundingBox(new OBB(collider));
                 try {
-                    physicsEngine.addGameItem(gameItemMesh);
+                    physicsEngine.addGameItem(collider);
                 } catch (Exception e) {
                     System.out.println("object colliding");
                 }
@@ -166,18 +166,18 @@ public class UltimateKekGame implements IGameLogic {
             GraphUtils.drawRay(renderer, rayCast, 10);
         }
 
-        ArrayList<GameItemMesh> clickedItems = new ArrayList<>();
+        ArrayList<Collider> clickedItems = new ArrayList<>();
         for (AbstractGameItem gameItem : scene.getGameItems()) {
-            if (gameItem instanceof GameItemMesh) {
+            if (gameItem instanceof Collider) {
                 // todo: spaghet
-                GameItemMesh gameItemMesh = (GameItemMesh) gameItem;
-                if(mouseInput.isLeftClicked() && ray.intersectsItem(gameItemMesh)) clickedItems.add(gameItemMesh);
+                Collider collider = (Collider) gameItem;
+                if(mouseInput.isLeftClicked() && ray.intersectsItem(collider)) clickedItems.add(collider);
             }
         }
 
         if(!clickedItems.isEmpty()) {
             float d = cameraPos.distance(clickedItems.get(0).getPosition());
-            for (GameItemMesh item : clickedItems) {
+            for (Collider item : clickedItems) {
                 if (cameraPos.distance(item.getPosition()) <= d){
                     d = cameraPos.distance(item.getPosition());
                     selectedItem = item;
@@ -316,7 +316,7 @@ public class UltimateKekGame implements IGameLogic {
                     Texture texture = new Texture("src/main/resources/textures/lebloq.png");
                     Material material = new Material(texture, 1f);
                     mesh.setMaterial(material);
-                    AbstractGameItem newItem = new GameItemMesh(mesh);
+                    Collider newItem = new Collider(mesh);
                     scene.getGameItems().add(newItem);
                 } catch (IOException e) {
                     e.printStackTrace();

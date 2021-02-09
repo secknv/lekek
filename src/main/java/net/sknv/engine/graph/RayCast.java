@@ -1,7 +1,6 @@
 package net.sknv.engine.graph;
 
-import net.sknv.engine.entities.GameItemMesh;
-import net.sknv.game.Renderer;
+import net.sknv.engine.entities.Collider;
 import org.joml.Vector3f;
 
 public class RayCast {
@@ -86,9 +85,9 @@ public class RayCast {
         return true;
     }
 
-    public boolean intersectsItem(GameItemMesh gameItem) {
-        Vector3f min = gameItem.getBoundingBox().getMin().getPosition();
-        Vector3f max = gameItem.getBoundingBox().getMax().getPosition();
+    public boolean intersectsItem(Collider collider) {
+        Vector3f min = collider.getBoundingBox().getMin().getPosition();
+        Vector3f max = collider.getBoundingBox().getMax().getPosition();
 
         Vector3f[] vertex = new Vector3f[]{
                 min, new Vector3f(max.x, min.y, min.z), new Vector3f(min.x, min.y, max.z),

@@ -1,6 +1,6 @@
 package net.sknv.engine.physics.colliders;
 
-import net.sknv.engine.entities.GameItemMesh;
+import net.sknv.engine.entities.Collider;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -10,19 +10,19 @@ import java.util.ArrayList;
 
 public class AABB implements BoundingBox {
 
-    public GameItemMesh gameItem;
+    public Collider collider;
     public EndPoint min, max;
 
-    public AABB(GameItemMesh gameItem) {
-        this.gameItem = gameItem;
+    public AABB(Collider collider) {
+        this.collider = collider;
 
         //load vertices
-        ArrayList<Vector3f> vertices = gameItem.getMesh().getVertices();
+        ArrayList<Vector3f> vertices = collider.getMesh().getVertices();
         ArrayList<Vector3f> tvertices = new ArrayList<>();
 
         //transform vertices according to gameItem state
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(gameItem.getPosition()).scale(gameItem.getScale()).rotateXYZ(gameItem.getRotation());
+        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotateXYZ(collider.getRotation());
 
         for (Vector3f v : vertices){
             Vector4f tv = new Vector4f(v.x, v.y, v.z, 1);
@@ -77,11 +77,11 @@ public class AABB implements BoundingBox {
     @Override
     public void rotate(Quaternionf rot) {
         //calculate new AABB
-        ArrayList<Vector3f> vertices = gameItem.getMesh().getVertices();
+        ArrayList<Vector3f> vertices = collider.getMesh().getVertices();
         ArrayList<Vector3f> tvertices = new ArrayList<>();
 
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(gameItem.getPosition()).scale(gameItem.getScale()).rotateXYZ(gameItem.getRotation());
+        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotateXYZ(collider.getRotation());
 
         for (Vector3f v : vertices){
             Vector4f tv = new Vector4f(v.x, v.y, v.z, 1);
@@ -104,8 +104,8 @@ public class AABB implements BoundingBox {
     }
 
     @Override
-    public GameItemMesh getGameItem() {
-        return gameItem;
+    public Collider getCollider() {
+        return collider;
     }
 
     public String toString() {

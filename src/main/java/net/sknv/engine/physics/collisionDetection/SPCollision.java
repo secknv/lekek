@@ -1,6 +1,6 @@
 package net.sknv.engine.physics.collisionDetection;
 
-import net.sknv.engine.entities.GameItemMesh;
+import net.sknv.engine.entities.Collider;
 import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.colliders.EndPoint;
 import org.joml.Vector3f;
@@ -16,10 +16,10 @@ public class SPCollision implements ISweepPrune {
     private int nItems = 0;
 
     @Override
-    public Set<BoundingBox> addItem(GameItemMesh gameItem){
-        Set<BoundingBox> xCollisions = checkAddX(gameItem);
-        Set<BoundingBox> yCollisions = checkAddY(gameItem);
-        Set<BoundingBox> zCollisions = checkAddZ(gameItem);
+    public Set<BoundingBox> addItem(Collider collider){
+        Set<BoundingBox> xCollisions = checkAddX(collider);
+        Set<BoundingBox> yCollisions = checkAddY(collider);
+        Set<BoundingBox> zCollisions = checkAddZ(collider);
 
         if(nItems>0){
             xCollisions.retainAll(yCollisions);
@@ -27,15 +27,15 @@ public class SPCollision implements ISweepPrune {
             //if (!xCollisions.isEmpty()) throw new Exception("Object colliding"); //prevent adding colliding item
         }
 
-        insertItem(gameItem);
+        insertItem(collider);
         return xCollisions;
     }
 
     @Override
-    public Set<BoundingBox> checkStepCollisions(GameItemMesh gameItem, Vector3f step) {
+    public Set<BoundingBox> checkStepCollisions(Collider collider, Vector3f step) {
         sortAxis();
 
-        BoundingBox bb = gameItem.getBoundingBox();
+        BoundingBox bb = collider.getBoundingBox();
         Vector3f nextMin = new Vector3f(), nextMax = new Vector3f();
 
         nextMin.add(bb.getMin().getPosition()).add(step);
@@ -43,9 +43,9 @@ public class SPCollision implements ISweepPrune {
 
         HashSet<BoundingBox> possibleCollisions = new HashSet<>();
 
-        if(step.x!=0) possibleCollisions.addAll(checkStepX(gameItem, step.x));
-        if(step.y!=0) possibleCollisions.addAll(checkStepY(gameItem, step.y));
-        if(step.z!=0) possibleCollisions.addAll(checkStepZ(gameItem, step.z));
+        if(step.x!=0) possibleCollisions.addAll(checkStepX(collider, step.x));
+        if(step.y!=0) possibleCollisions.addAll(checkStepY(collider, step.y));
+        if(step.z!=0) possibleCollisions.addAll(checkStepZ(collider, step.z));
 
         Set<BoundingBox> collidingBoxes = new HashSet<>();
 
@@ -57,8 +57,8 @@ public class SPCollision implements ISweepPrune {
     }
 
     @Override
-    public void removeItem(GameItemMesh gameItem) {
-        BoundingBox bb = gameItem.getBoundingBox();
+    public void removeItem(Collider collider) {
+        BoundingBox bb = collider.getBoundingBox();
         xAxis.remove(bb.getMin());
         xAxis.remove(bb.getMax());
         yAxis.remove(bb.getMin());
@@ -68,8 +68,8 @@ public class SPCollision implements ISweepPrune {
         nItems--;
     }
 
-    private void insertItem(GameItemMesh gameItem){
-        BoundingBox bb = gameItem.getBoundingBox();
+    private void insertItem(Collider collider){
+        BoundingBox bb = collider.getBoundingBox();
 
         xAxis.add(bb.getMin());
         xAxis.add(bb.getMax());
@@ -85,8 +85,8 @@ public class SPCollision implements ISweepPrune {
     }
 
 
-    private Set<BoundingBox> checkAddX(GameItemMesh gameItem) {
-        BoundingBox bb = gameItem.getBoundingBox();
+    private Set<BoundingBox> checkAddX(Collider collider) {
+        BoundingBox bb = collider.getBoundingBox();
         EndPoint min, max;
         Set<BoundingBox> possibleCollisions = new HashSet<>();
 
@@ -111,8 +111,8 @@ public class SPCollision implements ISweepPrune {
         return possibleCollisions;
     }
 
-    private Set<BoundingBox> checkAddY(GameItemMesh gameItem) {
-        BoundingBox bb = gameItem.getBoundingBox();
+    private Set<BoundingBox> checkAddY(Collider collider) {
+        BoundingBox bb = collider.getBoundingBox();
         EndPoint min, max;
         Set<BoundingBox> possibleCollisions = new HashSet<>();
 
@@ -137,8 +137,8 @@ public class SPCollision implements ISweepPrune {
         return possibleCollisions;
     }
 
-    private Set<BoundingBox> checkAddZ(GameItemMesh gameItem) {
-        BoundingBox bb = gameItem.getBoundingBox();
+    private Set<BoundingBox> checkAddZ(Collider collider) {
+        BoundingBox bb = collider.getBoundingBox();
         EndPoint min, max;
         Set<BoundingBox> possibleCollisions = new HashSet<>();
 
@@ -163,9 +163,9 @@ public class SPCollision implements ISweepPrune {
         return possibleCollisions;
     }
 
-    private HashSet<BoundingBox> checkStepX(GameItemMesh gameItem, float stepX){
+    private HashSet<BoundingBox> checkStepX(Collider collider, float stepX){
         HashSet<BoundingBox> collisions = new HashSet<>();
-        BoundingBox bb = gameItem.getBoundingBox();
+        BoundingBox bb = collider.getBoundingBox();
         float nextMin = bb.getMin().getPosition().x + stepX;
         float nextMax = bb.getMax().getPosition().x + stepX;
 
@@ -193,9 +193,9 @@ public class SPCollision implements ISweepPrune {
         return collisions;
     }
 
-    private HashSet<BoundingBox> checkStepY(GameItemMesh gameItem, float stepY){
+    private HashSet<BoundingBox> checkStepY(Collider collider, float stepY){
         HashSet<BoundingBox> collisions = new HashSet<>();
-        BoundingBox bb = gameItem.getBoundingBox();
+        BoundingBox bb = collider.getBoundingBox();
         float nextMin = bb.getMin().getPosition().y + stepY;
         float nextMax = bb.getMax().getPosition().y + stepY;
 
@@ -223,9 +223,9 @@ public class SPCollision implements ISweepPrune {
         return collisions;
     }
 
-    private HashSet<BoundingBox> checkStepZ(GameItemMesh gameItem, float stepZ){
+    private HashSet<BoundingBox> checkStepZ(Collider collider, float stepZ){
         HashSet<BoundingBox> collisions = new HashSet<>();
-        BoundingBox bb = gameItem.getBoundingBox();
+        BoundingBox bb = collider.getBoundingBox();
         float nextMin = bb.getMin().getPosition().z + stepZ;
         float nextMax = bb.getMax().getPosition().z + stepZ;
 
