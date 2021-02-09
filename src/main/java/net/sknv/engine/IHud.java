@@ -11,7 +11,7 @@ public interface IHud {
     default void cleanup() {
         ArrayList<HudElement> HudElements = getHudElements();
         for (HudElement elem : HudElements) {
-            elem.getMesh().cleanUp();
+            if (elem.getMesh()!=null) elem.getMesh().cleanUp();
         }
     }
 }

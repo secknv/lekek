@@ -4,6 +4,7 @@ import net.sknv.engine.graph.Mesh;
 import net.sknv.engine.graph.ShaderProgram;
 import net.sknv.engine.graph.Transformation;
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
@@ -29,8 +30,11 @@ public class HudElement extends GameItemMesh {
         Matrix4f projModelMatrix = Transformation.getOrtoProjModelMatrix(this, orthoProjMatrix);
 
         shaderProgram.setUniform("projModelMatrix", projModelMatrix);
-        shaderProgram.setUniform("colour", mesh.getMaterial().getAmbientColor());
-        shaderProgram.setUniform("hasTexture", mesh.getMaterial().isTextured() ? 1 : 0);
+
+
+        // todo: temp fix, this is spaghet
+        shaderProgram.setUniform("colour", mesh!=null ? mesh.getMaterial().getAmbientColor() : new Vector4f(1, 1, 1, 1));
+        shaderProgram.setUniform("hasTexture", mesh!=null ? (mesh.getMaterial().isTextured() ? 1 : 0) : 0 );
 
         shaderProgram.unbind();
     }

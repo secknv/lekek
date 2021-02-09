@@ -1,6 +1,12 @@
 package net.sknv.game;
 
-import net.sknv.engine.*;
+import net.sknv.engine.IGameLogic;
+import net.sknv.engine.MouseInput;
+import net.sknv.engine.Scene;
+import net.sknv.engine.Window;
+import net.sknv.engine.entities.AbstractGameItem;
+import net.sknv.engine.entities.GameItemMesh;
+import net.sknv.engine.entities.HudElement;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.PhysicsEngine;
 import net.sknv.engine.physics.colliders.OBB;
@@ -37,7 +43,7 @@ public class UltimateKekGame implements IGameLogic {
 
     //collisions stuff
     private PhysicsEngine physicsEngine;
-    public GameItem movableItem;
+    public GameItemMesh movableItem;
 
     public UltimateKekGame() {
         renderer = new Renderer();
@@ -61,7 +67,7 @@ public class UltimateKekGame implements IGameLogic {
         camera.setPosition(0.65f, 1.15f, 4.34f);
 
         //todo temp - figure this out
-        if(!scene.getGameItems().isEmpty()) movableItem = scene.getGameItems().get(0);
+        if(!scene.getGameItems().isEmpty()) movableItem = (GameItemMesh) scene.getGameItems().get(0);
     }
 
     public void initScene(String scene) {
@@ -74,16 +80,21 @@ public class UltimateKekGame implements IGameLogic {
 
     public void initPhysicsEngine() {
         physicsEngine = new PhysicsEngine();
-        List<GameItem> gameItems = scene.getGameItems();
-        for (GameItem gameItem : gameItems) {
+        List<AbstractGameItem> gameItems = scene.getGameItems();
+        for (AbstractGameItem gameItem : gameItems) {
             //todo: temporary, GameItem empty constructor should deprecate and bb should be initialized on a constructor with all params,
             // unless it is decided to not deprecate the empty constructor to support other types of gameItems (Huds, lines, stuff)
             // in that case class inheritance should be pondered
-            gameItem.setBoundingBox(new OBB(gameItem));
-            try {
-                physicsEngine.addGameItem(gameItem);
-            } catch (Exception e) {
-                System.out.println("object colliding");
+
+            // todo: temp if to prevent HudElements from getting called in the Physics Engine
+            if (gameItem instanceof GameItemMesh && !(gameItem instanceof HudElement)) {
+                GameItemMesh gameItemMesh = (GameItemMesh) gameItem;
+                gameItemMesh.setBoundingBox(new OBB(gameItemMesh));
+                try {
+                    physicsEngine.addGameItem(gameItemMesh);
+                } catch (Exception e) {
+                    System.out.println("object colliding");
+                }
             }
         }
     }
@@ -101,7 +112,7 @@ public class UltimateKekGame implements IGameLogic {
 
         if (cameraPosInc.length() != 0) cameraPosInc.normalize();
 
-        if (renderer.getClicked() != null) movableItem = renderer.getClicked();
+        if (renderer.getClicked() != null) movableItem = (GameItemMesh) renderer.getClicked();
         if (window.isKeyPressed(GLFW_KEY_UP)) {
             if (window.isKeyPressed(GLFW_KEY_DOWN)) movableItem.getVelocity().z = 0f;
             else movableItem.getVelocity().z = -.1f;
@@ -271,7 +282,7 @@ public class UltimateKekGame implements IGameLogic {
                     Texture texture = new Texture("src/main/resources/textures/lebloq.png");
                     Material material = new Material(texture, 1f);
                     mesh.setMaterial(material);
-                    GameItem newItem = new GameItem(mesh);
+                    AbstractGameItem newItem = new GameItemMesh(mesh);
                     scene.getGameItems().add(newItem);
                 } catch (IOException e) {
                     e.printStackTrace();

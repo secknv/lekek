@@ -1,12 +1,9 @@
 package net.sknv.engine.entities;
 
-import net.sknv.engine.Utils;
 import net.sknv.engine.graph.IRenderable;
 import net.sknv.engine.graph.ShaderProgram;
 import net.sknv.engine.physics.colliders.BoundingBox;
-import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.io.Serializable;
@@ -65,52 +62,12 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
         this.position = position;
     }
 
-    public void setRotationEuclidean(Vector3f euclideanRot) {
-        euclideanRot.sub(rotation);
-        rotateEuclidean(euclideanRot);
-    }
+
 
     public void setScale(float scale) {
         this.scale = scale;
     }
 
-    public void setBoundingBox(BoundingBox boundingBox) {
-        this.boundingBox = boundingBox;
-    }
-
-    public void rotateEuclidean(Vector3f rot) {
-        // Object POV axis
-        Vector3f xAxis = new Vector3f(1,0,0);
-        Vector3f yAxis = new Vector3f(0,1,0);
-        Vector3f zAxis = new Vector3f(0,0,1);
-
-        //quaternions to get to current rot
-        Quaternionf current = new Quaternionf(new AxisAngle4f(this.getRotation().x, xAxis));
-        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRotation().y, yAxis));
-        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRotation().z, zAxis));
-        current.mul(curY).mul(curZ);
-
-        // generate rotated object axis'
-        current.transform(xAxis);
-        current.transform(yAxis);
-        current.transform(zAxis);
-
-        Quaternionf xq = new Quaternionf(new AxisAngle4f(rot.x, xAxis));
-        Quaternionf yq = new Quaternionf(new AxisAngle4f(rot.y, yAxis));
-        Quaternionf zq = new Quaternionf(new AxisAngle4f(rot.z, zAxis));
-
-        // get rotation on world axis for setRotation
-        xq.mul(yq).mul(zq);
-
-        Quaternionf rotQuaternion = new Quaternionf();
-        xq.get(rotQuaternion);
-
-        //combine
-        xq.mul(current);
-
-        rotation = Utils.getEulerAngles(xq);//set item rot
-        this.boundingBox.rotate(rotQuaternion);//set bb rot
-    }
 
     public void translate(Vector3f step) {
         this.position.x += step.x;
@@ -129,5 +86,12 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
 
     public void applyForce(Vector3f force) {
         forces.add(force);
+    }
+
+    @Override
+    public String toString() {
+        return "AbstractGameItem{" +
+                "Type=" + (this instanceof HudElement) +
+                '}';
     }
 }

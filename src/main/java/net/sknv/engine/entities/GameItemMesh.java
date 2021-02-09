@@ -1,8 +1,13 @@
 package net.sknv.engine.entities;
 
+import net.sknv.engine.Utils;
 import net.sknv.engine.graph.*;
+import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.colliders.OBB;
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -28,6 +33,8 @@ public class GameItemMesh extends AbstractGameItem {
 
     @Override
     public void render(ShaderProgram shaderProgram, Matrix4f viewMatrix) {
+        shaderProgram.bind();
+
         int drawMode = GL_TRIANGLES;
 
         Matrix4f transformationResult = Transformation.getModelViewMatrix(this, viewMatrix);
@@ -43,7 +50,7 @@ public class GameItemMesh extends AbstractGameItem {
             glBindTexture(GL_TEXTURE_2D, texture.getId());
         }
         else {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
 
         //draw mesh
@@ -54,6 +61,9 @@ public class GameItemMesh extends AbstractGameItem {
         //restore state
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
+
+        // reset to default
+        shaderProgram.unbind();
     }
 
     public Mesh getMesh() {
@@ -67,7 +77,8 @@ public class GameItemMesh extends AbstractGameItem {
     @Override
     public String toString() {
         return "GameItem{" +
-                "color=" + this.mesh.getMaterial() +
+                "hud?=" + (this instanceof HudElement) +
+                "color=" + (mesh!=null ? this.mesh.getMaterial() : "no mesh") +
                 ", pos=" + position +
                 ", boundingBox=" + boundingBox +
                 '}';
@@ -87,4 +98,50 @@ public class GameItemMesh extends AbstractGameItem {
         outputStream.writeObject(mesh.getModelFile());
         outputStream.writeObject(mesh.getMaterial());
     }
+
+    public void setBoundingBox(BoundingBox boundingBox) {
+        this.boundingBox = boundingBox;
+    }
+
+
+    public void rotateEuclidean(Vector3f rot) {
+        // Object POV axis
+        Vector3f xAxis = new Vector3f(1,0,0);
+        Vector3f yAxis = new Vector3f(0,1,0);
+        Vector3f zAxis = new Vector3f(0,0,1);
+
+        //quaternions to get to current rot
+        Quaternionf current = new Quaternionf(new AxisAngle4f(this.getRotation().x, xAxis));
+        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRotation().y, yAxis));
+        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRotation().z, zAxis));
+        current.mul(curY).mul(curZ);
+
+        // generate rotated object axis'
+        current.transform(xAxis);
+        current.transform(yAxis);
+        current.transform(zAxis);
+
+        Quaternionf xq = new Quaternionf(new AxisAngle4f(rot.x, xAxis));
+        Quaternionf yq = new Quaternionf(new AxisAngle4f(rot.y, yAxis));
+        Quaternionf zq = new Quaternionf(new AxisAngle4f(rot.z, zAxis));
+
+        // get rotation on world axis for setRotation
+        xq.mul(yq).mul(zq);
+
+        Quaternionf rotQuaternion = new Quaternionf();
+        xq.get(rotQuaternion);
+
+        //combine
+        xq.mul(current);
+
+        rotation = Utils.getEulerAngles(xq);//set item rot
+        if (this instanceof HudElement) return;
+        this.boundingBox.rotate(rotQuaternion);//set bb rot
+    }
+
+    public void setRotationEuclidean(Vector3f euclideanRot) {
+        euclideanRot.sub(rotation);
+        rotateEuclidean(euclideanRot);
+    }
+
 }

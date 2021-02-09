@@ -1,9 +1,9 @@
 package net.sknv.game;
 
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.GameItemMesh;
 import net.sknv.engine.graph.Mesh;
 
-public class Boid extends GameItem {
+public class Boid extends GameItemMesh {
 
     public Boid(Mesh mesh) {
         super(mesh);

@@ -125,7 +125,7 @@ public class Scene implements Serializable {
         }
 
         // Special game items
-        AbstractGameItem testItem = new GameItemMesh(kek);
+        GameItemMesh testItem = new GameItemMesh(kek);
         testItem.setPosition(2f, 1, 2f);
         testItem.setScale(blockScale);
 
