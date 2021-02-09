@@ -1,6 +1,8 @@
 package net.sknv.game;
 
 import net.sknv.engine.*;
+import net.sknv.engine.entities.AbstractGameItem;
+import net.sknv.engine.entities.HudElement;
 import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -105,16 +107,8 @@ public class Renderer {
         renderLights(viewMatrix, ambientLight, directionalLight);
 
         //render each game item
-        for (GameItem gameItem : scene.getGameItems()) {
-
-            Mesh mesh = gameItem.getMesh();
-            //set model view
-            Matrix4f modelViewMatrix = Transformation.getModelViewMatrix(gameItem, viewMatrix);
-            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-
-            //if color
-            shaderProgram.setUniform("material", mesh.getMaterial());
-            mesh.render();
+        for (AbstractGameItem gameItem : scene.getGameItems()) {
+            gameItem.render(shaderProgram, viewMatrix);
         }
 
         while (!alienVAOQueue.isEmpty()){
@@ -167,40 +161,23 @@ public class Renderer {
     private void renderHud(Matrix4f ortho, IHud hud) {
         hudShaderProgram.bind();
 
-        for (GameItem gameItem : hud.getGameItems()) {
-            Mesh mesh = gameItem.getMesh();
-            // Set ortohtaphic and model matrix for this HUD item
-            Matrix4f projModelMatrix = Transformation.getOrtoProjModelMatrix(gameItem, ortho);
-
-            hudShaderProgram.setUniform("projModelMatrix", projModelMatrix);
-            hudShaderProgram.setUniform("colour", gameItem.getMesh().getMaterial().getAmbientColor());
-            hudShaderProgram.setUniform("hasTexture", gameItem.getMesh().getMaterial().isTextured() ? 1 : 0);
-
-            // Render the mesh for this HUD item
-            mesh.render();
+        for (HudElement elem : hud.getHudElements()) {
+            elem.render(hudShaderProgram, ortho);
         }
 
         hudShaderProgram.unbind();
     }
 
     private void renderSkyBox(Matrix4f projectionMatrix, Matrix4f viewMatrix, Scene scene) {
-        skyBoxShaderProgram.bind();
-
-        skyBoxShaderProgram.setUniform("texture_sampler", 0);
-        skyBoxShaderProgram.setUniform("projectionMatrix", projectionMatrix);
-
         SkyBox skyBox = scene.getSkyBox();
-        Matrix4f vMatrix = new Matrix4f(viewMatrix);
-        vMatrix.m30(0);
-        vMatrix.m31(0);
-        vMatrix.m32(0);
-        Matrix4f modelViewMatrix = Transformation.getModelViewMatrix(skyBox, vMatrix);
-        skyBoxShaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-        skyBoxShaderProgram.setUniform("ambientLight", scene.getSceneLight().getAmbientLight());
 
-        scene.getSkyBox().getMesh().render();
+        // todo: [spaghet] SkyBox ShaderProgram needs ambient light and projection matrix,
+        //  these setters are used to provide them without having to change the render method signature.
+        //  Bad because calling render without using these setters = fail engine.
+        skyBox.setAmbientLight(scene.getSceneLight().getAmbientLight());
+        skyBox.setProjectionMatrix(projectionMatrix);
 
-        skyBoxShaderProgram.unbind();
+        skyBox.render(skyBoxShaderProgram, viewMatrix);
     }
 
     public void cleanup() {

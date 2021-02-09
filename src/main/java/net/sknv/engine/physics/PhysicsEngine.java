@@ -1,7 +1,9 @@
 package net.sknv.engine.physics;
 
-import net.sknv.engine.GameItem;
 import net.sknv.engine.Scene;
+import net.sknv.engine.entities.AbstractGameItem;
+import net.sknv.engine.entities.GameItemMesh;
+import net.sknv.engine.entities.HudElement;
 import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.collisionDetection.SPCollision;
 import org.joml.Vector3f;
@@ -13,25 +15,29 @@ import java.util.Set;
 public class PhysicsEngine {
 
     private SPCollision sweepPrune;
-    private ArrayList<GameItem> items;
+    private ArrayList<GameItemMesh> items = new ArrayList<>();
 
     public PhysicsEngine() {
         sweepPrune = new SPCollision();
     }
 
-    public void addGameItem(GameItem gameItem) {
+    public void addGameItem(GameItemMesh gameItem) {
         sweepPrune.addItem(gameItem);
     }
 
     public void simulate(Scene scene){
-        items = scene.getGameItems();
+        // todo: tem GameItemMesh fix
+        ArrayList<AbstractGameItem> absGIList = scene.getGameItems();
+        for (AbstractGameItem item : absGIList) {
+            if (item instanceof GameItemMesh && !(item instanceof HudElement)) items.add((GameItemMesh) item);
+        }
 
         //applyForces(scene);
         //update();
         //detectCollisions(gameItems);
         //solveCollisions();
 
-        for (GameItem gameItem: items) {
+        for (GameItemMesh gameItem: items) {
             if(gameItem.getVelocity().length() != 0){ //game item has vel
                 detectCollisions(gameItem);
             }
@@ -40,12 +46,12 @@ public class PhysicsEngine {
     }
 
     private void applyForces(Scene scene) {
-        for (GameItem gameItem : items){
+        for (GameItemMesh gameItem : items){
             gameItem.applyForce(scene.getGravity());
         }
     }
 
-    private void detectCollisions(GameItem gameItem) {
+    private void detectCollisions(GameItemMesh gameItem) {
         //calculate step
         Vector3f step = gameItem.getVelocity().mul(0.1f);
 
@@ -60,7 +66,7 @@ public class PhysicsEngine {
         }
     }
 
-    private void handleCollisions(GameItem gameItem, Set<BoundingBox> colliders){
+    private void handleCollisions(GameItemMesh gameItem, Set<BoundingBox> colliders){
         Vector3f step = gameItem.getVelocity().mul(0.1f); // CHANGE THIS! step should be calculated from gameitem properties thus gameitem.getStep
         Vector3f possibleStep = calculatePossibleStep(gameItem, colliders.iterator().next(), step); //could calculate for every item but cba as for now
         Vector3f intersection = new Vector3f();
@@ -110,14 +116,14 @@ public class PhysicsEngine {
 
     }
 
-    private void collisionResponse(GameItem agent, GameItem subject, Vector3f step, Vector3f intersect){
+    private void collisionResponse(GameItemMesh agent, GameItemMesh subject, Vector3f step, Vector3f intersect){
         float agentP = intersect.length() * agent.getMass();
         float subjectP = intersect.length() * subject.getMass();
 
         if(agentP >= subjectP) ;
     }
 
-    private Vector3f calculatePossibleStep(GameItem gameItem, BoundingBox bb, Vector3f step) {
+    private Vector3f calculatePossibleStep(GameItemMesh gameItem, BoundingBox bb, Vector3f step) {
         float x = 0;
         float y = 0;
         float z = 0;

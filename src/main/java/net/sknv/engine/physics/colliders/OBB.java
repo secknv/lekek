@@ -1,6 +1,6 @@
 package net.sknv.engine.physics.colliders;
 
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.GameItemMesh;
 import org.joml.Math;
 import org.joml.*;
 
@@ -9,7 +9,7 @@ public class OBB extends AABB implements BoundingBox {
     private Vector3f center;
     private Vector3f x, y, z;
 
-    public OBB(GameItem gameItem) {
+    public OBB(GameItemMesh gameItem) {
         super(gameItem);
 
         Vector3f min = gameItem.getMesh().getMin();

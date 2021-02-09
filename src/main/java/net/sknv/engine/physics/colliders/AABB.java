@@ -1,6 +1,6 @@
 package net.sknv.engine.physics.colliders;
 
-import net.sknv.engine.GameItem;
+import net.sknv.engine.entities.GameItemMesh;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -10,10 +10,10 @@ import java.util.ArrayList;
 
 public class AABB implements BoundingBox {
 
-    public GameItem gameItem;
+    public GameItemMesh gameItem;
     public EndPoint min, max;
 
-    public AABB(GameItem gameItem) {
+    public AABB(GameItemMesh gameItem) {
         this.gameItem = gameItem;
 
         //load vertices
@@ -104,7 +104,7 @@ public class AABB implements BoundingBox {
     }
 
     @Override
-    public GameItem getGameItem() {
+    public GameItemMesh getGameItem() {
         return gameItem;
     }
 

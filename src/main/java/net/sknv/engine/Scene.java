@@ -1,5 +1,7 @@
 package net.sknv.engine;
 
+import net.sknv.engine.entities.AbstractGameItem;
+import net.sknv.engine.entities.GameItemMesh;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector3f;
@@ -11,7 +13,7 @@ import java.util.Arrays;
 
 public class Scene implements Serializable {
 
-    private ArrayList<GameItem> gameItems;
+    private ArrayList<AbstractGameItem> gameItems;
     private SkyBox skyBox;
     private SceneLight sceneLight;
     private Vector3f gravity;
@@ -36,11 +38,11 @@ public class Scene implements Serializable {
         this.gravity = g;
     }
 
-    public ArrayList<GameItem> getGameItems() {
+    public ArrayList<AbstractGameItem> getGameItems() {
         return gameItems;
     }
 
-    public void setGameItems(ArrayList<GameItem> gameItems) {
+    public void setGameItems(ArrayList<AbstractGameItem> gameItems) {
         this.gameItems = gameItems;
     }
 
@@ -106,13 +108,13 @@ public class Scene implements Serializable {
         float incy = 0.0f;
         int NUM_ROWS = 10;
         int NUM_COLS = 10;
-        ArrayList<GameItem> gameItems  = new ArrayList<>(NUM_ROWS * NUM_COLS + 10);
+        ArrayList<AbstractGameItem> gameItems  = new ArrayList<>(NUM_ROWS * NUM_COLS + 10);
         for(int i=0; i<NUM_ROWS; i++) {
             for(int j=0; j<NUM_COLS; j++) {
-                GameItem gameItem = new GameItem(cube);
+                AbstractGameItem gameItem = new GameItemMesh(cube);
                 gameItem.setScale(blockScale);
                 incy = Math.random() > 0.9f ? blockScale * 2 : 0f;
-                gameItem.setPos(posx, starty + incy, posz);
+                gameItem.setPosition(posx, starty + incy, posz);
                 gameItems.add(gameItem);
 
                 posx += inc;
@@ -122,8 +124,8 @@ public class Scene implements Serializable {
         }
 
         // Special game items
-        GameItem testItem = new GameItem(kek);
-        testItem.setPos(2f, 1, 2f);
+        GameItemMesh testItem = new GameItemMesh(kek);
+        testItem.setPosition(2f, 1, 2f);
         testItem.setScale(blockScale);
 
         OBB testBox = new OBB(testItem);
@@ -132,7 +134,7 @@ public class Scene implements Serializable {
         // add special items to gameItems array
         // this is here case more than one special items...
         // easier to just add {testItem, myOtherItem, kekItem}
-        GameItem[] specialItems = {testItem};
+        AbstractGameItem[] specialItems = {testItem};
         gameItems.addAll(Arrays.asList(specialItems));
         setGameItems(gameItems);
 
