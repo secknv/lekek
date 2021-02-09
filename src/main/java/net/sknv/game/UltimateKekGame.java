@@ -161,7 +161,11 @@ public class UltimateKekGame implements IGameLogic {
         if(!clickedItems.isEmpty()) {
             float d = cameraPos.distance(clickedItems.get(0).getPosition());
             for (GameItem item : clickedItems) {
-                if (cameraPos.distance(item.getPosition()) <= d) selectedItem = item;
+                if (cameraPos.distance(item.getPosition()) <= d){
+                    d = cameraPos.distance(item.getPosition());
+                    selectedItem = item;
+                }
+                GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), item.getBoundingBox());
             }
             GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), selectedItem.getBoundingBox());
         }
