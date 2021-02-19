@@ -170,6 +170,7 @@ public class Renderer {
 
     private void renderSkyBox(Matrix4f projectionMatrix, Matrix4f viewMatrix, Scene scene) {
         SkyBox skyBox = scene.getSkyBox();
+        skyBoxShaderProgram.bind();
 
         // todo: [spaghet] SkyBox ShaderProgram needs ambient light and projection matrix,
         //  these setters are used to provide them without having to change the render method signature.
@@ -178,6 +179,8 @@ public class Renderer {
         skyBox.setProjectionMatrix(projectionMatrix);
 
         skyBox.render(skyBoxShaderProgram, viewMatrix);
+
+        skyBoxShaderProgram.unbind();
     }
 
     public void cleanup() {

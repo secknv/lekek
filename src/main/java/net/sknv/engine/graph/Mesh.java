@@ -329,4 +329,12 @@ public class Mesh {
     }
 
     public ArrayList<Vector3f> getVertices(){return vertices;}
+
+    @Override
+    public String toString() {
+        return "Mesh{" +
+                "modelFile='" + modelFile + '\'' +
+                ", material=" + material +
+                '}';
+    }
 }

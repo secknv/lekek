@@ -1,11 +1,9 @@
 package net.sknv.game;
 
-import net.sknv.engine.entities.AbstractGameItem;
-import net.sknv.engine.entities.GameItemMesh;
 import net.sknv.engine.IHud;
+import net.sknv.engine.Window;
 import net.sknv.engine.entities.HudElement;
 import net.sknv.engine.entities.TextItem;
-import net.sknv.engine.Window;
 import net.sknv.engine.graph.FontTexture;
 import net.sknv.engine.graph.Material;
 import net.sknv.engine.graph.Mesh;
@@ -46,10 +44,10 @@ public class Hud implements IHud {
         compassItem = new HudElement(mesh);
         compassItem.setScale(40.0f);
         // Rotate to transform it to screen coordinates
-        compassItem.setRotationEuclidean(new Vector3f(0f, 0f, 180f));
+        compassItem.setRotationEuclidean(new Vector3f(0f, 0f, (float)Math.PI));
 
         // Create list that holds the items that compose the HUD
-        hudElements = new ArrayList<HudElement>(List.of(statusTextItem, compassItem));
+        hudElements = new ArrayList<>(List.of(statusTextItem, compassItem));
     }
 
     public void setStatusText(String statusText) {

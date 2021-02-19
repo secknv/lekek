@@ -5,6 +5,11 @@ import net.sknv.engine.graph.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+
 public class SkyBox extends GameItemMesh {
 
     private Matrix4f projectionMatrix;
@@ -33,10 +38,10 @@ public class SkyBox extends GameItemMesh {
     @Override
     public void render(ShaderProgram shaderProgram, Matrix4f viewMatrix) throws AssertionError {
 
+        int drawMode = GL_TRIANGLES;
+
         assert ambientLight != null: "You MUST set the Ambient Light with this::setAmbientLight!";
         assert projectionMatrix != null: "You MUST set the Projection Matrix with this::setProjectionMatrix!";
-
-        shaderProgram.bind();
 
         shaderProgram.setUniform("texture_sampler", 0);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
@@ -49,8 +54,25 @@ public class SkyBox extends GameItemMesh {
         shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
         shaderProgram.setUniform("ambientLight", ambientLight);
 
+        // this part used to be on Mesh::render
+        Texture texture = mesh.getMaterial().getTexture();
+        if (texture != null) {
+            //tell openGL to use first texture bank and bind texture
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texture.getId());
+        }
+        else {
+            // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
 
-        shaderProgram.unbind();
+        //draw mesh
+        glBindVertexArray(mesh.getVaoId());
+
+        glDrawElements(drawMode, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+
+        //restore state
+        glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public void setAmbientLight(Vector3f ambientLight) {
