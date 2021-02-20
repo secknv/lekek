@@ -12,7 +12,7 @@ public class Transformation {
      * There are 5 different coordinate systems:
      *
      * - Local Space (or Object Space):
-     *      This is the object's self coordinate system and it is composed by local coordinates [(x,y,z)] that are
+     *      This is the object's self coordinate system and it is composed by local coordinates that are
      *      relative to the object's local origin (it's center). You can think of a object's local space as if it were
      *      alone in the world with its local origin overlapping the world's origin. That way the local space coordinates
      *      would define the positions of the object's vertices relative to its origin and the sum of the object's
@@ -37,30 +37,25 @@ public class Transformation {
      *
      * - Clip Space:
      *      This space is the result of scaling the xyz axis into a frustum shape clipping all the view space coordinates out of a given coordinate set (frustum).
-     *      Since opengl expects the vertex coordinates in NDC (Normalized Display Coorinates) that are in the range [-1,1]
-     *      for xyz axis we have to convert to those coordinates. First we have to specify a coordinate set to work in
-     *      and then convert those coordinates to NDC. The projection matrix is responsible for defining that coordinate set
-     *      simulating a viewing box (the frustum). Each coordinate inside this frustum will end up on the screen.
+     *      The projection matrix is responsible for defining that coordinate set simulating a viewing box. Each coordinate inside this frustum will end up on the screen.
      *
-     *      View space coordinates can be transformed to clip space coordinates:
-     *      [View Space] -> ProjectionMatrix -> [Homogenous Clip Space]
      *
      *      After the vertices coordinates are transformed to clip space a final operation called perspective division is performed
      *      where we divide the x, y and z components of the position vectors by the vector's homogeneous w component.
      *      Perspective division is what transforms the 4D clip space coordinates to 3D normalized device coordinates, this is
-     *      what gives perspective, changing the homogenous clip space to normalised device space,
-     *      This step is performed automatically at the end of the vertex shader step.
+     *      what gives perspective, changing the homogenous clip space to normalised device space.
      *
-     *
-     *
-     *      Projection to clip-space coordinates can add perspective if using perspective projection.
+     *      View space coordinates can be transformed to clip space coordinates:
+     *      [View Space] -> ProjectionMatrix -> [Homogenous Clip Space]
+     *      View-space to clip-space coordinates can add perspective if using perspective projection.
      *
      * - Screen Space (or Viewport Space):
+     *      The resulting coordinates are finally mapped to screen coordinates (using the settings of glViewport) and turned into fragments.
+     *      The viewport transformation is a scale and translation that maps the -1 to 1 normalized device-coordinate cube into window coordinates range defined by glViewport.
+     *      This transformation applies not only to x and y values, but also to the z value. The viewport transformation maps normalized device-coordinate z values
+     *      to the range of acceptable depth buffer values.
      *
-     *      It is after this stage where the resulting coordinates are mapped to screen coordinates (using the settings of glViewport) and turned into fragments.
-     *      The projection matrix to transform view coordinates to clip coordinates usually takes two different forms, where each form defines its own unique frustum. We can either create an orthographic projection matrix or a perspective projection matrix.
-     *
-     *
+     *      Transformation is performed in shader (i think)
      *
      * https://learnopengl.com/Getting-started/Coordinate-Systems
      * https://antongerdelan.net/opengl/raycasting.html
