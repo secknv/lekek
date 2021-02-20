@@ -9,6 +9,14 @@ public class Transformation {
      * The Transformation class contains the methods that provide all the necessary matrices to
      * perform space transformations, changing the coordinates from one coordinate system to another.
      *
+     * ╔══════════════════════════════════════════════════════════════════════════════════╗
+     * ║ TL;DR for Matrices                                                               ║
+     * ╠══════════════════════════════════════════════════════════════════════════════════╣
+     * ║ ModelMatrix      -> Turns local Mesh coords into global World coords             ║
+     * ║ ViewMatrix       -> Turns World coords to a World with the Camera as it's origin ║
+     * ║ ProjectionMatrix -> Turns World based on Camera origin into frustum clip space   ║
+     * ╚══════════════════════════════════════════════════════════════════════════════════╝
+     *
      * There are 5 different coordinate systems:
      *
      * - Local Space (or Object Space):
