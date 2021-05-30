@@ -89,7 +89,7 @@ public class Renderer {
     public void render(Matrix4f projectionMatrix, Matrix4f viewMatrix, Matrix4f ortho, Scene scene, IHud hud) {
         clear();
         renderScene(projectionMatrix, viewMatrix, scene);
-        renderSkyBox(projectionMatrix, viewMatrix, scene);
+        //renderSkyBox(projectionMatrix, viewMatrix, scene);
         renderHud(ortho, hud);
         renderGraphUtils();
     }
