@@ -93,10 +93,12 @@ public class Scene implements Serializable {
         Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
         kek.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
 
-        //init gameItems
-        //background game items
         float blockScale = 0.5f;
         float skyBoxScale = 20.0f;
+
+        //init gameItems
+        //background game items
+
 
         float startx = 0;
         float startz = 0;
@@ -126,10 +128,10 @@ public class Scene implements Serializable {
         // Special game items
         Collider testItem = new Collider(kek);
         testItem.setPosition(2f, 1, 2f);
-        testItem.setScale(blockScale);
 
         OBB testBox = new OBB(testItem);
         testItem.setBoundingBox(testBox);
+        testItem.setScale(blockScale);
 
         // add special items to gameItems array
         // this is here case more than one special items...

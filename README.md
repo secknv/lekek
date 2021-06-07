@@ -1,8 +1,23 @@
-Hello this is my 27th attempt at getting started with lwjgl.
+![Requires Java 11+](https://img.shields.io/badge/Java-11%2B-blue)
+# LWJGL project
+- Wannabe Game Engine
+- Wannabe Multiplayer Game
 
-Wow actually getting somewhere
+## Core ideas to implement
+- Logically organised render engine
+- Collisions
+- Multiplayer
+- Terrain
 
-## Requires java 11+
+## Sorta abstract road map
+
+- [ ] Working collisions
+- [ ] Player Character
+- [ ] Walkable terrain
+- [ ] Multiplayer
+- [ ] A GUN?
+
+## Run instructions
 
 Inside project folder open cmd and do:
 
@@ -11,14 +26,38 @@ Inside project folder open cmd and do:
 
 wow such gradle many amaze
 
+## (Probably outdated) controls
 `a w s d` to move
 `space shift` for up/down
 `mouse` to look around
 
-`p` to unlock mouse
+`t` to open command line
 `left click` to select gameItem
 
 `arrow keys` to move selected item
 `x y z` to rotate selected item
 
 press power button to paint screen black
+
+# About
+This section holds documentation of the inner workings of the engine.
+
+## Game Item concept
+Everything that's renderable must implement `IRenderable`.  
+Currently, there's:
+- `AbstractGameItem` - Has Position, Scale, Rotation and Mesh attributes and requires children to implement a render method.
+- `SkyBox` - Exists to provide a `render` implementation without the other attributes.
+
+`AbstractGameItem` is extended by:
+- `HudElement` - A special `render` implementation to draw the HUD.
+- `Phantom` - Traditional `render` implementation to display geometries in the world.
+   - Extended by `Collider` - Adds physics capabilities. (Should we interface this?)
+    
+`Terrain` should fit in here somewhere... currently WIP.
+
+### Summary Chart:  
+![Renderable Chart](https://i.imgur.com/DyHGZi6.png)
+
+## DBZ Collision Engine
+Sorcery fo sure  
+![I am confuse](https://i.imgur.com/55r5cV1.png)

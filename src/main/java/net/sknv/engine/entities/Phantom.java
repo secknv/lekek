@@ -11,39 +11,30 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
-public class HudElement extends AbstractGameItem {
+public class Phantom extends AbstractGameItem {
 
-    public HudElement() {
-        super();
-    }
-
-    public HudElement(Mesh mesh) {
+    public Phantom(Mesh mesh) {
         super(mesh);
     }
-
     @Override
-    public void render(ShaderProgram shaderProgram, Matrix4f orthoProjMatrix) {
+    public void render(ShaderProgram shaderProgram, Matrix4f viewMatrix) {
 
-        int drawMode = GL_TRIANGLES;
+        int drawMode = mesh.getDrawMode();
 
-        Mesh mesh = this.getMesh();
-        // Set ortohtaphic and model matrix for this HUD item
-        Matrix4f projModelMatrix = Transformation.getOrtoProjModelMatrix(this, orthoProjMatrix);
+        Matrix4f transformationResult = Transformation.getModelViewMatrix(this, viewMatrix);
 
-        shaderProgram.setUniform("projModelMatrix", projModelMatrix);
-        shaderProgram.setUniform("colour", mesh.getMaterial().getAmbientColor());
-        shaderProgram.setUniform("hasTexture", mesh.getMaterial().isTextured() ? 1 : 0);
+        shaderProgram.setUniform("modelViewMatrix", transformationResult);
+        shaderProgram.setUniform("material", mesh.getMaterial());
 
+        // this part used to be on Mesh::render
         Texture texture = mesh.getMaterial().getTexture();
         if (texture != null) {
             //tell openGL to use first texture bank and bind texture
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture.getId());
-            //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
         else {
-            //for test models
-            //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+            // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
 
         //draw mesh

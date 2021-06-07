@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class Collider extends GameItemMesh{
+public class Collider extends Phantom{
 
     protected transient BoundingBox boundingBox;
     protected boolean movable;
