@@ -1,7 +1,6 @@
 package net.sknv.engine.physics.collisionDetection;
 
 import net.sknv.engine.entities.Collider;
-import net.sknv.engine.entities.GameItemMesh;
 import net.sknv.engine.physics.colliders.BoundingBox;
 import org.joml.Vector3f;
 
@@ -11,7 +10,7 @@ public interface ISweepPrune {
 
     /**
      * @param collider the {@link Collider} to be added to the Sweep & Prune algorithm.
-     * @return a set containing the bounding boxes that collide with the added {@link GameItemMesh}.
+     * @return a set containing the bounding boxes that collide with the added {@link Collider}.
      */
     Set<BoundingBox> addItem(Collider collider);
 

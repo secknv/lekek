@@ -6,7 +6,7 @@ import net.sknv.engine.Scene;
 import net.sknv.engine.Window;
 import net.sknv.engine.entities.AbstractGameItem;
 import net.sknv.engine.entities.Collider;
-import net.sknv.engine.entities.GameItemMesh;
+import net.sknv.engine.entities.Phantom;
 import net.sknv.engine.entities.Terrain;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.PhysicsEngine;
@@ -77,7 +77,7 @@ public class UltimateKekGame implements IGameLogic {
 
         Mesh line = MeshUtils.generateLine(WebColor.Red, new Vector3f(0,0,0), new Vector3f(10,10,0));
 
-        items.add(new GameItemMesh(line));
+        items.add(new Phantom(line));
         scene.setGameItems(items);
         initPhysicsEngine();
 
@@ -245,7 +245,7 @@ public class UltimateKekGame implements IGameLogic {
         renderer.cleanup();
         for(AbstractGameItem item : scene.getGameItems()) {
             // todo: temp fix for retro-compat. Update AbsGameItem to include cleanup methods or find other good solution.
-            if (item instanceof GameItemMesh) ((GameItemMesh)item).getMesh().cleanUp();
+            if (item instanceof Phantom) ((Phantom)item).getMesh().cleanUp();
         }
         hud.cleanup();
     }
