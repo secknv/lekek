@@ -7,6 +7,7 @@ import net.sknv.engine.Window;
 import net.sknv.engine.entities.AbstractGameItem;
 import net.sknv.engine.entities.Collider;
 import net.sknv.engine.entities.GameItemMesh;
+import net.sknv.engine.entities.Terrain;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.PhysicsEngine;
 import net.sknv.engine.physics.colliders.OBB;
@@ -50,6 +51,8 @@ public class UltimateKekGame implements IGameLogic {
     private PhysicsEngine physicsEngine;
     public Collider selectedItem;
 
+    private Terrain terrain;
+
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera(new Vector3f(), new Vector3f());
@@ -59,10 +62,19 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void init(Window window, MouseInput mouseInput) throws Exception {
+
         renderer.init();
         setKeyCallbacks(window, mouseInput);
 
         initScene("default");
+
+        float terrainScale = 100;
+        int terrainSize = 1;
+        float minY = -0.1f;
+        float maxY = 0.1f;
+        int textInc = 40;
+        terrain = new Terrain(terrainSize, terrainScale, minY, maxY, "src/main/resources/textures/heightmap.png", "src/main/resources/textures/terrain.png", textInc);
+        scene.setGameItems(terrain.getGameItems());
         initPhysicsEngine();
 
         // Setup HUD
@@ -72,7 +84,7 @@ public class UltimateKekGame implements IGameLogic {
         camera.setPosition(0.65f, 1.15f, 4.34f);
 
         //todo temp - figure this out
-        if(!scene.getGameItems().isEmpty()) selectedItem = (Collider) scene.getGameItems().get(0);
+        //if(!scene.getGameItems().isEmpty()) selectedItem = (Collider) scene.getGameItems().get(0);
     }
 
     public void initScene(String scene) {
@@ -191,8 +203,17 @@ public class UltimateKekGame implements IGameLogic {
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {
+
+        Vector3f prevPos = new Vector3f(camera.getPosition());
         // moves camera pos
         if(!(menu || usingTerminal)) camera.movePosition(cameraPosInc.x * CAMERA_POS_STEP, cameraPosInc.y * CAMERA_POS_STEP, cameraPosInc.z * CAMERA_POS_STEP);
+
+        // Check if there has been a collision. If true, set the y position to
+        // the maximum height
+        float height = terrain.getHeight(camera.getPosition());
+        if ( camera.getPosition().y <= height )  {
+            camera.setPosition(prevPos.x, prevPos.y, prevPos.z);
+        }
 
         // rotates camera
         if (!(menu || usingTerminal) && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
