@@ -14,7 +14,6 @@ import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -74,7 +73,12 @@ public class UltimateKekGame implements IGameLogic {
         float maxY = 0.1f;
         int textInc = 40;
         terrain = new Terrain(terrainSize, terrainScale, minY, maxY, "src/main/resources/textures/heightmap.png", "src/main/resources/textures/terrain.png", textInc);
-        scene.setGameItems(terrain.getGameItems());
+        ArrayList<AbstractGameItem> items = terrain.getGameItems();
+
+        Mesh line = MeshUtils.generateLine(WebColor.Red, new Vector3f(0,0,0), new Vector3f(10,10,0));
+
+        items.add(new GameItemMesh(line));
+        scene.setGameItems(items);
         initPhysicsEngine();
 
         // Setup HUD
@@ -138,6 +142,7 @@ public class UltimateKekGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_D)) cameraPosInc.x = (cameraPosInc.x < 0 ? 0 : 1);
         if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraPosInc.y = -1;
         if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraPosInc.y = (cameraPosInc.y < 0 ? 0 : 1);
+        if (window.isKeyPressed(GLFW_KEY_K)) System.out.println(scene.getGameItems());
 
         if (cameraPosInc.length() != 0) cameraPosInc.normalize();
 
@@ -168,14 +173,14 @@ public class UltimateKekGame implements IGameLogic {
 
         //ray casting quad intersection test
         if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
-            GraphUtils.drawQuad(renderer, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
+            //GraphUtils.drawQuad(renderer, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
         } else{
-            GraphUtils.drawQuad(renderer, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
+            //GraphUtils.drawQuad(renderer, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
         }
 
         if(mouseInput.isRightClicked()) rayCasts.add(ray);
         for (RayCast rayCast : rayCasts){
-            GraphUtils.drawRay(renderer, rayCast, 10);
+            //GraphUtils.drawRay(renderer, rayCast, 10);
         }
 
         ArrayList<Collider> clickedItems = new ArrayList<>();
@@ -194,12 +199,12 @@ public class UltimateKekGame implements IGameLogic {
                     d = cameraPos.distance(item.getPosition());
                     selectedItem = item;
                 }
-                GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), item.getBoundingBox());
+                //GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), item.getBoundingBox());
             }
-            GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), selectedItem.getBoundingBox());
+            //GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), selectedItem.getBoundingBox());
         }
 
-        if(selectedItem != null) GraphUtils.drawBoundingBox(renderer, new Vector4f(75f,0,15f,0f), selectedItem.getBoundingBox());
+        if(selectedItem != null); //GraphUtils.drawBoundingBox(renderer, new Vector4f(75f,0,15f,0f), selectedItem.getBoundingBox());
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {

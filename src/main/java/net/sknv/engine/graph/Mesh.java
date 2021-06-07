@@ -24,8 +24,8 @@ public class Mesh {
     private Vector3f min, max;
     private final ArrayList<Vector3f> vertices;
 
-    public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx) {
-        this.drawMode = GL_TRIANGLES;
+    public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx, int drawmode) {
+        this.drawMode = drawmode;
 
         FloatBuffer posbuff = null;
         FloatBuffer textCoordsBuff = null;
@@ -267,15 +267,13 @@ public class Mesh {
         }
     }
 
-    public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx, int drawMode) {
-        this(pos, textCoords, normals, idx);
-        this.drawMode = drawMode;
+    public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx) {
+        this(pos, textCoords, normals, idx, GL_TRIANGLES);
     }
 
     public Mesh(float[] pos, int[] idx, int drawMode) {
         // constructor for stuff without textures and normals
-        this(pos, null, null, idx);
-        this.drawMode = drawMode;
+        this(pos, null, null, idx, drawMode);
     }
 
     public Material getMaterial() {
@@ -352,5 +350,9 @@ public class Mesh {
                 "modelFile='" + modelFile + '\'' +
                 ", material=" + material +
                 '}';
+    }
+
+    public int getDrawMode() {
+        return drawMode;
     }
 }

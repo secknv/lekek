@@ -31,7 +31,7 @@ public class GameItemMesh extends AbstractGameItem {
     @Override
     public void render(ShaderProgram shaderProgram, Matrix4f viewMatrix) {
 
-        int drawMode = GL_TRIANGLES;
+        int drawMode = mesh.getDrawMode();
 
         Matrix4f transformationResult = Transformation.getModelViewMatrix(this, viewMatrix);
 
