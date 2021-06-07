@@ -78,6 +78,7 @@ public class UltimateKekGame implements IGameLogic {
         Mesh line = MeshUtils.generateLine(WebColor.Red, new Vector3f(0,0,0), new Vector3f(10,10,0));
 
         items.add(new Phantom(line));
+        items.addAll(scene.getGameItems());
         scene.setGameItems(items);
         initPhysicsEngine();
 
@@ -199,12 +200,12 @@ public class UltimateKekGame implements IGameLogic {
                     d = cameraPos.distance(item.getPosition());
                     selectedItem = item;
                 }
-                //GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), item.getBoundingBox());
+                item.drawBB();
             }
-            //GraphUtils.drawBoundingBox(renderer, new Vector4f(255, 255, 0, 0), selectedItem.getBoundingBox());
+            selectedItem.drawBB();
         }
 
-        if(selectedItem != null); //GraphUtils.drawBoundingBox(renderer, new Vector4f(75f,0,15f,0f), selectedItem.getBoundingBox());
+        if(selectedItem != null) selectedItem.drawBB();
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {
