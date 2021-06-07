@@ -73,12 +73,18 @@ public class UltimateKekGame implements IGameLogic {
         float maxY = 0.1f;
         int textInc = 40;
         terrain = new Terrain(terrainSize, terrainScale, minY, maxY, "src/main/resources/textures/heightmap.png", "src/main/resources/textures/terrain.png", textInc);
-        ArrayList<AbstractGameItem> items = terrain.getGameItems();
+
 
         Mesh line = MeshUtils.generateLine(WebColor.Red, new Vector3f(0,0,0), new Vector3f(10,10,0));
 
+        // get default scene game items
+        ArrayList<AbstractGameItem> items = scene.getGameItems();
+
+        // add line
         items.add(new Phantom(line));
-        items.addAll(scene.getGameItems());
+        // add terrain
+        items.addAll(terrain.getGameItems());
+
         scene.setGameItems(items);
         initPhysicsEngine();
 
@@ -87,9 +93,6 @@ public class UltimateKekGame implements IGameLogic {
 
         //Setup Camera
         camera.setPosition(0.65f, 1.15f, 4.34f);
-
-        //todo temp - figure this out
-        //if(!scene.getGameItems().isEmpty()) selectedItem = (Collider) scene.getGameItems().get(0);
     }
 
     public void initScene(String scene) {
@@ -172,16 +175,10 @@ public class UltimateKekGame implements IGameLogic {
         Vector3f cameraPos = camera.getPosition();
         RayCast ray = new RayCast(new Vector3f(cameraPos), new Vector3f(worldRay.x, worldRay.y, worldRay.z));
 
-        //ray casting quad intersection test
-        if(ray.intersectsTriangle(new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0))|| ray.intersectsTriangle(new Vector3f(-5,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0)) ){
-            //GraphUtils.drawQuad(renderer, new Vector4f(0f,255f,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        } else{
-            //GraphUtils.drawQuad(renderer, new Vector4f(255f,0,0,0), new Vector3f(-5,0,0), new Vector3f(-10,0,0),new Vector3f(-10,5,0), new Vector3f(-5,5,0));
-        }
-
-        if(mouseInput.isRightClicked()) rayCasts.add(ray);
-        for (RayCast rayCast : rayCasts){
-            //GraphUtils.drawRay(renderer, rayCast, 10);
+        if(mouseInput.isRightClicked()) {
+            Vector3f end = new Vector3f();
+            ray.origin.add(ray.direction, end);
+            scene.addGameItem(new Phantom(MeshUtils.generateLine(WebColor.Yellow, new Vector3f(ray.origin), new Vector3f(end))));
         }
 
         ArrayList<Collider> clickedItems = new ArrayList<>();
