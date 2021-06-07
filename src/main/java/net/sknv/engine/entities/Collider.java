@@ -1,16 +1,18 @@
 package net.sknv.engine.entities;
 
-import net.sknv.engine.graph.Material;
-import net.sknv.engine.graph.Mesh;
-import net.sknv.engine.graph.OBJLoader;
+import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.colliders.OBB;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class Collider extends Phantom{
 
@@ -20,9 +22,13 @@ public class Collider extends Phantom{
     protected Vector3f velocity;
     protected transient Vector3f forces;
 
+    private boolean showBB = false;
+    private Mesh bbMesh;
+
     public Collider(Mesh mesh) {
         super(mesh);
-        this.boundingBox = new OBB(this);
+        boundingBox = new OBB(this);
+        bbMesh = MeshUtils.generateBB(WebColor.Purple, boundingBox);
 
         velocity = new Vector3f(0, 0, 0);
         forces = new Vector3f(0, 0, 0);
@@ -75,5 +81,29 @@ public class Collider extends Phantom{
     }
     public float getMass() {
         return mass;
+    }
+
+    @Override
+    public void render(ShaderProgram shaderProgram, Matrix4f viewMatrix) {
+        super.render(shaderProgram, viewMatrix);
+        if (showBB) {
+            Matrix4f transformationResult = Transformation.getModelViewMatrix(this, viewMatrix);
+
+            shaderProgram.setUniform("modelViewMatrix", transformationResult);
+            shaderProgram.setUniform("material", bbMesh.getMaterial());
+
+            //draw mesh
+            glBindVertexArray(bbMesh.getVaoId());
+
+            glDrawElements(GL_LINES, bbMesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+
+            //restore state
+            glBindVertexArray(0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            showBB = false;
+        }
+    }
+    public void drawBB() {
+        this.showBB = true;
     }
 }

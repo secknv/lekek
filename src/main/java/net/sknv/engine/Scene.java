@@ -162,4 +162,10 @@ public class Scene implements Serializable {
         setSceneLight(sceneLight);
         setGravity(new Vector3f(0,-1f,0));
     }
+
+    public void addGameItem(AbstractGameItem gameItem) {
+        ArrayList<AbstractGameItem> items = this.getGameItems();
+        items.add(gameItem);
+        this.setGameItems(items);
+    }
 }

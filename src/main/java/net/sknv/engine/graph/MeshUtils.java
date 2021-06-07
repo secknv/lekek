@@ -1,5 +1,8 @@
 package net.sknv.engine.graph;
 
+import net.sknv.engine.physics.colliders.AABB;
+import net.sknv.engine.physics.colliders.BoundingBox;
+import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -36,8 +39,111 @@ public class MeshUtils {
         // Create Indices Array
         int[] idxArray = new int[]{0,1};
         Mesh mesh = new Mesh(posArray,idxArray, GL_LINES);
-        // mesh must be able to no recieve textcoords, normas
         mesh.setMaterial(new Material(color, 1, 1));
         return mesh;
+    }
+
+    public static Mesh generateBB(WebColor color, BoundingBox bb) {
+
+        if(bb instanceof AABB) {
+            Vector3f min = bb.getMin().getPosition();
+            Vector3f max = bb.getMax().getPosition();
+
+            // Create Positions Array
+            float[] posArray = new float[]{
+                    min.x, min.y, min.z,
+                    max.x, min.y, min.z,
+                    min.x, max.y, min.z,
+                    min.x, min.y, max.z,
+
+                    min.x, max.y, max.z,
+                    max.x, min.y, max.z,
+                    max.x, max.y, min.z,
+                    max.x, max.y, max.z,
+            };
+
+            // Create Indices Array
+            int[] idxArray = new int[]{
+                    0, 1,
+                    0, 2,
+                    0, 3,
+
+                    1, 5,
+                    1, 6,
+
+                    2, 4,
+                    2, 6,
+
+                    3, 4,
+                    3, 5,
+
+                    4, 7,
+                    5, 7,
+                    6, 7,
+            };
+
+            Mesh mesh = new Mesh(posArray,idxArray, GL_LINES);
+            mesh.setMaterial(new Material(color, 1, 1));
+            return mesh;
+
+            //testing purposes
+        }
+        if(bb instanceof OBB){
+            Vector3f center = ((OBB) bb).getCenter();
+
+            Vector3f x = ((OBB) bb).getX();
+            Vector3f y = ((OBB) bb).getY();
+            Vector3f z = ((OBB) bb).getZ();
+
+            // Create Positions Array
+            float[] posArray = new float[] {
+                    //Axis
+                    center.x, center.y, center.z,
+
+                    center.x + x.x, center.y + x.y, center.z + x.z,
+                    center.x + y.x, center.y + y.y, center.z + y.z,
+                    center.x + z.x, center.y + z.y, center.z + z.z,
+
+                    //exact Box
+                    center.x + x.x + y.x + z.x, center.y + x.y + y.y + z.y, center.z + x.z + y.z + z.z, //max
+
+                    center.x - x.x + y.x + z.x, center.y - x.y + y.y + z.y, center.z - x.z + y.z + z.z,
+                    center.x + x.x - y.x + z.x, center.y + x.y - y.y + z.y, center.z + x.z - y.z + z.z,
+                    center.x + x.x + y.x - z.x, center.y + x.y + y.y - z.y, center.z + x.z + y.z - z.z,
+
+                    center.x - x.x - y.x - z.x, center.y - x.y - y.y - z.y, center.z - x.z - y.z - z.z, //min
+
+                    center.x + x.x - y.x - z.x, center.y + x.y - y.y - z.y, center.z + x.z - y.z - z.z,
+                    center.x - x.x + y.x - z.x, center.y - x.y + y.y - z.y, center.z - x.z + y.z - z.z,
+                    center.x - x.x - y.x + z.x, center.y - x.y - y.y + z.y, center.z - x.z - y.z + z.z,
+            };
+
+            // Create Indices Array
+            int[] idxArray = new int[] {
+                    0,1,
+                    0,2,
+                    0,3,
+
+                    4,5,
+                    4,6,
+                    4,7,
+
+                    8,9,
+                    8,10,
+                    8,11,
+
+                    5,10,
+                    5,11,
+                    6,11,
+                    6,9,
+                    7,9,
+                    7,10,
+            };
+
+            Mesh mesh = new Mesh(posArray,idxArray, GL_LINES);
+            mesh.setMaterial(new Material(color, 1, 1));
+            return mesh;
+        }
+        return null;
     }
 }
