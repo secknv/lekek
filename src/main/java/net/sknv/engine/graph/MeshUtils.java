@@ -1,6 +1,9 @@
 package net.sknv.engine.graph;
 
+import org.joml.Vector3f;
 import org.joml.Vector4f;
+
+import static org.lwjgl.opengl.GL11.GL_LINES;
 
 public class MeshUtils {
     public static Mesh generateCube(WebColor color) {
@@ -23,6 +26,18 @@ public class MeshUtils {
         float[] texCoordsArr = new float[1];
         Mesh mesh = new Mesh(posArr, normalsArr, texCoordsArr, idxArr);
         mesh.setMaterial(material);
+        return mesh;
+    }
+
+    public static Mesh generateLine(WebColor color, Vector3f start, Vector3f end) {
+
+        // Create Vertex Positions Array
+        float[] posArray = new float[]{start.x,start.y,start.z,end.x,end.y,end.z};
+        // Create Indices Array
+        int[] idxArray = new int[]{0,1};
+        Mesh mesh = new Mesh(posArray,idxArray, GL_LINES);
+        // mesh must be able to no recieve textcoords, normas
+        mesh.setMaterial(new Material(color, 1, 1));
         return mesh;
     }
 }
