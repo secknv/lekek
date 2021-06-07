@@ -1,19 +1,18 @@
 package net.sknv.game;
 
-import net.sknv.engine.*;
+import net.sknv.engine.IHud;
+import net.sknv.engine.Scene;
+import net.sknv.engine.SkyBox;
+import net.sknv.engine.Utils;
 import net.sknv.engine.entities.AbstractGameItem;
 import net.sknv.engine.entities.HudElement;
-import net.sknv.engine.graph.*;
+import net.sknv.engine.graph.DirectionalLight;
+import net.sknv.engine.graph.ShaderProgram;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.util.concurrent.LinkedBlockingQueue;
-
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 
 public class Renderer {
 
@@ -22,8 +21,6 @@ public class Renderer {
     private static final int MAX_POINT_LIGHTS = 5;
     private static final int MAX_SPOT_LIGHTS = 5;
     private float specularPower;
-
-    private final LinkedBlockingQueue<AlienVAO> alienVAOQueue = new LinkedBlockingQueue<>();
 
     public Renderer() {
         specularPower = 10f;
@@ -91,7 +88,6 @@ public class Renderer {
         renderScene(projectionMatrix, viewMatrix, scene);
         renderSkyBox(projectionMatrix, viewMatrix, scene);
         renderHud(ortho, hud);
-        renderGraphUtils();
     }
 
     private void renderScene(Matrix4f projectionMatrix, Matrix4f viewMatrix, Scene scene) {
@@ -111,30 +107,6 @@ public class Renderer {
             gameItem.render(shaderProgram, viewMatrix);
         }
 
-        while (!alienVAOQueue.isEmpty()){
-
-            AlienVAO vao = alienVAOQueue.poll();
-
-            shaderProgram.setUniform("material", new Material(vao.getColor(), 0.5f));
-            shaderProgram.setUniform("modelViewMatrix", viewMatrix);
-
-            // Bind our VAO
-            glBindVertexArray(vao.getVaoId());
-
-            // Draw
-            glDrawElements(vao.getDrawMode(),vao.getVertexCount(), GL_UNSIGNED_INT, 0);
-
-            // Delete the VBOs
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            for (int vboId : vao.getVboIds()) {
-                glDeleteBuffers(vboId);
-            }
-
-            // Unbind and delete the VAO
-            glBindVertexArray(0);
-            glDeleteVertexArrays(vao.getVaoId());
-        }
-
         shaderProgram.unbind();
     }
 
@@ -151,11 +123,6 @@ public class Renderer {
         dir.mul(viewMatrix);
         currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
         shaderProgram.setUniform("directionalLight", currDirLight);
-    }
-
-    private void renderGraphUtils() {
-        //GraphUtils.drawGrid(this, new Vector3f(0,0,0),20);
-        GraphUtils.drawAxis(this);
     }
 
     private void renderHud(Matrix4f ortho, IHud hud) {
@@ -187,11 +154,5 @@ public class Renderer {
         if (shaderProgram != null) {
             shaderProgram.cleanup();
         }
-    }
-    /**
-     * Adds an AlienVAO object to the alienVAOQueue to be rendered.
-     * */
-    public void addAlienVAO(AlienVAO alienVAO) {
-        this.alienVAOQueue.offer(alienVAO);
     }
 }
