@@ -32,7 +32,9 @@ public class Mesh {
         FloatBuffer vecNormalsBuffer = null;
         IntBuffer idxbuff = null;
 
-        //generate values for bounding box
+        // Start BB code
+        // -------------------------------------------------------------------------------------------------------------
+        // generate values for bounding box
         min = new Vector3f(pos[0], pos[1], pos[2]);
         max = new Vector3f(pos[0], pos[1], pos[2]);
         for(int i=0; i!=pos.length; i+=3){
@@ -45,6 +47,7 @@ public class Mesh {
             if(pos[i+2]>max.z) max.z = pos[i+2];
         }
 
+        // bounding box vertices
         vertices = new ArrayList<Vector3f>(
                 List.of(min,
                         new Vector3f(min.x, min.y, max.z), new Vector3f(min.x, max.y, min.z),
@@ -52,6 +55,9 @@ public class Mesh {
                         new Vector3f(max.x, min.y, max.z), new Vector3f(max.x, max.y, min.z),
                         max)
                 );
+
+        // end BB code
+        // -------------------------------------------------------------------------------------------------------------
 
         try {
             vertexCount = idx.length;
@@ -185,17 +191,19 @@ public class Mesh {
             // Texture Coords VBO - attribute list #1
             // ---------------------------------------------------------------------------------------------------------
 
-            vboId = glGenBuffers();
-            vboIdList.add(vboId);
-            textCoordsBuff = MemoryUtil.memAllocFloat(textCoords.length);
-            textCoordsBuff.put(textCoords).flip();
-            // With this, we change the bound VBO to this one (instead of the Positions VBO).
-            glBindBuffer(GL_ARRAY_BUFFER, vboId);
-            glBufferData(GL_ARRAY_BUFFER, textCoordsBuff, GL_STATIC_DRAW);
-            // Put this VBO in attribute list #1
-            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-            // Enable attribute list #1
-            glEnableVertexAttribArray(1);
+            if (textCoords != null) {
+                vboId = glGenBuffers();
+                vboIdList.add(vboId);
+                textCoordsBuff = MemoryUtil.memAllocFloat(textCoords.length);
+                textCoordsBuff.put(textCoords).flip();
+                // With this, we change the bound VBO to this one (instead of the Positions VBO).
+                glBindBuffer(GL_ARRAY_BUFFER, vboId);
+                glBufferData(GL_ARRAY_BUFFER, textCoordsBuff, GL_STATIC_DRAW);
+                // Put this VBO in attribute list #1
+                glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+                // Enable attribute list #1
+                glEnableVertexAttribArray(1);
+            }
 
             // End of Texture Coords VBO
             // ---------------------------------------------------------------------------------------------------------
@@ -203,16 +211,18 @@ public class Mesh {
             // Vertex Normals VBO - attribute list #2
             // ---------------------------------------------------------------------------------------------------------
 
-            vboId = glGenBuffers();
-            vboIdList.add(vboId);
-            vecNormalsBuffer = MemoryUtil.memAllocFloat(normals.length);
-            vecNormalsBuffer.put(normals).flip();
-            glBindBuffer(GL_ARRAY_BUFFER, vboId);
-            glBufferData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
-            // Put this VBO in attribute list #2
-            glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
-            // Enable attribute list #2
-            glEnableVertexAttribArray(2);
+            if (normals != null) {
+                vboId = glGenBuffers();
+                vboIdList.add(vboId);
+                vecNormalsBuffer = MemoryUtil.memAllocFloat(normals.length);
+                vecNormalsBuffer.put(normals).flip();
+                glBindBuffer(GL_ARRAY_BUFFER, vboId);
+                glBufferData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
+                // Put this VBO in attribute list #2
+                glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+                // Enable attribute list #2
+                glEnableVertexAttribArray(2);
+            }
 
             // End of Vertex Normals VBO
             // ---------------------------------------------------------------------------------------------------------
@@ -259,6 +269,12 @@ public class Mesh {
 
     public Mesh(float[] pos, float[] textCoords, float[] normals, int[] idx, int drawMode) {
         this(pos, textCoords, normals, idx);
+        this.drawMode = drawMode;
+    }
+
+    public Mesh(float[] pos, int[] idx, int drawMode) {
+        // constructor for stuff without textures and normals
+        this(pos, null, null, idx);
         this.drawMode = drawMode;
     }
 
