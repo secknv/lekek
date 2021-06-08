@@ -7,7 +7,6 @@ import net.sknv.engine.Window;
 import net.sknv.engine.entities.AbstractGameItem;
 import net.sknv.engine.entities.Collider;
 import net.sknv.engine.entities.Phantom;
-import net.sknv.engine.entities.Terrain;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.PhysicsEngine;
 import net.sknv.engine.physics.colliders.OBB;
@@ -50,8 +49,6 @@ public class UltimateKekGame implements IGameLogic {
     private PhysicsEngine physicsEngine;
     public Collider selectedItem;
 
-    private Terrain terrain;
-
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera(new Vector3f(), new Vector3f());
@@ -67,25 +64,9 @@ public class UltimateKekGame implements IGameLogic {
 
         initScene("default");
 
-        float terrainScale = 100;
-        int terrainSize = 1;
-        float minY = -0.1f;
-        float maxY = 0.1f;
-        int textInc = 40;
-        terrain = new Terrain(terrainSize, terrainScale, minY, maxY, "src/main/resources/textures/heightmap.png", "src/main/resources/textures/terrain.png", textInc);
-
-
         Mesh line = MeshUtils.generateLine(WebColor.Red, new Vector3f(0,0,0), new Vector3f(10,10,0));
+        scene.addGameItem(new Phantom(line));
 
-        // get default scene game items
-        ArrayList<AbstractGameItem> items = scene.getGameItems();
-
-        // add line
-        items.add(new Phantom(line));
-        // add terrain
-        items.addAll(terrain.getGameItems());
-
-        scene.setGameItems(items);
         initPhysicsEngine();
 
         // Setup HUD
@@ -213,7 +194,7 @@ public class UltimateKekGame implements IGameLogic {
 
         // Check if there has been a collision. If true, set the y position to
         // the maximum height
-        float height = terrain.getHeight(camera.getPosition());
+        float height = scene.getTerrain().getHeight(camera.getPosition());
         if ( camera.getPosition().y <= height )  {
             camera.setPosition(prevPos.x, prevPos.y, prevPos.z);
         }

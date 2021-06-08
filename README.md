@@ -58,6 +58,13 @@ Currently, there's:
 ### Summary Chart:  
 ![Renderable Chart](https://i.imgur.com/DyHGZi6.png)
 
+## Scene
+Everything required to construct a level:
+- `Terrain`
+- `GameItems`
+- `SkyBox`
+- `Lighting`
+
 ## DBZ Collision Engine
 Sorcery fo sure  
 ![I am confuse](https://i.imgur.com/55r5cV1.png)
