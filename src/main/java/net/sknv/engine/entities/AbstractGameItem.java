@@ -92,6 +92,7 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
                 "position=" + position +
                 ", rotation=" + rotation +
                 ", scale=" + scale +
+                ", mesh=" + mesh +
                 '}';
     }
 

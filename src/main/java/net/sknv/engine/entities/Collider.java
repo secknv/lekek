@@ -106,4 +106,11 @@ public class Collider extends Phantom {
     public void drawBB() {
         this.showBB = true;
     }
+
+    @Override
+    public String toString() {
+        return "Collider{" +
+                "boundingBox=" + boundingBox +
+                '}';
+    }
 }
