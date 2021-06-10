@@ -25,23 +25,21 @@ public class PhysicsEngine {
     }
 
     public void simulate(Scene scene){
-        // todo: tem GameItemMesh fix
-        ArrayList<AbstractGameItem> absGIList = scene.getGameItems();
-        for (AbstractGameItem item : absGIList) {
-            if (item instanceof Collider) items.add((Collider) item);
-        }
-
         //applyForces(scene);
         //update();
         //detectCollisions(gameItems);
         //solveCollisions();
 
-        for (Collider collider : items) {
-            if(collider.getVelocity().length() != 0){ //game item has vel
-                //detectCollisions(collider);
-                Vector3f step = collider.getVelocity().mul(0.1f);
-                collider.translate(step);
+        for (AbstractGameItem collider : scene.getGameItems()) {
+            if(collider instanceof Collider){
+                Collider fodase = (Collider) collider;
+                if(fodase.getVelocity().length() != 0 ){ //game item has vel
+                    //detectCollisions(collider);
+                    Vector3f step = fodase.getVelocity().mul(0.1f);
+                    collider.translate(step);
+                }
             }
+
         }
 
     }

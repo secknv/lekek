@@ -327,7 +327,7 @@ public class UltimateKekGame implements IGameLogic {
                 initPhysicsEngine();
                 System.out.println("scene loaded");
                 break;
-            case "removeitems":
+            case "clearitems":
                 scene.removeAllItems();
                 break;
             case "removeitem":
