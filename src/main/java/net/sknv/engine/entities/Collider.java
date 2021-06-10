@@ -14,7 +14,7 @@ import java.io.ObjectOutputStream;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
-public class Collider extends Phantom{
+public class Collider extends Phantom {
 
     protected transient BoundingBox boundingBox;
     protected boolean movable;
@@ -23,7 +23,7 @@ public class Collider extends Phantom{
     protected transient Vector3f forces;
 
     private boolean showBB = false;
-    private Mesh bbMesh;
+    private transient Mesh bbMesh;
 
     public Collider(Mesh mesh) {
         super(mesh);

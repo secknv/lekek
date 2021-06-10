@@ -28,7 +28,7 @@ public class Scene implements Serializable {
 
     private final static Logger logger = Logger.getLogger(Scene.class.getName());
 
-    private Terrain terrain;
+    private transient Terrain terrain;
     private ArrayList<AbstractGameItem> gameItems = new ArrayList<>();
     private SkyBox skyBox;
     private SceneLight sceneLight;
