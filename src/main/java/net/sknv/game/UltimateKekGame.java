@@ -121,35 +121,38 @@ public class UltimateKekGame implements IGameLogic {
         cameraPosInc.zero();
         hud.updateSize(window);
 
-        if (window.isKeyPressed(GLFW_KEY_W)) cameraPosInc.z = -1;
-        if (window.isKeyPressed(GLFW_KEY_S)) cameraPosInc.z = (cameraPosInc.z < 0 ? 0 : 1);
-        if (window.isKeyPressed(GLFW_KEY_A)) cameraPosInc.x = -1;
-        if (window.isKeyPressed(GLFW_KEY_D)) cameraPosInc.x = (cameraPosInc.x < 0 ? 0 : 1);
-        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraPosInc.y = -1;
-        if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraPosInc.y = (cameraPosInc.y < 0 ? 0 : 1);
-        if (window.isKeyPressed(GLFW_KEY_K)) System.out.println(scene.getGameItems());
+        if (!usingTerminal) {
+            if (window.isKeyPressed(GLFW_KEY_W)) cameraPosInc.z = -1;
+            if (window.isKeyPressed(GLFW_KEY_S)) cameraPosInc.z = (cameraPosInc.z < 0 ? 0 : 1);
+            if (window.isKeyPressed(GLFW_KEY_A)) cameraPosInc.x = -1;
+            if (window.isKeyPressed(GLFW_KEY_D)) cameraPosInc.x = (cameraPosInc.x < 0 ? 0 : 1);
+            if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraPosInc.y = -1;
+            if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraPosInc.y = (cameraPosInc.y < 0 ? 0 : 1);
+            if (window.isKeyPressed(GLFW_KEY_K)) System.out.println(scene.getGameItems());
 
-        if (cameraPosInc.length() != 0) cameraPosInc.normalize();
+            if (cameraPosInc.length() != 0) cameraPosInc.normalize();
 
-        if (window.isKeyPressed(GLFW_KEY_UP)) {
-            if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = 0f;
-            else selectedItem.getVelocity().z = -.1f;
-        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = .1f;
+            if (window.isKeyPressed(GLFW_KEY_UP)) {
+                if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = 0f;
+                else selectedItem.getVelocity().z = -.1f;
+            } else if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = .1f;
 
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-            if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = 0f;
-            else selectedItem.getVelocity().x = -.1f;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = .1f;
+            if (window.isKeyPressed(GLFW_KEY_LEFT)) {
+                if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = 0f;
+                else selectedItem.getVelocity().x = -.1f;
+            } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = .1f;
 
-        if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) {
-            if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = 0f;
-            else selectedItem.getVelocity().y = .1f;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = -.1f;
+            if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) {
+                if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = 0f;
+                else selectedItem.getVelocity().y = .1f;
+            } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = -.1f;
 
-        if (window.isKeyPressed(GLFW_KEY_X)) selectedItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
-        if (window.isKeyPressed(GLFW_KEY_Y)) selectedItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
-        if (window.isKeyPressed(GLFW_KEY_Z)) selectedItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
-        if (window.isKeyPressed(GLFW_KEY_K)) selectedItem.setRotationEuclidean(new Vector3f());
+            if (window.isKeyPressed(GLFW_KEY_X)) selectedItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
+            if (window.isKeyPressed(GLFW_KEY_Y)) selectedItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
+            if (window.isKeyPressed(GLFW_KEY_Z)) selectedItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
+            if (window.isKeyPressed(GLFW_KEY_K)) selectedItem.setRotationEuclidean(new Vector3f());
+
+        }
 
         //ray casting
         Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
