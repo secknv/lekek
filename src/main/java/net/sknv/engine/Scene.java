@@ -35,19 +35,9 @@ public class Scene implements Serializable {
 
     private Vector3f gravity;
 
-    public Scene(String scene) throws Exception {
-        if (scene.equals("default")) {
-            logger.info("Initializing default scene.");
-            initializeScene();
-        }
-        else {
-            logger.info("Initializing serialized scene.");
-            Scene dScene = load(scene);
-            setGameItems(dScene.getGameItems());
-            setSkyBox(dScene.getSkyBox());
-            setSceneLight(dScene.getSceneLight());
-            setGravity(dScene.getGravity());
-        }
+    public Scene() throws Exception {
+        logger.info("Initializing default scene.");
+        initializeScene();
     }
 
     public void save(String sceneName){
@@ -65,8 +55,14 @@ public class Scene implements Serializable {
         }
     }
 
-    public static Scene load(String sceneName) throws IOException, ClassNotFoundException {
-        return (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/" + sceneName + ".ser")).readObject());
+    private void readObject(ObjectInputStream inputStream) throws Exception {
+        inputStream.defaultReadObject();
+        setupTerrain();
+    }
+
+    private void writeObject(ObjectOutputStream outputStream) throws IOException {
+        gameItems.removeAll(terrain.getGameItems());
+        outputStream.defaultWriteObject();
     }
 
     public void initializeScene() {
@@ -89,7 +85,6 @@ public class Scene implements Serializable {
             terrain = new Terrain(terrainSize, terrainScale, minY, maxY,
                     "src/main/resources/textures/heightmap.png",
                     "src/main/resources/textures/terrain.png", textInc);
-            addAllGameItems(terrain.getGameItems());
         }
         catch (Exception e) {
             logger.severe("Failed to load Terrain files.");
@@ -109,7 +104,7 @@ public class Scene implements Serializable {
             Mesh kekMesh = OBJLoader.loadMesh("/models/untitled.obj");
             kekMesh.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
             Collider kekItem = new Collider(kekMesh);
-            kekItem.setPosition(2f, 1, 2f);
+            kekItem.setPosition(2, 1, 2);
             // kekItem BB
             OBB testBox = new OBB(kekItem);
             kekItem.setBoundingBox(testBox);
@@ -153,7 +148,12 @@ public class Scene implements Serializable {
     public void addAllGameItems(Collection<? extends AbstractGameItem> items) {
         gameItems.addAll(items);
     }
-
+    public void removeItem(AbstractGameItem item) {
+        gameItems.remove(item);
+    }
+    public void removeAllItems() {
+        gameItems.clear();
+    }
     public Terrain getTerrain() {
         return terrain;
     }

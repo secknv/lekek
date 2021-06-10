@@ -107,4 +107,11 @@ public class Collider extends Phantom {
     public void drawBB(WebColor color) {
         this.showBB = color;
     }
+
+    @Override
+    public String toString() {
+        return "Collider{" +
+                "boundingBox=" + boundingBox +
+                '}';
+    }
 }

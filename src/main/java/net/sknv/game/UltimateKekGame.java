@@ -14,7 +14,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +67,7 @@ public class UltimateKekGame implements IGameLogic {
         initScene("default");
 
         Mesh line = MeshUtils.generateLine(WebColor.Red, new Vector3f(0,0,0), new Vector3f(10,10,0));
-        scene.addGameItem(new Phantom(line));
+        //scene.addGameItem(new Phantom(line));
 
         initPhysicsEngine();
 
@@ -78,7 +80,13 @@ public class UltimateKekGame implements IGameLogic {
 
     public void initScene(String scene) {
         try {
-            this.scene = new Scene(scene);
+
+            if (scene.equals("default")) this.scene = new Scene();
+            else {
+                FileInputStream file = new FileInputStream("src/main/resources/scenes/" + scene + ".ser");
+                this.scene = (Scene) new ObjectInputStream(file).readObject();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -320,10 +328,10 @@ public class UltimateKekGame implements IGameLogic {
                 System.out.println("scene loaded");
                 break;
             case "removeitems":
-                scene.getGameItems().clear();
+                scene.removeAllItems();
                 break;
             case "removeitem":
-                scene.getGameItems().remove(selectedItem);
+                scene.removeItem(selectedItem);
                 break;
             case "additem":
                 try {
@@ -333,7 +341,7 @@ public class UltimateKekGame implements IGameLogic {
                     Material material = new Material(texture, 1f);
                     mesh.setMaterial(material);
                     Collider newItem = new Collider(mesh);
-                    scene.getGameItems().add(newItem);
+                    scene.addGameItem(newItem);
 
                     if(in.length==5) newItem.translate(new Vector3f(Float.valueOf(in[2]), Float.valueOf(in[3]), Float.valueOf(in[4])));
 

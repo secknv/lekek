@@ -108,6 +108,10 @@ public class Renderer {
             gameItem.render(shaderProgram, viewMatrix);
         }
 
+        for (AbstractGameItem terrainBlock : scene.getTerrain().getGameItems()) {
+            terrainBlock.render(shaderProgram, viewMatrix);
+        }
+
         shaderProgram.unbind();
     }
 

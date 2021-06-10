@@ -60,7 +60,14 @@ Currently, there's:
 
 ## Scene
 Everything required to construct a level:
-- `Terrain`
+- `Terrain`  
+  Terrain rendering note: while terrain is made of `AbstractGameItem` chunks, these are not included in the `scene.getGameItems()` list.  
+  They are separately rendered inside `renderScene()` with:
+  ```java
+  for (AbstractGameItem terrainBlock : scene.getTerrain().getGameItems()) {
+            terrainBlock.render(shaderProgram, viewMatrix);
+  }
+  ```
 - `GameItems`
 - `SkyBox`
 - `Lighting`
