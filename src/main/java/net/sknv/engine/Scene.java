@@ -123,7 +123,7 @@ public class Scene implements Serializable {
         }
     }
     private void setupSkyBox() {
-        float skyBoxScale = 20.0f;
+        float skyBoxScale = 200.0f;
         // todo: make try include just the file loading
         try {
             SkyBox skyBox = new SkyBox("/models/skybox.obj", "src/main/resources/textures/skybox.png");

@@ -22,14 +22,11 @@ public class Collider extends Phantom {
     protected Vector3f velocity;
     protected transient Vector3f forces;
 
-    private boolean showBB = false;
-    private transient Mesh bbMesh;
+    private WebColor showBB = null;
 
     public Collider(Mesh mesh) {
         super(mesh);
         boundingBox = new OBB(this);
-        bbMesh = MeshUtils.generateBB(WebColor.Purple, boundingBox);
-
         velocity = new Vector3f(0, 0, 0);
         forces = new Vector3f(0, 0, 0);
         movable = false;
@@ -86,24 +83,28 @@ public class Collider extends Phantom {
     @Override
     public void render(ShaderProgram shaderProgram, Matrix4f viewMatrix) {
         super.render(shaderProgram, viewMatrix);
-        if (showBB) {
-            Matrix4f transformationResult = Transformation.getModelViewMatrix(this, viewMatrix);
+        if (showBB!=null) {
+            Mesh aabbMesh = MeshUtils.generateAABB(showBB, boundingBox);
+            Mesh obbMesh = MeshUtils.generateOBB(showBB, boundingBox);
 
-            shaderProgram.setUniform("modelViewMatrix", transformationResult);
-            shaderProgram.setUniform("material", bbMesh.getMaterial());
+            shaderProgram.setUniform("modelViewMatrix", viewMatrix);
 
-            //draw mesh
-            glBindVertexArray(bbMesh.getVaoId());
+            //draw meshes
+            shaderProgram.setUniform("material", aabbMesh.getMaterial());
+            glBindVertexArray(aabbMesh.getVaoId());
+            glDrawElements(GL_LINES, aabbMesh.getVertexCount(), GL_UNSIGNED_INT, 0);
 
-            glDrawElements(GL_LINES, bbMesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+            shaderProgram.setUniform("material", obbMesh.getMaterial());
+            glBindVertexArray(obbMesh.getVaoId());
+            glDrawElements(GL_LINES, obbMesh.getVertexCount(), GL_UNSIGNED_INT, 0);
 
             //restore state
             glBindVertexArray(0);
             glBindTexture(GL_TEXTURE_2D, 0);
-            showBB = false;
+            showBB = null;
         }
     }
-    public void drawBB() {
-        this.showBB = true;
+    public void drawBB(WebColor color) {
+        this.showBB = color;
     }
 }

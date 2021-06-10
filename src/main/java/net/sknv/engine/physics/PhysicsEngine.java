@@ -38,7 +38,9 @@ public class PhysicsEngine {
 
         for (Collider collider : items) {
             if(collider.getVelocity().length() != 0){ //game item has vel
-                detectCollisions(collider);
+                //detectCollisions(collider);
+                Vector3f step = collider.getVelocity().mul(0.1f);
+                collider.translate(step);
             }
         }
 
