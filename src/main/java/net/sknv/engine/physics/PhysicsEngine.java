@@ -7,6 +7,7 @@ import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.collisionDetection.SPCollision;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ public class PhysicsEngine {
     }
 
     public void simulate(Scene scene){
+        ArrayList<Collider> colliders = scene.getColliders();
         //applyForces(scene);
         //update();
         //detectCollisions(gameItems);

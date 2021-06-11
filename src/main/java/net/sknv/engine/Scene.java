@@ -30,6 +30,7 @@ public class Scene implements Serializable {
 
     private transient Terrain terrain;
     private ArrayList<AbstractGameItem> gameItems = new ArrayList<>();
+    private ArrayList<Collider> colliders = new ArrayList<>();
     private SkyBox skyBox;
     private SceneLight sceneLight;
 
@@ -61,7 +62,6 @@ public class Scene implements Serializable {
     }
 
     private void writeObject(ObjectOutputStream outputStream) throws IOException {
-        gameItems.removeAll(terrain.getGameItems());
         outputStream.defaultWriteObject();
     }
 
@@ -109,14 +109,16 @@ public class Scene implements Serializable {
             OBB testBox = new OBB(kekItem);
             kekItem.setBoundingBox(testBox);
 
-            ArrayList<AbstractGameItem> blocks = new ArrayList<>(Arrays.asList(kekItem, block));
-            addAllGameItems(blocks);
+            ArrayList<Collider> colliders = new ArrayList<>(Arrays.asList(kekItem, block));
+            addColliders(colliders);
+            addAllGameItems(colliders);
         }
         catch (Exception e) {
             logger.severe("Failed to load GameItem files!");
             e.printStackTrace();
         }
     }
+
     private void setupSkyBox() {
         float skyBoxScale = 200.0f;
         // todo: make try include just the file loading
@@ -147,6 +149,9 @@ public class Scene implements Serializable {
     }
     public void addAllGameItems(Collection<? extends AbstractGameItem> items) {
         gameItems.addAll(items);
+    }
+    private void addColliders(Collection<? extends Collider> items) {
+        colliders.addAll(items);
     }
     public void removeItem(AbstractGameItem item) {
         gameItems.remove(item);
@@ -192,5 +197,9 @@ public class Scene implements Serializable {
 
     public void setGravity(Vector3f gravity) {
         this.gravity = gravity;
+    }
+
+    public ArrayList<Collider> getColliders() {
+        return colliders;
     }
 }
