@@ -7,6 +7,8 @@ public class RayCast {
     public Vector3f origin;
     public Vector3f direction;
 
+    private static final double EPSILON = 0.0000001;
+
     public RayCast(Vector3f origin, Vector3f direction) {
         this.origin = origin;
         this.direction = direction.normalize();
@@ -32,66 +34,51 @@ public class RayCast {
         return null;
     }
 
-    public boolean intersectsTriangle(Vector3f p1, Vector3f p2, Vector3f p3){
+    public boolean intersectsTriangle(Vector3f vertex0, Vector3f vertex1, Vector3f vertex2){
         Vector3f edge1 = new Vector3f();
         Vector3f edge2 = new Vector3f();
-        Vector3f triangleNormal = new Vector3f();
-        Vector3f perp = new Vector3f();
-        Vector3f perpLength = new Vector3f();
+        Vector3f h = new Vector3f();
+        Vector3f s = new Vector3f();
+        Vector3f q = new Vector3f();
+        double a, f, u, v;
+        vertex1.sub(vertex0, edge1);
+        vertex2.sub(vertex0, edge2);
 
-        p1.sub(p2, edge1);
-        p3.sub(p2, edge2);
-
-        edge1.cross(edge2, triangleNormal);
-        Vector3f intersectionPoint = intersectPlane(p1, triangleNormal);
-        if(intersectionPoint==null) return false;
-
-        float dotP = edge1.dot(edge2) / edge2.dot(edge2);
-        edge2.mul(dotP, perp);
-        perp.add(p2);
-        perp.sub(p1, perpLength);
-
-        Vector3f intersectionLength = new Vector3f();
-        intersectionPoint.sub(p1, intersectionLength);
-
-        float barycentric = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
-        if(barycentric>1 || barycentric<0) return false;
-
-        //-------------------------second barycentric
-        p3.sub(p1, edge1);
-        p2.sub(p1, edge2);
-        dotP = edge1.dot(edge2) / edge2.dot(edge2);
-
-        edge2.mul(dotP, perp);
-        perp.add(p1);
-        perp.sub(p3, perpLength);
-        intersectionPoint.sub(p3, intersectionLength);
-
-        barycentric = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
-        if(barycentric>1 || barycentric<0) return false;
-
-        //----------------------third barycentric
-        p2.sub(p3, edge1);
-        p1.sub(p3, edge2);
-        dotP = edge1.dot(edge2) / edge2.dot(edge2);
-
-        edge2.mul(dotP, perp);
-        perp.add(p3);
-        perp.sub(p2, perpLength);
-        intersectionPoint.sub(p2, intersectionLength);
-
-        barycentric = (intersectionLength.dot(perpLength)) / (perpLength.dot(perpLength));
-        if(barycentric>1 || barycentric<0) return false;
-        return true;
+        direction.cross(edge2, h);
+        a = edge1.dot(h);
+        if (a > -EPSILON && a < EPSILON) {
+            return false;    // Ray is parallel
+        }
+        f = 1.0 / a;
+        origin.sub(vertex0, s);
+        u = f * (s.dot(h));
+        if (u < 0.0 || u > 1.0) {
+            return false;
+        }
+        s.cross(edge1, q);
+        v = f * direction.dot(q);
+        if (v < 0.0 || u + v > 1.0) {
+            return false;
+        }
+        // At this stage we can compute t to find out where the intersection point is on the line.
+        double t = f * edge2.dot(q);
+        if (t > EPSILON) // ray intersection
+        {
+            System.out.println("distance hit = " + t);
+            return true;
+        } else // This means that there is a line intersection but not a ray intersection.
+        {
+            return false;
+        }
     }
 
     public boolean intersectsItem(Collider collider) {
-        Vector3f min = collider.getBoundingBox().getMin().getPosition();
-        Vector3f max = collider.getBoundingBox().getMax().getPosition();
+        Vector3f min = new Vector3f(collider.getBoundingBox().getMin().getPosition());
+        Vector3f max = new Vector3f(collider.getBoundingBox().getMax().getPosition());
 
         Vector3f[] vertex = new Vector3f[]{
                 min, new Vector3f(max.x, min.y, min.z), new Vector3f(min.x, min.y, max.z),
-                min, new Vector3f(min.x, max.y, min.z), new Vector3f(min.x, min.z, max.z),
+                min, new Vector3f(min.x, max.y, min.z), new Vector3f(min.x, min.y, max.z),
                 min, new Vector3f(min.x, max.y, min.z), new Vector3f(max.x, min.y, min.z),
 
                 max, new Vector3f(max.x, max.y, min.z), new Vector3f(min.x, max.y, max.z),
