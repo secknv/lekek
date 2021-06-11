@@ -140,26 +140,30 @@ public class UltimateKekGame implements IGameLogic {
 
             if (cameraPosInc.length() != 0) cameraPosInc.normalize();
 
-            if (window.isKeyPressed(GLFW_KEY_UP)) {
-                if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = 0f;
-                else selectedItem.getVelocity().z = -.1f;
-            } else if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = .1f;
+            if(selectedItem!=null) {
+                if (window.isKeyPressed(GLFW_KEY_UP)) {
+                    if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = 0f;
+                    else selectedItem.getVelocity().z = -.1f;
+                } else if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = .1f;
 
-            if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-                if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = 0f;
-                else selectedItem.getVelocity().x = -.1f;
-            } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = .1f;
+                if (window.isKeyPressed(GLFW_KEY_LEFT)) {
+                    if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = 0f;
+                    else selectedItem.getVelocity().x = -.1f;
+                } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = .1f;
 
-            if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) {
-                if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = 0f;
-                else selectedItem.getVelocity().y = .1f;
-            } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = -.1f;
+                if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) {
+                    if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = 0f;
+                    else selectedItem.getVelocity().y = .1f;
+                } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = -.1f;
 
-            if (window.isKeyPressed(GLFW_KEY_X)) selectedItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
-            if (window.isKeyPressed(GLFW_KEY_Y)) selectedItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
-            if (window.isKeyPressed(GLFW_KEY_Z)) selectedItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
-            if (window.isKeyPressed(GLFW_KEY_K)) selectedItem.setRotationEuclidean(new Vector3f());
-
+                if (window.isKeyPressed(GLFW_KEY_X))
+                    selectedItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
+                if (window.isKeyPressed(GLFW_KEY_Y))
+                    selectedItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
+                if (window.isKeyPressed(GLFW_KEY_Z))
+                    selectedItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
+                if (window.isKeyPressed(GLFW_KEY_K)) selectedItem.setRotationEuclidean(new Vector3f());
+            }
         }
 
         //ray casting
@@ -169,7 +173,7 @@ public class UltimateKekGame implements IGameLogic {
 
         if(mouseInput.isRightClicked()) {
             Vector3f end = new Vector3f();
-            ray.origin.add(ray.direction, end);
+            ray.origin.add(ray.direction.mul(20f), end);
             scene.addGameItem(new Phantom(MeshUtils.generateLine(WebColor.Yellow, new Vector3f(ray.origin), new Vector3f(end))));
         }
 
@@ -182,6 +186,8 @@ public class UltimateKekGame implements IGameLogic {
             }
         }
 
+        if(selectedItem != null) selectedItem.drawBB(WebColor.Green);
+
         if(!clickedItems.isEmpty()) {
             float d = cameraPos.distance(clickedItems.get(0).getPosition());
             for (Collider item : clickedItems) {
@@ -189,12 +195,11 @@ public class UltimateKekGame implements IGameLogic {
                     d = cameraPos.distance(item.getPosition());
                     selectedItem = item;
                 }
-                item.drawBB();
+                item.drawBB(WebColor.Yellow);
             }
-            selectedItem.drawBB();
+            selectedItem.drawBB(WebColor.Red);
         }
 
-        if(selectedItem != null) selectedItem.drawBB();
     }
 
     private void moveCamera(Window window, MouseInput mouseInput) {
@@ -205,10 +210,12 @@ public class UltimateKekGame implements IGameLogic {
 
         // Check if there has been a collision. If true, set the y position to
         // the maximum height
+        /*
         float height = scene.getTerrain().getHeight(camera.getPosition());
         if ( camera.getPosition().y <= height )  {
             camera.setPosition(prevPos.x, prevPos.y, prevPos.z);
         }
+         */
 
         // rotates camera
         if (!(menu || usingTerminal) && glfwGetWindowAttrib(window.getWindowHandle(), GLFW_FOCUSED) == 1) {
@@ -250,7 +257,7 @@ public class UltimateKekGame implements IGameLogic {
     private void setKeyCallbacks(Window window, MouseInput mouseInput) {
         window.setKeyCallback((windowHandle, key, scancode, action, mods) -> {
             if (usingTerminal && (action == GLFW_PRESS || action == GLFW_REPEAT)){ //using hud terminal
-                if(key>48 && key<91){
+                if(key>=48 && key<=90){
                     hud.getTerminal().addText(String.valueOf((char)Character.toLowerCase(key)));
                 } else if (key == 32) hud.getTerminal().addText(" ");
                 else if (key == 257) {
@@ -258,6 +265,7 @@ public class UltimateKekGame implements IGameLogic {
                     closeHudTerminal(mouseInput, windowHandle);
                 }
                 else if (key == 259) hud.getTerminal().backspace();
+                else if (key == 265) hud.getTerminal().previous();
             }
 
             if (key == GLFW_KEY_P && action == GLFW_PRESS && !usingTerminal) {
@@ -319,7 +327,7 @@ public class UltimateKekGame implements IGameLogic {
                 initPhysicsEngine();
                 System.out.println("scene loaded");
                 break;
-            case "removeitems":
+            case "clearitems":
                 scene.removeAllItems();
                 break;
             case "removeitem":
@@ -334,6 +342,9 @@ public class UltimateKekGame implements IGameLogic {
                     mesh.setMaterial(material);
                     Collider newItem = new Collider(mesh);
                     scene.addGameItem(newItem);
+
+                    if(in.length==5) newItem.translate(new Vector3f(Float.valueOf(in[2]), Float.valueOf(in[3]), Float.valueOf(in[4])));
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {

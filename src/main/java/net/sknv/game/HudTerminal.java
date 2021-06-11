@@ -5,6 +5,7 @@ import net.sknv.engine.entities.TextItem;
 public class HudTerminal {
     private TextItem terminalText;
     private String stored = "";
+    private String previous = null;
 
     public HudTerminal(TextItem terminalText) {
         this.terminalText = terminalText;
@@ -35,6 +36,7 @@ public class HudTerminal {
     }
 
     public String enter() {
+        previous = getText();
         String enter = getText().substring(1);
         stored = "";
         setText("/");
@@ -49,5 +51,11 @@ public class HudTerminal {
     public void open() {
         if(!stored.isEmpty()) setText(stored);
         else setText("/");
+    }
+
+    public void previous() {
+        if(previous!=null){
+            setText(previous);
+        }
     }
 }

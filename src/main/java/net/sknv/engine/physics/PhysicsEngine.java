@@ -7,14 +7,12 @@ import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.collisionDetection.SPCollision;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 public class PhysicsEngine {
 
     private SPCollision sweepPrune;
-    private ArrayList<Collider> items = new ArrayList<>();
 
     public PhysicsEngine() {
         sweepPrune = new SPCollision();
@@ -25,28 +23,28 @@ public class PhysicsEngine {
     }
 
     public void simulate(Scene scene){
-        // todo: tem GameItemMesh fix
-        ArrayList<AbstractGameItem> absGIList = scene.getGameItems();
-        for (AbstractGameItem item : absGIList) {
-            if (item instanceof Collider) items.add((Collider) item);
-        }
-
         //applyForces(scene);
         //update();
         //detectCollisions(gameItems);
         //solveCollisions();
 
-        for (Collider collider : items) {
-            if(collider.getVelocity().length() != 0){ //game item has vel
-                detectCollisions(collider);
+        for (AbstractGameItem collider : scene.getGameItems()) {
+            if(collider instanceof Collider){
+                Collider fodase = (Collider) collider;
+                if(fodase.getVelocity().length() != 0 ){ //game item has vel
+                    //detectCollisions(collider);
+                    Vector3f step = fodase.getVelocity().mul(0.1f);
+                    collider.translate(step);
+                }
             }
+
         }
 
     }
 
     private void applyForces(Scene scene) {
-        for (Collider collider : items){
-            collider.applyForce(scene.getGravity());
+        for (AbstractGameItem collider : scene.getGameItems()){
+            //collider.applyForce(scene.getGravity());
         }
     }
 
