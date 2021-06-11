@@ -58,6 +58,20 @@ Currently, there's:
 ### Summary Chart:  
 ![Renderable Chart](https://i.imgur.com/DyHGZi6.png)
 
+## Scene
+Everything required to construct a level:
+- `Terrain`  
+  Terrain rendering note: while terrain is made of `AbstractGameItem` chunks, these are not included in the `scene.getGameItems()` list.  
+  They are separately rendered inside `renderScene()` with:
+  ```java
+  for (AbstractGameItem terrainBlock : scene.getTerrain().getGameItems()) {
+            terrainBlock.render(shaderProgram, viewMatrix);
+  }
+  ```
+- `GameItems`
+- `SkyBox`
+- `Lighting`
+
 ## DBZ Collision Engine
 Sorcery fo sure  
 ![I am confuse](https://i.imgur.com/55r5cV1.png)

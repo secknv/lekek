@@ -7,7 +7,6 @@ import net.sknv.engine.Window;
 import net.sknv.engine.entities.AbstractGameItem;
 import net.sknv.engine.entities.Collider;
 import net.sknv.engine.entities.Phantom;
-import net.sknv.engine.entities.Terrain;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.PhysicsEngine;
 import net.sknv.engine.physics.colliders.OBB;
@@ -15,7 +14,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +51,6 @@ public class UltimateKekGame implements IGameLogic {
     private PhysicsEngine physicsEngine;
     public Collider selectedItem;
 
-    private Terrain terrain;
-
     public UltimateKekGame() {
         renderer = new Renderer();
         camera = new Camera(new Vector3f(), new Vector3f());
@@ -67,25 +66,9 @@ public class UltimateKekGame implements IGameLogic {
 
         initScene("default");
 
-        float terrainScale = 100;
-        int terrainSize = 1;
-        float minY = -0.1f;
-        float maxY = 0.1f;
-        int textInc = 40;
-        terrain = new Terrain(terrainSize, terrainScale, minY, maxY, "src/main/resources/textures/heightmap.png", "src/main/resources/textures/terrain.png", textInc);
-
-
         Mesh line = MeshUtils.generateLine(WebColor.Red, new Vector3f(0,0,0), new Vector3f(10,10,0));
+        //scene.addGameItem(new Phantom(line));
 
-        // get default scene game items
-        ArrayList<AbstractGameItem> items = scene.getGameItems();
-
-        // add line
-        items.add(new Phantom(line));
-        // add terrain
-        items.addAll(terrain.getGameItems());
-
-        scene.setGameItems(items);
         initPhysicsEngine();
 
         // Setup HUD
@@ -97,7 +80,13 @@ public class UltimateKekGame implements IGameLogic {
 
     public void initScene(String scene) {
         try {
-            this.scene = new Scene(scene);
+
+            if (scene.equals("default")) this.scene = new Scene();
+            else {
+                FileInputStream file = new FileInputStream("src/main/resources/scenes/" + scene + ".ser");
+                this.scene = (Scene) new ObjectInputStream(file).readObject();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,35 +129,38 @@ public class UltimateKekGame implements IGameLogic {
         cameraPosInc.zero();
         hud.updateSize(window);
 
-        if (window.isKeyPressed(GLFW_KEY_W)) cameraPosInc.z = -1;
-        if (window.isKeyPressed(GLFW_KEY_S)) cameraPosInc.z = (cameraPosInc.z < 0 ? 0 : 1);
-        if (window.isKeyPressed(GLFW_KEY_A)) cameraPosInc.x = -1;
-        if (window.isKeyPressed(GLFW_KEY_D)) cameraPosInc.x = (cameraPosInc.x < 0 ? 0 : 1);
-        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraPosInc.y = -1;
-        if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraPosInc.y = (cameraPosInc.y < 0 ? 0 : 1);
-        if (window.isKeyPressed(GLFW_KEY_K)) System.out.println(scene.getGameItems());
+        if (!usingTerminal) {
+            if (window.isKeyPressed(GLFW_KEY_W)) cameraPosInc.z = -1;
+            if (window.isKeyPressed(GLFW_KEY_S)) cameraPosInc.z = (cameraPosInc.z < 0 ? 0 : 1);
+            if (window.isKeyPressed(GLFW_KEY_A)) cameraPosInc.x = -1;
+            if (window.isKeyPressed(GLFW_KEY_D)) cameraPosInc.x = (cameraPosInc.x < 0 ? 0 : 1);
+            if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) cameraPosInc.y = -1;
+            if (window.isKeyPressed(GLFW_KEY_SPACE)) cameraPosInc.y = (cameraPosInc.y < 0 ? 0 : 1);
+            if (window.isKeyPressed(GLFW_KEY_K)) System.out.println(scene.getGameItems());
 
-        if (cameraPosInc.length() != 0) cameraPosInc.normalize();
+            if (cameraPosInc.length() != 0) cameraPosInc.normalize();
 
-        if (window.isKeyPressed(GLFW_KEY_UP)) {
-            if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = 0f;
-            else selectedItem.getVelocity().z = -.1f;
-        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = .1f;
+            if (window.isKeyPressed(GLFW_KEY_UP)) {
+                if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = 0f;
+                else selectedItem.getVelocity().z = -.1f;
+            } else if (window.isKeyPressed(GLFW_KEY_DOWN)) selectedItem.getVelocity().z = .1f;
 
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-            if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = 0f;
-            else selectedItem.getVelocity().x = -.1f;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = .1f;
+            if (window.isKeyPressed(GLFW_KEY_LEFT)) {
+                if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = 0f;
+                else selectedItem.getVelocity().x = -.1f;
+            } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) selectedItem.getVelocity().x = .1f;
 
-        if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) {
-            if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = 0f;
-            else selectedItem.getVelocity().y = .1f;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = -.1f;
+            if (window.isKeyPressed(GLFW_KEY_RIGHT_SHIFT)) {
+                if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = 0f;
+                else selectedItem.getVelocity().y = .1f;
+            } else if (window.isKeyPressed(GLFW_KEY_RIGHT_CONTROL)) selectedItem.getVelocity().y = -.1f;
 
-        if (window.isKeyPressed(GLFW_KEY_X)) selectedItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
-        if (window.isKeyPressed(GLFW_KEY_Y)) selectedItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
-        if (window.isKeyPressed(GLFW_KEY_Z)) selectedItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
-        if (window.isKeyPressed(GLFW_KEY_K)) selectedItem.setRotationEuclidean(new Vector3f());
+            if (window.isKeyPressed(GLFW_KEY_X)) selectedItem.rotateEuclidean(new Vector3f((float) (-Math.PI / 200), 0, 0));
+            if (window.isKeyPressed(GLFW_KEY_Y)) selectedItem.rotateEuclidean(new Vector3f(0, (float) (-Math.PI / 200), 0));
+            if (window.isKeyPressed(GLFW_KEY_Z)) selectedItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
+            if (window.isKeyPressed(GLFW_KEY_K)) selectedItem.setRotationEuclidean(new Vector3f());
+
+        }
 
         //ray casting
         Vector3f worldRay = mouseInput.getWorldRay(window, projectionMatrix, viewMatrix);
@@ -213,7 +205,7 @@ public class UltimateKekGame implements IGameLogic {
 
         // Check if there has been a collision. If true, set the y position to
         // the maximum height
-        float height = terrain.getHeight(camera.getPosition());
+        float height = scene.getTerrain().getHeight(camera.getPosition());
         if ( camera.getPosition().y <= height )  {
             camera.setPosition(prevPos.x, prevPos.y, prevPos.z);
         }
@@ -328,10 +320,10 @@ public class UltimateKekGame implements IGameLogic {
                 System.out.println("scene loaded");
                 break;
             case "removeitems":
-                scene.getGameItems().clear();
+                scene.removeAllItems();
                 break;
             case "removeitem":
-                scene.getGameItems().remove(selectedItem);
+                scene.removeItem(selectedItem);
                 break;
             case "additem":
                 try {
@@ -341,7 +333,7 @@ public class UltimateKekGame implements IGameLogic {
                     Material material = new Material(texture, 1f);
                     mesh.setMaterial(material);
                     Collider newItem = new Collider(mesh);
-                    scene.getGameItems().add(newItem);
+                    scene.addGameItem(newItem);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {

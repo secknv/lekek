@@ -1,14 +1,14 @@
 package net.sknv.engine.entities;
 
 import net.sknv.engine.Utils;
-import net.sknv.engine.graph.*;
+import net.sknv.engine.graph.IRenderable;
+import net.sknv.engine.graph.Mesh;
+import net.sknv.engine.graph.ShaderProgram;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -20,7 +20,7 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     protected Vector3f rotation;
     protected float scale;
 
-    protected transient Mesh mesh;
+    protected Mesh mesh;
     public AbstractGameItem() {
         // this still exists because of TextItem calling it
         // but spaghet
@@ -72,26 +72,13 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
         this.mesh = mesh;
     }
 
-    private void readObject(java.io.ObjectInputStream inputStream) throws Exception {
-        inputStream.defaultReadObject();
-        Mesh mesh = OBJLoader.loadMesh((String) inputStream.readObject());
-        mesh.setMaterial((Material) inputStream.readObject());
-
-        setMesh(mesh);
-    }
-
-    private void writeObject(ObjectOutputStream outputStream) throws IOException {
-        outputStream.defaultWriteObject();
-        outputStream.writeObject(mesh.getModelFile());
-        outputStream.writeObject(mesh.getMaterial());
-    }
-
     @Override
     public String toString() {
         return "AbstractGameItem{" +
                 "position=" + position +
                 ", rotation=" + rotation +
                 ", scale=" + scale +
+                ", mesh=" + mesh +
                 '}';
     }
 

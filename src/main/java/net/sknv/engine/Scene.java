@@ -2,6 +2,7 @@ package net.sknv.engine;
 
 import net.sknv.engine.entities.AbstractGameItem;
 import net.sknv.engine.entities.Collider;
+import net.sknv.engine.entities.Terrain;
 import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Vector3f;
@@ -10,32 +11,155 @@ import org.joml.Vector4f;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.logging.Logger;
 
+/**
+ * This class represents a level.<br>
+ * It's responsible for managing:
+ * <ul>
+ *     <li>{@link Terrain}</li>
+ *     <li>Game Items ({@link AbstractGameItem})</li>
+ *     <li>{@link SkyBox}</li>
+ *     <li>Lighting ({@link SceneLight})</li>
+ * </ul>
+ */
 public class Scene implements Serializable {
 
-    private ArrayList<AbstractGameItem> gameItems;
+    private final static Logger logger = Logger.getLogger(Scene.class.getName());
+
+    private transient Terrain terrain;
+    private ArrayList<AbstractGameItem> gameItems = new ArrayList<>();
     private SkyBox skyBox;
     private SceneLight sceneLight;
+
     private Vector3f gravity;
 
-    public Scene(String scene) throws Exception {
-        if (scene.equals("default")) initializeScene();
-        else {
-            System.out.println("initializing serialized scene");
-            Scene dScene = load(scene);
-            setGameItems(dScene.getGameItems());
-            setSkyBox(dScene.getSkyBox());
-            setSceneLight(dScene.getSceneLight());
-            setGravity(dScene.getGravity());
+    public Scene() throws Exception {
+        logger.info("Initializing default scene.");
+        initializeScene();
+    }
+    // todo: getColliders
+    public void save(String sceneName){
+        try {
+            FileOutputStream fileOut = new FileOutputStream("src/main/resources/scenes/" + sceneName + ".ser");
+            ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
+            outStream.writeObject(this);
+            outStream.flush();
+            outStream.close();
+            fileOut.flush();
+            fileOut.close();
+            logger.info("Scene file saved - " + sceneName);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public Vector3f getGravity() {
-        return gravity;
+    private void readObject(ObjectInputStream inputStream) throws Exception {
+        inputStream.defaultReadObject();
+        setupTerrain();
     }
 
-    public void setGravity(Vector3f g) {
-        this.gravity = g;
+    private void writeObject(ObjectOutputStream outputStream) throws IOException {
+        gameItems.removeAll(terrain.getGameItems());
+        outputStream.defaultWriteObject();
+    }
+
+    public void initializeScene() {
+
+        setupTerrain();
+        setupGameItems();
+        setupSkyBox();
+        setupLighting();
+
+        setGravity(new Vector3f(0,-1f,0));
+    }
+
+    private void setupTerrain() {
+        float terrainScale = 100;
+        int terrainSize = 1;
+        float minY = -0.1f;
+        float maxY = 0.1f;
+        int textInc = 40;
+        try {
+            terrain = new Terrain(terrainSize, terrainScale, minY, maxY,
+                    "src/main/resources/textures/heightmap.png",
+                    "src/main/resources/textures/terrain.png", textInc);
+        }
+        catch (Exception e) {
+            logger.severe("Failed to load Terrain files.");
+            e.printStackTrace();
+        }
+    }
+    private void setupGameItems() {
+        float reflectance = 1f;
+        // todo: make try include just the file loading
+        try {
+            Mesh cubeMesh = OBJLoader.loadMesh("/models/cube.obj");
+            Texture blockTexture = new Texture("src/main/resources/textures/lebloq.png");
+            cubeMesh.setMaterial(new Material(blockTexture, reflectance));
+            Collider block = new Collider(cubeMesh);
+
+            // Setup kek item
+            Mesh kekMesh = OBJLoader.loadMesh("/models/untitled.obj");
+            kekMesh.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
+            Collider kekItem = new Collider(kekMesh);
+            kekItem.setPosition(2, 1, 2);
+            // kekItem BB
+            OBB testBox = new OBB(kekItem);
+            kekItem.setBoundingBox(testBox);
+
+            ArrayList<AbstractGameItem> blocks = new ArrayList<>(Arrays.asList(kekItem, block));
+            addAllGameItems(blocks);
+        }
+        catch (Exception e) {
+            logger.severe("Failed to load GameItem files!");
+            e.printStackTrace();
+        }
+    }
+    private void setupSkyBox() {
+        float skyBoxScale = 20.0f;
+        // todo: make try include just the file loading
+        try {
+            SkyBox skyBox = new SkyBox("/models/skybox.obj", "src/main/resources/textures/skybox.png");
+            skyBox.setScale(skyBoxScale);
+            setSkyBox(skyBox);
+        } catch (Exception e) {
+            logger.severe("Failed to load SkyBox files!");
+            e.printStackTrace();
+        }
+
+    }
+    private void setupLighting() {
+        SceneLight sceneLight = new SceneLight();
+        sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
+
+        float lightIntensity = 1.0f;
+        Vector3f lightPos = new Vector3f(-1, 0, 0);
+        Vector3f lightColor = new Vector3f(1, 1, 1);
+        sceneLight.setDirectionalLight(new DirectionalLight(lightColor, lightPos, lightIntensity));
+
+        setSceneLight(sceneLight);
+    }
+
+    public void addGameItem(AbstractGameItem item) {
+        gameItems.add(item);
+    }
+    public void addAllGameItems(Collection<? extends AbstractGameItem> items) {
+        gameItems.addAll(items);
+    }
+    public void removeItem(AbstractGameItem item) {
+        gameItems.remove(item);
+    }
+    public void removeAllItems() {
+        gameItems.clear();
+    }
+    public Terrain getTerrain() {
+        return terrain;
+    }
+
+    public void setTerrain(Terrain terrain) {
+        this.terrain = terrain;
     }
 
     public ArrayList<AbstractGameItem> getGameItems() {
@@ -62,110 +186,11 @@ public class Scene implements Serializable {
         this.sceneLight = sceneLight;
     }
 
-    public void save(String sceneName){
-        try {
-            FileOutputStream fileOut = new FileOutputStream("src/main/resources/scenes/" + sceneName + ".ser");
-            ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
-            outStream.writeObject(this);
-            outStream.flush();
-            outStream.close();
-            fileOut.flush();
-            fileOut.close();
-            System.out.println("Scene file saved - " + sceneName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public Vector3f getGravity() {
+        return gravity;
     }
 
-    public static Scene load(String sceneName) throws IOException, ClassNotFoundException {
-        return (Scene) (new ObjectInputStream(new FileInputStream("src/main/resources/scenes/" + sceneName + ".ser")).readObject());
-    }
-
-    public void initializeScene() throws Exception {
-        //Setup model meshes and materials
-        float reflectance = 1f;
-        Mesh cube = OBJLoader.loadMesh("/models/cube.obj");
-        Texture texture = new Texture("src/main/resources/textures/lebloq.png");
-        Material material = new Material(texture, reflectance);
-        cube.setMaterial(material);
-
-        // Setup kek mesh
-        Mesh kek = OBJLoader.loadMesh("/models/untitled.obj");
-        kek.setMaterial(new Material(new Vector4f(1f, 0, 0,1f), 0.5f));
-
-        float blockScale = 0.5f;
-        float skyBoxScale = 20.0f;
-
-        //init gameItems
-        //background game items
-
-
-        float startx = 0;
-        float startz = 0;
-        float starty = -1.0f;
-        float inc = blockScale * 2;
-
-        float posx = startx;
-        float posz = startz;
-        float incy = 0.0f;
-        int NUM_ROWS = 10;
-        int NUM_COLS = 10;
-        ArrayList<AbstractGameItem> blocks  = new ArrayList<>(NUM_ROWS * NUM_COLS + 10);
-        for(int i=0; i<NUM_ROWS; i++) {
-            for(int j=0; j<NUM_COLS; j++) {
-                Collider grass = new Collider(cube);
-                grass.setScale(blockScale);
-                incy = Math.random() > 0.9f ? blockScale * 2 : 0f;
-                grass.setPosition(posx, starty + incy, posz);
-                blocks.add(grass);
-
-                posx += inc;
-            }
-            posx = startx;
-            posz -= inc;
-        }
-
-        // Special game items
-        Collider testItem = new Collider(kek);
-        testItem.setPosition(2f, 1, 2f);
-
-        OBB testBox = new OBB(testItem);
-        testItem.setBoundingBox(testBox);
-        testItem.setScale(blockScale);
-
-        // add special items to gameItems array
-        // this is here case more than one special items...
-        // easier to just add {testItem, myOtherItem, kekItem}
-        Collider[] specialItems = {testItem};
-        blocks.addAll(Arrays.asList(specialItems));
-        setGameItems(blocks);
-
-        // Setup SkyBox
-        // todo: standardize resource paths
-        try {
-            SkyBox skyBox = new SkyBox("/models/skybox.obj", "src/main/resources/textures/skybox.png");
-            skyBox.setScale(skyBoxScale);
-            setSkyBox(skyBox);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //initLighting
-        SceneLight sceneLight = new SceneLight();
-        sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
-
-        float lightIntensity = 1.0f;
-        Vector3f lightPos = new Vector3f(-1, 0, 0);
-        Vector3f lightColor = new Vector3f(1, 1, 1);
-        sceneLight.setDirectionalLight(new DirectionalLight(lightColor, lightPos, lightIntensity));
-
-        setSceneLight(sceneLight);
-        setGravity(new Vector3f(0,-1f,0));
-    }
-
-    public void addGameItem(AbstractGameItem gameItem) {
-        ArrayList<AbstractGameItem> items = this.getGameItems();
-        items.add(gameItem);
-        this.setGameItems(items);
+    public void setGravity(Vector3f gravity) {
+        this.gravity = gravity;
     }
 }

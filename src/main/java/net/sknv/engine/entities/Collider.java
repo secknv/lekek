@@ -1,20 +1,21 @@
 package net.sknv.engine.entities;
 
-import net.sknv.engine.graph.*;
+import net.sknv.engine.graph.Mesh;
+import net.sknv.engine.graph.MeshUtils;
+import net.sknv.engine.graph.ShaderProgram;
+import net.sknv.engine.graph.WebColor;
 import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
-public class Collider extends Phantom{
+public class Collider extends Phantom {
 
     protected transient BoundingBox boundingBox;
     protected boolean movable;
@@ -23,7 +24,7 @@ public class Collider extends Phantom{
     protected transient Vector3f forces;
 
     private boolean showBB = false;
-    private Mesh bbMesh;
+    private transient Mesh bbMesh;
 
     public Collider(Mesh mesh) {
         super(mesh);
@@ -40,28 +41,22 @@ public class Collider extends Phantom{
     public Quaternionf rotateEuclidean(Vector3f rot) {
         Quaternionf rotQuaternion = super.rotateEuclidean(rot);
         this.boundingBox.rotate(rotQuaternion);//set bb rot
+        bbMesh = MeshUtils.generateBB(WebColor.Purple, boundingBox);
         return rotQuaternion;
     }
 
     private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
-        Mesh mesh = OBJLoader.loadMesh((String) inputStream.readObject());
-        mesh.setMaterial((Material) inputStream.readObject());
 
-        setMesh(mesh);
+        // add BB specific stuff
         setBoundingBox(new OBB(this));
-    }
-
-    private void writeObject(ObjectOutputStream outputStream) throws IOException {
-        outputStream.defaultWriteObject();
-        outputStream.writeObject(mesh.getModelFile());
-        outputStream.writeObject(mesh.getMaterial());
     }
 
     @Override
     public void translate(Vector3f step) {
         super.translate(step);
         this.boundingBox.translate(step);
+        bbMesh = MeshUtils.generateBB(WebColor.Purple, boundingBox);
     }
 
     public void applyForce(Vector3f force) {
@@ -87,9 +82,9 @@ public class Collider extends Phantom{
     public void render(ShaderProgram shaderProgram, Matrix4f viewMatrix) {
         super.render(shaderProgram, viewMatrix);
         if (showBB) {
-            Matrix4f transformationResult = Transformation.getModelViewMatrix(this, viewMatrix);
+            //Matrix4f transformationResult = Transformation.getModelViewMatrix(this, viewMatrix);
 
-            shaderProgram.setUniform("modelViewMatrix", transformationResult);
+            shaderProgram.setUniform("modelViewMatrix", viewMatrix);
             shaderProgram.setUniform("material", bbMesh.getMaterial());
 
             //draw mesh
@@ -105,5 +100,12 @@ public class Collider extends Phantom{
     }
     public void drawBB() {
         this.showBB = true;
+    }
+
+    @Override
+    public String toString() {
+        return "Collider{" +
+                "boundingBox=" + boundingBox +
+                '}';
     }
 }
