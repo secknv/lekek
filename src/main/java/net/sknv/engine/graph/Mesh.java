@@ -3,6 +3,7 @@ package net.sknv.engine.graph;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
+import java.io.Serializable;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
-public class Mesh {
+public class Mesh implements Serializable {
 
     private String modelFile;
     public final int vaoId;
