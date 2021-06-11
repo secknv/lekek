@@ -54,6 +54,12 @@ public class Collider extends Phantom {
         this.boundingBox.translate(step);
     }
 
+    @Override
+    public void setPosition(Vector3f position) {
+        super.setPosition(position);
+        setBoundingBox(new OBB(this));
+    }
+
     public void applyForce(Vector3f force) {
         forces.add(force);
     }

@@ -15,7 +15,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -343,12 +342,37 @@ public class UltimateKekGame implements IGameLogic {
                     Collider newItem = new Collider(mesh);
                     scene.addGameItem(newItem);
 
-                    if(in.length==5) newItem.translate(new Vector3f(Float.valueOf(in[2]), Float.valueOf(in[3]), Float.valueOf(in[4])));
+                    if(in.length==5) newItem.translate(new Vector3f(Float.parseFloat(in[2]), Float.parseFloat(in[3]), Float.parseFloat(in[4])));
 
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                }
+                break;
+            case "addcubes":
+                try {
+                    int side = Integer.parseInt(in[1]);
+                    float scale;
+                    if (in.length > 2) {
+                        System.out.println("scale: " + in[2]);
+                        scale = Float.parseFloat(in[2]);
+                    }
+                    else scale = 1;
+
+                    Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
+                    Texture texture = new Texture("src/main/resources/textures/lebloq.png");
+                    Material material = new Material(texture, 1f);
+                    mesh.setMaterial(material);
+
+                    int offset = side/2;
+                    for (int i=0;i<side;i++) {
+                        for (int j=0; j<side; j++) {
+                            Collider newItem = new Collider(mesh);
+                            scene.addGameItem(newItem);
+                            newItem.setScale(scale);
+                            newItem.setPosition(2*scale*(i-offset), 0, 2*scale*(j-offset));
+                        }
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
