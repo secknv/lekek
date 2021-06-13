@@ -117,11 +117,13 @@ public class Transformation {
     }
 
     public static Matrix4f getModelMatrix(AbstractGameItem gameItem){
-        Vector3f rotation = gameItem.getRotation();
+        //Vector3f rotation = gameItem.getRotation();
+
         modelViewMatrix.identity().translate(gameItem.getPosition()).
-                rotateX(rotation.x).
-                rotateY(rotation.y).
-                rotateZ(rotation.z).
+                rotate(gameItem.getRotation()).
+                //rotateX(rotation.x).
+                //rotateY(rotation.y).
+                //rotateZ(rotation.z).
                 scale(gameItem.getScale());
         return modelViewMatrix;
     }

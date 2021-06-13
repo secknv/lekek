@@ -25,10 +25,10 @@ public class OBB extends AABB implements BoundingBox {
         Vector4f tz = new Vector4f(z.x, z.y, z.z,1);
 
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotateXYZ(collider.getRotation());
+        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotate(collider.getRotation());
         modelViewMatrix.transform(tc);
 
-        modelViewMatrix.identity().rotateXYZ(collider.getRotation()).scale(collider.getScale());
+        modelViewMatrix.identity().rotate(collider.getRotation()).scale(collider.getScale());
         modelViewMatrix.transform(tx);
         modelViewMatrix.transform(ty);
         modelViewMatrix.transform(tz);

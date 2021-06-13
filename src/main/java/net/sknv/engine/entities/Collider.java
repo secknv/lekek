@@ -44,6 +44,7 @@ public class Collider extends Phantom {
         boundingBox = new OBB(this);
         isStatic = false;
         mass = 1;
+        velocity = new Vector3f();
         //IBody = ?;
         //IBody.invert(IBodyInv);
     }

@@ -1,10 +1,8 @@
 package net.sknv.engine.entities;
 
-import net.sknv.engine.Utils;
 import net.sknv.engine.graph.IRenderable;
 import net.sknv.engine.graph.Mesh;
 import net.sknv.engine.graph.ShaderProgram;
-import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -17,7 +15,8 @@ import java.io.Serializable;
 public abstract class AbstractGameItem implements IRenderable, Serializable {
 
     protected Vector3f position;
-    protected Vector3f rotation;
+    //protected Vector3f rotation;
+    protected Quaternionf rotation;
     protected float scale;
 
     protected Mesh mesh;
@@ -26,7 +25,8 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
         // but spaghet
         // todo: fix AbsGameItem should always construct with a mesh
         position = new Vector3f(0, 0, 0);
-        rotation = new Vector3f(0, 0, 0);
+        //rotation = new Vector3f(0, 0, 0);
+        rotation = new Quaternionf();
         scale = 1;
     }
     public AbstractGameItem(Mesh mesh) {
@@ -43,9 +43,13 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     public Vector3f getPosition() {
         return position;
     }
-    public Vector3f getRotation() {
+//    public Vector3f getRotation() {
+//        return rotation;
+//    }
+    public Quaternionf getRotation() {
         return rotation;
     }
+
     public float getScale() {
         return scale;
     }
@@ -59,12 +63,16 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     public void setPosition(Vector3f position){
         this.position = position;
     }
-    public void setRotation(float x, float y, float z) {
-        setRotation(new Vector3f(x,y,z));
-    }
-    public void setRotation(Vector3f rotation){
+//    public void setRotation(float x, float y, float z) {
+//        setRotation(new Vector3f(x,y,z));
+//    }
+//    public void setRotation(Vector3f rotation){
+//        this.rotation = rotation;
+//    }
+    public void setRotation(Quaternionf rotation){
         this.rotation = rotation;
     }
+
     public void setScale(float scale) {
         this.scale = scale;
     }
@@ -89,41 +97,22 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
      * SO we make this method return that
      * */
     public Quaternionf rotateEuclidean(Vector3f rot) {
-        // Object POV axis
-        Vector3f xAxis = new Vector3f(1,0,0);
-        Vector3f yAxis = new Vector3f(0,1,0);
-        Vector3f zAxis = new Vector3f(0,0,1);
-
-        //quaternions to get to current rot
-        Quaternionf current = new Quaternionf(new AxisAngle4f(this.getRotation().x, xAxis));
-        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRotation().y, yAxis));
-        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRotation().z, zAxis));
-        current.mul(curY).mul(curZ);
-
-        // generate rotated object axis'
-        current.transform(xAxis);
-        current.transform(yAxis);
-        current.transform(zAxis);
-
-        Quaternionf xq = new Quaternionf(new AxisAngle4f(rot.x, xAxis));
-        Quaternionf yq = new Quaternionf(new AxisAngle4f(rot.y, yAxis));
-        Quaternionf zq = new Quaternionf(new AxisAngle4f(rot.z, zAxis));
-
-        // get rotation on world axis for setRotation
-        xq.mul(yq).mul(zq);
+        Quaternionf rotation = new Quaternionf().rotationXYZ(rot.x, rot.y, rot.z);
 
         Quaternionf rotQuaternion = new Quaternionf();
-        xq.get(rotQuaternion);
+        rotation.get(rotQuaternion);
 
-        //combine
-        xq.mul(current);
+        //rotate
+        rotate(rotation);
 
-        rotation = Utils.getEulerAngles(xq);//set item rot
         return rotQuaternion;
     }
 
+    public void rotate(Quaternionf rotation){
+        this.rotation.mul(rotation);
+    }
+
     public void setRotationEuclidean(Vector3f euclideanRot) {
-        euclideanRot.sub(rotation);
-        rotateEuclidean(euclideanRot);
+        rotation.rotationXYZ(euclideanRot.x, euclideanRot.y, euclideanRot.z);
     }
 }

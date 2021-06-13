@@ -22,7 +22,7 @@ public class AABB implements BoundingBox {
 
         //transform vertices according to gameItem state
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotateXYZ(collider.getRotation());
+        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotate(collider.getRotation());
 
         for (Vector3f v : vertices){
             Vector4f tv = new Vector4f(v.x, v.y, v.z, 1);
@@ -81,7 +81,7 @@ public class AABB implements BoundingBox {
         ArrayList<Vector3f> tvertices = new ArrayList<>();
 
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotateXYZ(collider.getRotation());
+        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotate(collider.getRotation());
 
         for (Vector3f v : vertices){
             Vector4f tv = new Vector4f(v.x, v.y, v.z, 1);
