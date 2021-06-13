@@ -6,6 +6,7 @@ import net.sknv.engine.graph.ShaderProgram;
 import net.sknv.engine.graph.WebColor;
 import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.colliders.OBB;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -17,21 +18,50 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class Collider extends Phantom {
 
-    protected transient BoundingBox boundingBox;
-    protected boolean movable;
-    protected float mass;
-    protected Vector3f velocity;
-    protected transient Vector3f forces;
+    //computed
+    protected Vector3f force, toque;
 
+    //constant vars
+    protected Matrix3f IBody, IBodyInv; //momento inercia
+    protected float mass;
+
+    //state vars
+    protected Matrix3f R;//rotation
+    protected Vector3f P, L;//linear and angular momentum
+
+    //derived
+    //protected Matrix3f IInv;//inertia inverter matrix ??
+    //protected Vector3f v, w;//linear and angular velocity
+    protected Vector3f velocity;
+
+    //other
     private WebColor showBB = null;
+    protected transient BoundingBox boundingBox;
+    protected boolean isStatic;
 
     public Collider(Mesh mesh) {
         super(mesh);
         boundingBox = new OBB(this);
-        velocity = new Vector3f(0, 0, 0);
-        forces = new Vector3f(0, 0, 0);
-        movable = false;
+        isStatic = false;
         mass = 1;
+        //IBody = ?;
+        //IBody.invert(IBodyInv);
+    }
+
+    public Vector3f getLinearMomentum(){
+        return P;
+    }
+
+    public Vector3f getAngularMomentum(){
+        return L;
+    }
+
+    public Matrix3f getR(){
+        return R;
+    }
+
+    public Vector3f getVelocity(){
+        return velocity;
     }
 
     @Override
@@ -60,21 +90,18 @@ public class Collider extends Phantom {
         setBoundingBox(new OBB(this));
     }
 
-    public void applyForce(Vector3f force) {
-        forces.add(force);
-    }
     public void setBoundingBox(BoundingBox boundingBox) {
         this.boundingBox = boundingBox;
     }
-    public Vector3f getVelocity() {
-        return velocity;
-    }
+
     public BoundingBox getBoundingBox() {
         return boundingBox;
     }
-    public boolean isMovable() {
-        return movable;
+
+    public boolean isStatic() {
+        return isStatic;
     }
+
     public float getMass() {
         return mass;
     }

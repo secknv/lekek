@@ -40,7 +40,7 @@ public class Scene implements Serializable {
         logger.info("Initializing default scene.");
         initializeScene();
     }
-    // todo: getColliders
+
     public void save(String sceneName){
         try {
             FileOutputStream fileOut = new FileOutputStream("src/main/resources/scenes/" + sceneName + ".ser");

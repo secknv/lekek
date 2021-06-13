@@ -75,7 +75,7 @@ public class PhysicsEngine {
 
         Set<BoundingBox> staticItems = new HashSet<>();
         for(BoundingBox bb : bbx) { //define possible step and remove components from intersect
-            if (!bb.getCollider().isMovable()) {
+            if (!bb.getCollider().isStatic()) {
                 //static collider
                 staticItems.add(bb);
                 Set<BoundingBox> colX = null, colY = null, colZ = null;
