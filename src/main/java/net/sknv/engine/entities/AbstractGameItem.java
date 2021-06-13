@@ -98,14 +98,9 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
      * */
     public Quaternionf rotateEuclidean(Vector3f rot) {
         Quaternionf rotation = new Quaternionf().rotationXYZ(rot.x, rot.y, rot.z);
-
-        Quaternionf rotQuaternion = new Quaternionf();
-        rotation.get(rotQuaternion);
-
-        //rotate
         rotate(rotation);
 
-        return rotQuaternion;
+        return rotation;
     }
 
     public void rotate(Quaternionf rotation){
