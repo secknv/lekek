@@ -90,17 +90,8 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
                 '}';
     }
 
-    /*
-     * // todo: this is probably spaghet but ok
-     * The idea here is to have Collider override this method, call super and add the BB rotation line.
-     * BUT `this.boundingBox.rotate(rotQuaternion);` <- requires rotQuaternion
-     * SO we make this method return that
-     * */
-    public Quaternionf rotateEuclidean(Vector3f rot) {
-        Quaternionf rotation = new Quaternionf().rotationXYZ(rot.x, rot.y, rot.z);
-        rotate(rotation);
-
-        return rotation;
+    public void rotateEuclidean(Vector3f rot) {
+        rotate(new Quaternionf().rotationXYZ(rot.x, rot.y, rot.z));
     }
 
     public void rotate(Quaternionf rotation){
@@ -108,6 +99,6 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     }
 
     public void setRotationEuclidean(Vector3f euclideanRot) {
-        rotation.rotationXYZ(euclideanRot.x, euclideanRot.y, euclideanRot.z);
+        this.rotation.rotationXYZ(euclideanRot.x, euclideanRot.y, euclideanRot.z);
     }
 }

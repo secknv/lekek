@@ -66,10 +66,9 @@ public class Collider extends Phantom {
     }
 
     @Override
-    public Quaternionf rotateEuclidean(Vector3f rot) {
-        Quaternionf rotQuaternion = super.rotateEuclidean(rot);
-        this.boundingBox.rotate(rotQuaternion);//set bb rot
-        return rotQuaternion;
+    public void rotate(Quaternionf rotation) {
+        super.rotate(rotation);
+        this.boundingBox.rotate(rotation);
     }
 
     private void readObject(ObjectInputStream inputStream) throws Exception {
