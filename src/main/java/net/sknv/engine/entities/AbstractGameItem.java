@@ -15,7 +15,6 @@ import java.io.Serializable;
 public abstract class AbstractGameItem implements IRenderable, Serializable {
 
     protected Vector3f position;
-    //protected Vector3f rotation;
     protected Quaternionf rotation;
     protected float scale;
 
@@ -25,7 +24,6 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
         // but spaghet
         // todo: fix AbsGameItem should always construct with a mesh
         position = new Vector3f(0, 0, 0);
-        //rotation = new Vector3f(0, 0, 0);
         rotation = new Quaternionf();
         scale = 1;
     }
@@ -43,13 +41,9 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     public Vector3f getPosition() {
         return position;
     }
-//    public Vector3f getRotation() {
-//        return rotation;
-//    }
     public Quaternionf getRotation() {
         return rotation;
     }
-
     public float getScale() {
         return scale;
     }
@@ -63,16 +57,9 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     public void setPosition(Vector3f position){
         this.position = position;
     }
-//    public void setRotation(float x, float y, float z) {
-//        setRotation(new Vector3f(x,y,z));
-//    }
-//    public void setRotation(Vector3f rotation){
-//        this.rotation = rotation;
-//    }
     public void setRotation(Quaternionf rotation){
         this.rotation = rotation;
     }
-
     public void setScale(float scale) {
         this.scale = scale;
     }
@@ -80,14 +67,8 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
         this.mesh = mesh;
     }
 
-    @Override
-    public String toString() {
-        return "AbstractGameItem{" +
-                "position=" + position +
-                ", rotation=" + rotation +
-                ", scale=" + scale +
-                ", mesh=" + mesh +
-                '}';
+    public void setRotationEuclidean(Vector3f euclideanRot) {
+        this.rotation.rotationXYZ(euclideanRot.x, euclideanRot.y, euclideanRot.z);
     }
 
     public void rotateEuclidean(Vector3f rot) {
@@ -98,7 +79,13 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
         this.rotation.mul(rotation);
     }
 
-    public void setRotationEuclidean(Vector3f euclideanRot) {
-        this.rotation.rotationXYZ(euclideanRot.x, euclideanRot.y, euclideanRot.z);
+    @Override
+    public String toString() {
+        return "AbstractGameItem{" +
+                "position=" + position +
+                ", rotation=" + rotation +
+                ", scale=" + scale +
+                ", mesh=" + mesh +
+                '}';
     }
 }
