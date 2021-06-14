@@ -58,7 +58,7 @@ public class AABB implements BoundingBox {
     }
 
     @Override
-    public void rotate(Quaternionf rot) {
+    public void rotate(Quaternionf rot) {//todo second hand spaghet? maybe
         //calculate new AABB
         ArrayList<Vector3f> vertices = collider.getMesh().getVertices();
         ArrayList<Vector3f> tvertices = new ArrayList<>();
@@ -84,11 +84,6 @@ public class AABB implements BoundingBox {
             if (v.y > max.getY()) max.setY(v.y);
             if (v.z > max.getZ()) max.setZ(v.z);
         }
-    }
-
-    @Override //todo: spaghet
-    public void setRotation(Quaternionf rot) {
-        rotate(rot);
     }
 
     @Override

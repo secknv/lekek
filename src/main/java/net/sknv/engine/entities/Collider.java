@@ -73,14 +73,9 @@ public class Collider extends Phantom {
 
     @Override
     public void setRotationEuclidean(Vector3f euclideanRot) {
-        //todo spaghet + find why no work
-//        Quaternionf toRotate = new Quaternionf();
-//        getRotation().difference(new Quaternionf().rotateXYZ(euclideanRot.x, euclideanRot.y, euclideanRot.z),toRotate);
-//
-//        rotate(toRotate); why this no work tho? rotates mesh but not box properly
-
-        super.setRotationEuclidean(euclideanRot);
-        this.boundingBox.setRotation(new Quaternionf().rotationXYZ(euclideanRot.x,euclideanRot.y,euclideanRot.z));
+        Quaternionf toRotate = new Quaternionf();
+        getRotation().difference(new Quaternionf().rotateXYZ(euclideanRot.x, euclideanRot.y, euclideanRot.z),toRotate);
+        rotate(toRotate);
     }
 
     private void readObject(ObjectInputStream inputStream) throws Exception {

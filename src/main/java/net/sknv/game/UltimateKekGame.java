@@ -332,6 +332,9 @@ public class UltimateKekGame implements IGameLogic {
             case "removeitem":
                 scene.removeItem(selectedItem);
                 break;
+            case "rotateitem":
+                if(in.length==4) selectedItem.rotateEuclidean(new Vector3f(Float.parseFloat(in[1]), Float.parseFloat(in[2]), Float.parseFloat(in[3])));
+                break;
             case "additem":
                 try {
                     String model = in[1];

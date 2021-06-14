@@ -11,7 +11,32 @@ public class OBB extends AABB implements BoundingBox {
 
     public OBB(Collider collider) {
         super(collider);
-        calculate();
+
+        Vector3f min = collider.getMesh().getMin();
+        Vector3f max = collider.getMesh().getMax();
+        this.x = new Vector3f(Math.abs(max.x - min.x)/2,0,0);
+        this.y = new Vector3f(0,Math.abs(max.y - min.y)/2,0);
+        this.z = new Vector3f(0,0,Math.abs(max.z - min.z)/2);
+        this.center = new Vector3f(min.x + x.x, min.y + y.y, min.z + z.z);
+
+        Vector4f tc = new Vector4f(center.x, center.y, center.z, 1);
+        Vector4f tx = new Vector4f(x.x, x.y, x.z,1);
+        Vector4f ty = new Vector4f(y.x, y.y, y.z,1);
+        Vector4f tz = new Vector4f(z.x, z.y, z.z,1);
+
+        Matrix4f modelViewMatrix = new Matrix4f();
+        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotate(collider.getRotation());
+        modelViewMatrix.transform(tc);
+
+        modelViewMatrix.identity().rotate(collider.getRotation()).scale(collider.getScale());
+        modelViewMatrix.transform(tx);
+        modelViewMatrix.transform(ty);
+        modelViewMatrix.transform(tz);
+
+        this.x = new Vector3f(tx.x, tx.y, tx.z);
+        this.y = new Vector3f(ty.x, ty.y, ty.z);
+        this.z = new Vector3f(tz.x, tz.y, tz.z);
+        this.center = new Vector3f(tc.x, tc.y, tc.z);
     }
 
     @Override
@@ -45,47 +70,15 @@ public class OBB extends AABB implements BoundingBox {
         Quaternionf qy = new Quaternionf(new AxisAngle4f(rotation.y, myY));
         Quaternionf qz = new Quaternionf(new AxisAngle4f(rotation.z, myZ));
 
-        d.rotate(qx).rotate(qy).rotate(qz);
+        Quaternionf finalRot = new Quaternionf().mul(qx).mul(qy).mul(qz);
+
+        d.rotate(finalRot);
 
         this.center = new Vector3f(collider.getPosition().x + d.x, collider.getPosition().y + d.y, collider.getPosition().z + d.z);
 
-        this.x.rotate(qx).rotate(qy).rotate(qz);
-        this.y.rotate(qx).rotate(qy).rotate(qz);
-        this.z.rotate(qx).rotate(qy).rotate(qz);
-    }
-
-    @Override //todo surely spaghet unless there isnt a way to calculate bb from rot
-    public void setRotation(Quaternionf rot) {
-        super.setRotation(rot);
-        calculate();
-    }
-
-    private void calculate() {
-        Vector3f min = collider.getMesh().getMin();
-        Vector3f max = collider.getMesh().getMax();
-        this.x = new Vector3f(Math.abs(max.x - min.x)/2,0,0);
-        this.y = new Vector3f(0,Math.abs(max.y - min.y)/2,0);
-        this.z = new Vector3f(0,0,Math.abs(max.z - min.z)/2);
-        this.center = new Vector3f(min.x + x.x, min.y + y.y, min.z + z.z);
-
-        Vector4f tc = new Vector4f(center.x, center.y, center.z, 1);
-        Vector4f tx = new Vector4f(x.x, x.y, x.z,1);
-        Vector4f ty = new Vector4f(y.x, y.y, y.z,1);
-        Vector4f tz = new Vector4f(z.x, z.y, z.z,1);
-
-        Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotate(collider.getRotation());
-        modelViewMatrix.transform(tc);
-
-        modelViewMatrix.identity().rotate(collider.getRotation()).scale(collider.getScale());
-        modelViewMatrix.transform(tx);
-        modelViewMatrix.transform(ty);
-        modelViewMatrix.transform(tz);
-
-        this.x = new Vector3f(tx.x, tx.y, tx.z);
-        this.y = new Vector3f(ty.x, ty.y, ty.z);
-        this.z = new Vector3f(tz.x, tz.y, tz.z);
-        this.center = new Vector3f(tc.x, tc.y, tc.z);
+        this.x.rotate(finalRot);
+        this.y.rotate(finalRot);
+        this.z.rotate(finalRot);
     }
 
     public Vector3f getCenter() {
