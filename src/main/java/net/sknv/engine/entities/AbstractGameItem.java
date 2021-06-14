@@ -33,9 +33,7 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     }
 
     public void translate(Vector3f step) {
-        this.position.x += step.x;
-        this.position.y += step.y;
-        this.position.z += step.z;
+        this.position.add(step);
     }
 
     public Vector3f getPosition() {
