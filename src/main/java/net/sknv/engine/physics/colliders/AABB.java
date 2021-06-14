@@ -86,6 +86,11 @@ public class AABB implements BoundingBox {
         }
     }
 
+    @Override //todo: spaghet
+    public void setRotation(Quaternionf rot) {
+        rotate(rot);
+    }
+
     @Override
     public Collider getCollider() {
         return collider;
