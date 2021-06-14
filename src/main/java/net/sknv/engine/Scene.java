@@ -109,8 +109,7 @@ public class Scene implements Serializable {
             OBB testBox = new OBB(kekItem);
             kekItem.setBoundingBox(testBox);
 
-            ArrayList<Collider> colliders = new ArrayList<>(Arrays.asList(kekItem, block));
-            addColliders(colliders);
+            addColliders(Arrays.asList(kekItem, block));
             addAllGameItems(colliders);
         }
         catch (Exception e) {
