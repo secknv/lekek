@@ -74,7 +74,7 @@ public class OBB extends AABB implements BoundingBox {
 
         d.rotate(finalRot);
 
-        this.center = new Vector3f(collider.getPosition().x + d.x, collider.getPosition().y + d.y, collider.getPosition().z + d.z);
+        collider.getPosition().add(d, center);
 
         this.x.rotate(finalRot);
         this.y.rotate(finalRot);
