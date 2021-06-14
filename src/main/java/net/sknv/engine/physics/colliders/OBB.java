@@ -47,6 +47,7 @@ public class OBB extends AABB implements BoundingBox {
 
     @Override
     public void rotate(Quaternionf rot){
+        super.rotate(rot);
         Matrix3f rotAsMat = new Matrix3f();
         rot.get(rotAsMat);
 
