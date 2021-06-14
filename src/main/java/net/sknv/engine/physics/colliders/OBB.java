@@ -25,10 +25,10 @@ public class OBB extends AABB implements BoundingBox {
         Vector4f tz = new Vector4f(z.x, z.y, z.z,1);
 
         Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotateXYZ(collider.getRotation());
+        modelViewMatrix.identity().translate(collider.getPosition()).scale(collider.getScale()).rotate(collider.getRotation());
         modelViewMatrix.transform(tc);
 
-        modelViewMatrix.identity().rotateXYZ(collider.getRotation()).scale(collider.getScale());
+        modelViewMatrix.identity().rotate(collider.getRotation()).scale(collider.getScale());
         modelViewMatrix.transform(tx);
         modelViewMatrix.transform(ty);
         modelViewMatrix.transform(tz);
@@ -48,15 +48,22 @@ public class OBB extends AABB implements BoundingBox {
     @Override
     public void rotate(Quaternionf rot){
         super.rotate(rot);
+
         Vector3f d = new Vector3f();
         center.sub(collider.getPosition(),d);
-        d.rotate(rot);
 
-        this.center = new Vector3f(collider.getPosition().x + d.x, collider.getPosition().y + d.y, collider.getPosition().z + d.z);
+        Quaternionf finalRot = new Quaternionf();
+        Quaternionf inv = new Quaternionf();
+        collider.getRotation().invert(inv);
+        finalRot.mul(collider.getRotation()).mul(rot).mul(inv);
 
-        this.x.rotate(rot);
-        this.y.rotate(rot);
-        this.z.rotate(rot);
+        d.rotate(finalRot);
+
+        collider.getPosition().add(d, center);
+
+        this.x.rotate(finalRot);
+        this.y.rotate(finalRot);
+        this.z.rotate(finalRot);
     }
 
     public Vector3f getCenter() {

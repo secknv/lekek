@@ -36,6 +36,7 @@ wow such gradle many amaze
 
 `arrow keys` to move selected item
 `x y z` to rotate selected item
+`j` to rotate selected item in world Y axis
 
 press power button to paint screen black
 

@@ -7,6 +7,7 @@ import net.sknv.engine.physics.colliders.BoundingBox;
 import net.sknv.engine.physics.collisionDetection.SPCollision;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ public class PhysicsEngine {
     }
 
     public void simulate(Scene scene){
+        ArrayList<Collider> colliders = scene.getColliders();
         //applyForces(scene);
         //update();
         //detectCollisions(gameItems);
@@ -73,7 +75,7 @@ public class PhysicsEngine {
 
         Set<BoundingBox> staticItems = new HashSet<>();
         for(BoundingBox bb : bbx) { //define possible step and remove components from intersect
-            if (!bb.getCollider().isMovable()) {
+            if (!bb.getCollider().isStatic()) {
                 //static collider
                 staticItems.add(bb);
                 Set<BoundingBox> colX = null, colY = null, colZ = null;

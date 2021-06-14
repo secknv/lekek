@@ -1,10 +1,8 @@
 package net.sknv.engine.entities;
 
-import net.sknv.engine.Utils;
 import net.sknv.engine.graph.IRenderable;
 import net.sknv.engine.graph.Mesh;
 import net.sknv.engine.graph.ShaderProgram;
-import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -17,7 +15,7 @@ import java.io.Serializable;
 public abstract class AbstractGameItem implements IRenderable, Serializable {
 
     protected Vector3f position;
-    protected Vector3f rotation;
+    protected Quaternionf rotation;
     protected float scale;
 
     protected Mesh mesh;
@@ -26,7 +24,7 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
         // but spaghet
         // todo: fix AbsGameItem should always construct with a mesh
         position = new Vector3f(0, 0, 0);
-        rotation = new Vector3f(0, 0, 0);
+        rotation = new Quaternionf();
         scale = 1;
     }
     public AbstractGameItem(Mesh mesh) {
@@ -35,15 +33,13 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     }
 
     public void translate(Vector3f step) {
-        this.position.x += step.x;
-        this.position.y += step.y;
-        this.position.z += step.z;
+        this.position.add(step);
     }
 
     public Vector3f getPosition() {
         return position;
     }
-    public Vector3f getRotation() {
+    public Quaternionf getRotation() {
         return rotation;
     }
     public float getScale() {
@@ -59,17 +55,59 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     public void setPosition(Vector3f position){
         this.position = position;
     }
-    public void setRotation(float x, float y, float z) {
-        setRotation(new Vector3f(x,y,z));
-    }
-    public void setRotation(Vector3f rotation){
-        this.rotation = rotation;
-    }
+
+
     public void setScale(float scale) {
         this.scale = scale;
     }
     public void setMesh(Mesh mesh) {
         this.mesh = mesh;
+    }
+
+    /**
+     * Rotates object *to* the specified Euler Angles.
+     * @param eulerAngle Euler Angles representing the *final state* of the object in reference to the world axis.
+     */
+    public void setRotationEuclidean(Vector3f eulerAngle) {
+        setRotation(new Quaternionf().rotationXYZ(eulerAngle.x, eulerAngle.y, eulerAngle.z));
+    }
+    /**
+     * Rotates object *to* the specified Quaternion.
+     * @param rotation A Quaternion representing the *final state* of the object in reference to the world axis.
+     */
+    public void setRotation(Quaternionf rotation){
+        this.rotation = rotation;
+    }
+
+    /**
+     * Rotates object *by* the specified Euler Angles.
+     * @param eulerAngle Euler Angles representing the rotation increment.
+     */
+    public void rotateEuclidean(Vector3f eulerAngle) {
+        rotate(new Quaternionf().rotationXYZ(eulerAngle.x, eulerAngle.y, eulerAngle.z));
+    }
+    /**
+     * Rotates object *by* the specified rotation.
+     * @param rotation A Quaternion representing the rotation increment.
+     */
+    public void rotate(Quaternionf rotation){
+        this.rotation.mul(rotation);
+    }
+
+    /**
+     * Rotates object *by* the specified Euler Angle in the *World Axis*.
+     * @param eulerAngle Euler Angles representing the rotation increment in reference to the *World Axis*
+     */
+    public void rotateWorldEuclidean(Vector3f eulerAngle) {
+        rotateWorld(new Quaternionf().rotationXYZ(eulerAngle.x, eulerAngle.y, eulerAngle.z));
+    }
+    /**
+     * Rotates object *by* the specified rotation in the *World Axis*.
+     * @param rotation Quaternion representing the rotation increment in reference to the *World Axis*
+     */
+    public void rotateWorld(Quaternionf rotation) {
+        //resets rotation, applies global first, then local
+        setRotation(new Quaternionf().mul(rotation).mul(this.rotation));
     }
 
     @Override
@@ -80,50 +118,5 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
                 ", scale=" + scale +
                 ", mesh=" + mesh +
                 '}';
-    }
-
-    /*
-     * // todo: this is probably spaghet but ok
-     * The idea here is to have Collider override this method, call super and add the BB rotation line.
-     * BUT `this.boundingBox.rotate(rotQuaternion);` <- requires rotQuaternion
-     * SO we make this method return that
-     * */
-    public Quaternionf rotateEuclidean(Vector3f rot) {
-        // Object POV axis
-        Vector3f xAxis = new Vector3f(1,0,0);
-        Vector3f yAxis = new Vector3f(0,1,0);
-        Vector3f zAxis = new Vector3f(0,0,1);
-
-        //quaternions to get to current rot
-        Quaternionf current = new Quaternionf(new AxisAngle4f(this.getRotation().x, xAxis));
-        Quaternionf curY = new Quaternionf(new AxisAngle4f(this.getRotation().y, yAxis));
-        Quaternionf curZ = new Quaternionf(new AxisAngle4f(this.getRotation().z, zAxis));
-        current.mul(curY).mul(curZ);
-
-        // generate rotated object axis'
-        current.transform(xAxis);
-        current.transform(yAxis);
-        current.transform(zAxis);
-
-        Quaternionf xq = new Quaternionf(new AxisAngle4f(rot.x, xAxis));
-        Quaternionf yq = new Quaternionf(new AxisAngle4f(rot.y, yAxis));
-        Quaternionf zq = new Quaternionf(new AxisAngle4f(rot.z, zAxis));
-
-        // get rotation on world axis for setRotation
-        xq.mul(yq).mul(zq);
-
-        Quaternionf rotQuaternion = new Quaternionf();
-        xq.get(rotQuaternion);
-
-        //combine
-        xq.mul(current);
-
-        rotation = Utils.getEulerAngles(xq);//set item rot
-        return rotQuaternion;
-    }
-
-    public void setRotationEuclidean(Vector3f euclideanRot) {
-        euclideanRot.sub(rotation);
-        rotateEuclidean(euclideanRot);
     }
 }
