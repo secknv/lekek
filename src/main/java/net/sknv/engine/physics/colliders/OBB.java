@@ -47,16 +47,35 @@ public class OBB extends AABB implements BoundingBox {
 
     @Override
     public void rotate(Quaternionf rot){
-        super.rotate(rot);
+        Matrix3f rotAsMat = new Matrix3f();
+        rot.get(rotAsMat);
+
+        Vector3f myX = new Vector3f();
+        Vector3f myY = new Vector3f();
+        Vector3f myZ = new Vector3f();
+        Matrix3f rotAsMatrix = new Matrix3f();
+        collider.getRotation().get(rotAsMatrix);
+        rotAsMatrix.getColumn(0,myX);
+        rotAsMatrix.getColumn(1,myY);
+        rotAsMatrix.getColumn(2,myZ);
+
+        Vector3f rotation = new Vector3f();
+        rot.getEulerAnglesXYZ(rotation);
+
         Vector3f d = new Vector3f();
         center.sub(collider.getPosition(),d);
-        d.rotate(rot);
+
+        Quaternionf qx = new Quaternionf(new AxisAngle4f(rotation.x, myX));
+        Quaternionf qy = new Quaternionf(new AxisAngle4f(rotation.y, myY));
+        Quaternionf qz = new Quaternionf(new AxisAngle4f(rotation.z, myZ));
+
+        d.rotate(qx).rotate(qy).rotate(qz);
 
         this.center = new Vector3f(collider.getPosition().x + d.x, collider.getPosition().y + d.y, collider.getPosition().z + d.z);
 
-        this.x.rotate(rot);
-        this.y.rotate(rot);
-        this.z.rotate(rot);
+        this.x.rotate(qx).rotate(qy).rotate(qz);
+        this.y.rotate(qx).rotate(qy).rotate(qz);
+        this.z.rotate(qx).rotate(qy).rotate(qz);
     }
 
     public Vector3f getCenter() {
