@@ -55,9 +55,8 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
     public void setPosition(Vector3f position){
         this.position = position;
     }
-    public void setRotation(Quaternionf rotation){
-        this.rotation = rotation;
-    }
+
+
     public void setScale(float scale) {
         this.scale = scale;
     }
@@ -65,16 +64,50 @@ public abstract class AbstractGameItem implements IRenderable, Serializable {
         this.mesh = mesh;
     }
 
-    public void setRotationEuclidean(Vector3f euclideanRot) {
-        this.rotation.rotationXYZ(euclideanRot.x, euclideanRot.y, euclideanRot.z);
+    /**
+     * Rotates object *to* the specified Euler Angles.
+     * @param eulerAngle Euler Angles representing the *final state* of the object in reference to the world axis.
+     */
+    public void setRotationEuclidean(Vector3f eulerAngle) {
+        setRotation(new Quaternionf().rotationXYZ(eulerAngle.x, eulerAngle.y, eulerAngle.z));
+    }
+    /**
+     * Rotates object *to* the specified Quaternion.
+     * @param rotation A Quaternion representing the *final state* of the object in reference to the world axis.
+     */
+    public void setRotation(Quaternionf rotation){
+        this.rotation = rotation;
     }
 
-    public void rotateEuclidean(Vector3f rot) {
-        rotate(new Quaternionf().rotationXYZ(rot.x, rot.y, rot.z));
+    /**
+     * Rotates object *by* the specified Euler Angles.
+     * @param eulerAngle Euler Angles representing the rotation increment.
+     */
+    public void rotateEuclidean(Vector3f eulerAngle) {
+        rotate(new Quaternionf().rotationXYZ(eulerAngle.x, eulerAngle.y, eulerAngle.z));
     }
-
+    /**
+     * Rotates object *by* the specified rotation.
+     * @param rotation A Quaternion representing the rotation increment.
+     */
     public void rotate(Quaternionf rotation){
         this.rotation.mul(rotation);
+    }
+
+    /**
+     * Rotates object *by* the specified Euler Angle in the *World Axis*.
+     * @param eulerAngle Euler Angles representing the rotation increment in reference to the *World Axis*
+     */
+    public void rotateWorldEuclidean(Vector3f eulerAngle) {
+        rotateWorld(new Quaternionf().rotationXYZ(eulerAngle.x, eulerAngle.y, eulerAngle.z));
+    }
+    /**
+     * Rotates object *by* the specified rotation in the *World Axis*.
+     * @param rotation Quaternion representing the rotation increment in reference to the *World Axis*
+     */
+    public void rotateWorld(Quaternionf rotation) {
+        //resets rotation, applies global first, then local
+        setRotation(new Quaternionf().mul(rotation).mul(this.rotation));
     }
 
     @Override

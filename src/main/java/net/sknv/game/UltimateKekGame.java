@@ -162,6 +162,7 @@ public class UltimateKekGame implements IGameLogic {
                 if (window.isKeyPressed(GLFW_KEY_Z))
                     selectedItem.rotateEuclidean(new Vector3f(0, 0, (float) (-Math.PI / 200)));
                 if (window.isKeyPressed(GLFW_KEY_K)) selectedItem.setRotationEuclidean(new Vector3f());
+                if (window.isKeyPressed(GLFW_KEY_J)) selectedItem.rotateWorldEuclidean(new Vector3f(0, (float)Math.PI/200, 0));
             }
         }
 

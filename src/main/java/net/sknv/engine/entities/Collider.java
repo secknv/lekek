@@ -66,16 +66,19 @@ public class Collider extends Phantom {
     }
 
     @Override
-    public void rotate(Quaternionf rotation) {
-        super.rotate(rotation);
-        this.boundingBox.rotate(rotation);
+    public void setRotation(Quaternionf rotation) {
+        // calculates diff
+        Quaternionf diff = new Quaternionf(getRotation());
+        diff.difference(rotation);
+        this.boundingBox.rotate(diff);
+
+        super.setRotation(rotation);
     }
 
     @Override
-    public void setRotationEuclidean(Vector3f euclideanRot) {
-        Quaternionf toRotate = new Quaternionf();
-        getRotation().difference(new Quaternionf().rotateXYZ(euclideanRot.x, euclideanRot.y, euclideanRot.z),toRotate);
-        rotate(toRotate);
+    public void rotate(Quaternionf rotation) {
+        super.rotate(rotation);
+        this.boundingBox.rotate(rotation);
     }
 
     private void readObject(ObjectInputStream inputStream) throws Exception {
