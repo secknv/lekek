@@ -46,31 +46,16 @@ public class OBB extends AABB implements BoundingBox {
     }
 
     @Override
-    public void rotate(Quaternionf rot){//todo redundancy spaghetti?
+    public void rotate(Quaternionf rot){
         super.rotate(rot);
-        Matrix3f rotAsMat = new Matrix3f();
-        rot.get(rotAsMat);
-
-        Vector3f myX = new Vector3f();
-        Vector3f myY = new Vector3f();
-        Vector3f myZ = new Vector3f();
-        Matrix3f rotAsMatrix = new Matrix3f();
-        collider.getRotation().get(rotAsMatrix);
-        rotAsMatrix.getColumn(0,myX);
-        rotAsMatrix.getColumn(1,myY);
-        rotAsMatrix.getColumn(2,myZ);
-
-        Vector3f rotation = new Vector3f();
-        rot.getEulerAnglesXYZ(rotation);
 
         Vector3f d = new Vector3f();
         center.sub(collider.getPosition(),d);
 
-        Quaternionf qx = new Quaternionf(new AxisAngle4f(rotation.x, myX));
-        Quaternionf qy = new Quaternionf(new AxisAngle4f(rotation.y, myY));
-        Quaternionf qz = new Quaternionf(new AxisAngle4f(rotation.z, myZ));
-
-        Quaternionf finalRot = new Quaternionf().mul(qx).mul(qy).mul(qz);
+        Quaternionf finalRot = new Quaternionf();
+        Quaternionf inv = new Quaternionf();
+        collider.getRotation().invert(inv);
+        finalRot.mul(collider.getRotation()).mul(rot).mul(inv);
 
         d.rotate(finalRot);
 
