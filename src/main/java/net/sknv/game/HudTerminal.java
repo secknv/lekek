@@ -9,8 +9,8 @@ public class HudTerminal {
     private TextItem terminalText;
     private String stored = "";
     private String suggestion = "";
-    private static final int HISTORY_SIZE = 100;
     private LinkedList<String> history = new LinkedList();
+    private int historyIndex = -1;
 
     public HudTerminal(TextItem terminalText) {
         this.terminalText = terminalText;
@@ -42,7 +42,7 @@ public class HudTerminal {
 
     public String enter() {
         history.push(getText());
-        if(history.size()>HISTORY_SIZE) history.removeLast();
+        historyIndex = -1;
 
         String enter = getText().substring(1);
         stored = "";
@@ -63,18 +63,16 @@ public class HudTerminal {
     }
 
     public void previous() {
-        if(history.peek()!=null){
-            while (history.peek().equals(getText())) history.add(history.removeFirst());
-            setText(history.peek());
-            history.add(history.removeFirst());
+        if(history.size()>0){
+            if(++historyIndex>history.size()-1) historyIndex=history.size()-1;
+            setText(history.get(historyIndex));
         }
     }
 
     public void recent() {
-        if(history.peek()!=null){
-            while (history.peekLast().equals(getText())) history.push(history.removeLast());
-            setText(history.peekLast());
-            history.push(history.removeLast());
+        if(history.size()>0){
+            if(--historyIndex<0) historyIndex=0;
+            setText(history.get(historyIndex));
         }
     }
 
