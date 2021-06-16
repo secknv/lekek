@@ -267,6 +267,7 @@ public class UltimateKekGame implements IGameLogic {
                 }
                 else if (key == 259) hud.getTerminal().backspace();
                 else if (key == 265) hud.getTerminal().previous();
+                else if (key == 264) hud.getTerminal().recent();
             }
 
             if (key == GLFW_KEY_P && action == GLFW_PRESS && !usingTerminal) {
@@ -313,9 +314,6 @@ public class UltimateKekGame implements IGameLogic {
         String[] in = input.split(" ");
 
         switch (in[0]){
-            case "test":
-                System.out.println("its working :)");
-                break;
             case "savescene":
                 String sceneName;
                 if(in.length>1) sceneName = in[1]; else sceneName = "unnamed";
