@@ -11,6 +11,7 @@ import net.sknv.engine.graph.*;
 import net.sknv.engine.physics.PhysicsEngine;
 import net.sknv.engine.physics.colliders.OBB;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -52,7 +53,7 @@ public class UltimateKekGame implements IGameLogic {
 
     public UltimateKekGame() {
         renderer = new Renderer();
-        camera = new Camera(new Vector3f(), new Vector3f());
+        camera = new Camera(new Vector3f(), new Quaternionf());
         cameraPosInc = new Vector3f();
         cameraRotInc = new Vector3f();
     }
@@ -266,6 +267,7 @@ public class UltimateKekGame implements IGameLogic {
                 }
                 else if (key == 259) hud.getTerminal().backspace();
                 else if (key == 265) hud.getTerminal().previous();
+                else if (key == 264) hud.getTerminal().recent();
             }
 
             if (key == GLFW_KEY_P && action == GLFW_PRESS && !usingTerminal) {
@@ -312,9 +314,6 @@ public class UltimateKekGame implements IGameLogic {
         String[] in = input.split(" ");
 
         switch (in[0]){
-            case "test":
-                System.out.println("its working :)");
-                break;
             case "savescene":
                 String sceneName;
                 if(in.length>1) sceneName = in[1]; else sceneName = "unnamed";
