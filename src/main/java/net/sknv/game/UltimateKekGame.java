@@ -14,14 +14,16 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.stb.STBTTBakedChar;
 
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.round;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 
 public class UltimateKekGame implements IGameLogic {
 
@@ -47,6 +49,8 @@ public class UltimateKekGame implements IGameLogic {
     private Scene scene;
     private Hud hud;
 
+    private TrueType font;
+
     //collisions stuff
     private PhysicsEngine physicsEngine;
     public Collider selectedItem;
@@ -60,9 +64,13 @@ public class UltimateKekGame implements IGameLogic {
 
     @Override
     public void init(Window window, MouseInput mouseInput) throws Exception {
+        //todo: spaghet
+        font = new TrueType(window.getWindowHandle());
 
         renderer.init();
         setKeyCallbacks(window, mouseInput);
+        //fontstuff
+        glfwSetWindowSizeCallback(window.getWindowHandle(), font::windowSizeChanged);
 
         initScene("default");
 
@@ -236,6 +244,27 @@ public class UltimateKekGame implements IGameLogic {
     @Override
     public void render() {
         renderer.render(projectionMatrix, viewMatrix, ortho, scene, hud);
+        //todo: super spaghet, hard code
+        int BITMAP_W = round(165 * font.getContentScaleX());
+        int BITMAP_H = round(165 * font.getContentScaleY());
+
+        STBTTBakedChar.Buffer cdata = font.init(BITMAP_W, BITMAP_H);
+
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            float scaleFactor = 1.0f + font.getScale() * 0.25f;
+
+            glPushMatrix();
+            // Zoom
+            glScalef(scaleFactor, scaleFactor, 1f);
+            // Scroll
+            glTranslatef(4.0f, font.getFontHeight() * 0.5f + 4.0f - font.getLineOffset() * font.getFontHeight(), 0f);
+
+            font.renderText(cdata, BITMAP_W, BITMAP_H);
+
+            glPopMatrix();
+
+        //cdata.free(); on cleanup
     }
 
     @Override

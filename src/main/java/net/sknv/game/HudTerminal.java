@@ -2,6 +2,7 @@ package net.sknv.game;
 
 import net.sknv.engine.entities.TextItem;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class HudTerminal {
@@ -30,12 +31,14 @@ public class HudTerminal {
 
     public void addText(String toAdd) {
         setText(getText().concat(toAdd));
+        suggestCompletion();
         stored = getText();
     }
 
     public void backspace() {
         if(getText().length()>1){
             setText(getText().substring(0,getText().length()-1));
+            suggestCompletion();
             stored = getText();
         }
     }
@@ -85,11 +88,14 @@ public class HudTerminal {
             String toMatch = parsed[parsed.length-1];
             System.out.println("expression to match ->" + toMatch);
 
+            ArrayList<String> suggestions = new ArrayList<>();
             for (Command c : Command.values()){
                 if(c.getCommandName().startsWith(toMatch)){
-                    suggestion = c.getCommandName().replaceFirst(toMatch, "");
+                    suggestions.add(c.getCommandName().replaceFirst(toMatch, ""));
                 }
             }
+
+            System.out.println("suggestions ->" + suggestions);
         }
     }
 }
