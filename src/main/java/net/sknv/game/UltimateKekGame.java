@@ -244,25 +244,30 @@ public class UltimateKekGame implements IGameLogic {
     @Override
     public void render() {
         renderer.render(projectionMatrix, viewMatrix, ortho, scene, hud);
+        System.out.println("caralho");
         //todo: super spaghet, hard code
-        int BITMAP_W = round(165 * font.getContentScaleX());
-        int BITMAP_H = round(165 * font.getContentScaleY());
+        int BITMAP_W = round(168 * font.getContentScaleX());
+        int BITMAP_H = round(168 * font.getContentScaleY());
 
         STBTTBakedChar.Buffer cdata = font.init(BITMAP_W, BITMAP_H);
+
+        System.out.println("caralho2");
 
             glClear(GL_COLOR_BUFFER_BIT);
 
             float scaleFactor = 1.0f + font.getScale() * 0.25f;
 
-            glPushMatrix();
+            //glPushMatrix();
             // Zoom
-            glScalef(scaleFactor, scaleFactor, 1f);
+            //glScalef(scaleFactor, scaleFactor, 1f);
             // Scroll
-            glTranslatef(4.0f, font.getFontHeight() * 0.5f + 4.0f - font.getLineOffset() * font.getFontHeight(), 0f);
+            //glTranslatef(4.0f, font.getFontHeight() * 0.5f + 4.0f - font.getLineOffset() * font.getFontHeight(), 0f);
 
             font.renderText(cdata, BITMAP_W, BITMAP_H);
 
-            glPopMatrix();
+        System.out.println("caralho3");
+
+            //glPopMatrix();
 
         //cdata.free(); on cleanup
     }

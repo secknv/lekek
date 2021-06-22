@@ -1,7 +1,7 @@
 package net.sknv.game;
 
+import net.sknv.engine.graph.Mesh;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.stb.STBTTFontinfo;
@@ -27,6 +27,7 @@ import static java.lang.Math.*;
 import static org.lwjgl.BufferUtils.createByteBuffer;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.stb.STBTruetype.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.memSlice;
@@ -53,11 +54,11 @@ public class TrueType {
     private float lineHeight;
 
     private boolean kerningEnabled = true;
-    private boolean lineBBEnabled;
+    private boolean lineBBEnabled = false;
 
     public TrueType(long window){
         try {//todo: hardcode
-            this.ttf = ioResourceToByteBuffer("fonts/Roboto-Regular.ttf", 165 * 1024);
+            this.ttf = ioResourceToByteBuffer("fonts/Roboto-Regular.ttf", 168 * 1024);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -138,7 +139,7 @@ public class TrueType {
             }
         } else {
             try (
-                    InputStream source = Hud.class.getClassLoader().getResourceAsStream(resource);
+                    InputStream source = TrueType.class.getClassLoader().getResourceAsStream(resource);
                     ReadableByteChannel rbc = Channels.newChannel(source)
             ) {
                 buffer = createByteBuffer(bufferSize);
@@ -168,7 +169,7 @@ public class TrueType {
 
     //todo: ?
     public STBTTBakedChar.Buffer init(int BITMAP_W, int BITMAP_H) {
-        int                   texID = GL13.glGenTextures();
+        int texID = glGenTextures();
         STBTTBakedChar.Buffer cdata = STBTTBakedChar.malloc(96);
 
         ByteBuffer bitmap = BufferUtils.createByteBuffer(BITMAP_W * BITMAP_H);
@@ -208,7 +209,7 @@ public class TrueType {
 
             float lineY = 0.0f;
 
-            glBegin(GL_QUADS);
+            //glBegin(GL_QUADS);
             for (int i = 0, to = text.length(); i < to; ) {
                 i += getCP(text, to, i, pCodePoint);
 
@@ -243,19 +244,29 @@ public class TrueType {
                         y0 = scale(lineY, q.y0(), factorY),
                         y1 = scale(lineY, q.y1(), factorY);
 
-                glTexCoord2f(q.s0(), q.t0());
-                glVertex2f(x0, y0);
 
-                glTexCoord2f(q.s1(), q.t0());
-                glVertex2f(x1, y0);
+                //attempt
+                Mesh myMesh = new Mesh(new float[]{x0,y0,0,x1,y0,0,x1,y1,0,x0,y1,0}, new float[]{q.s0(),q.t0(),q.s1(),q.t0(),q.s1(),q.t1(),q.s0(),q.t1()},new float[0],new int[]{0,1,2,2,3,1}, GL_TRIANGLES);
 
-                glTexCoord2f(q.s1(), q.t1());
-                glVertex2f(x1, y1);
+                glBindVertexArray(myMesh.getVaoId());
+                glDrawElements(GL_TRIANGLES,myMesh.getVertexCount(), GL_UNSIGNED_INT,0);
+                glBindVertexArray(0);
+                glBindTexture(GL_TEXTURE_2D, 0);
+                //
 
-                glTexCoord2f(q.s0(), q.t1());
-                glVertex2f(x0, y1);
+//                glTexCoord2f(q.s0(), q.t0());
+//                glVertex2f(x0, y0);
+//
+//                glTexCoord2f(q.s1(), q.t0());
+//                glVertex2f(x1, y0);
+//
+//                glTexCoord2f(q.s1(), q.t1());
+//                glVertex2f(x1, y1);
+//
+//                glTexCoord2f(q.s0(), q.t1());
+//                glVertex2f(x0, y1);
             }
-            glEnd();
+            //glEnd();
             if (isLineBBEnabled()) {
                 renderLineBB(lineStart, text.length(), lineY, scale);
             }
